@@ -33,11 +33,11 @@ This register is the sign off record for every component in packages/ui. It is t
 | UI10 | ZoneLabel | Primitive | Both | In review | 22 September 2026 | On target, Below target, Loss risk. Solid and quiet tones |
 | UI11 | InfoNote | Primitive | Both | In review | 22 September 2026 | Muted 12px note with info icon. Text comes from packages/content |
 | UI12 | StopLine | Primitive | Both | In review | 22 September 2026 | Three thicknesses. Decorative unless given a label |
-| UI13 | SheetFrame | Primitive | Both | Not started |  |  |
-| UI14 | TitleBlock | Primitive | Web | Not started |  |  |
-| UI15 | DetailLabel | Primitive | Both | Not started |  |  |
-| UI16 | LeaderLine | Primitive | Both | Not started |  |  |
-| UI17 | LineIcon | Primitive | Both | Not started |  |  |
+| UI13 | SheetFrame | Primitive | Both | In review | 22 September 2026 | Double inset cyan frame on a navy panel. Detail B01 |
+| UI14 | TitleBlock | Primitive | Web | In review | 22 September 2026 | Label and value cells as a description list. Detail B02 |
+| UI15 | DetailLabel | Primitive | Both | In review | 22 September 2026 | Navy tab label such as Detail A. Detail B03 |
+| UI16 | LeaderLine | Primitive | Both | In review | 22 September 2026 | Label, dotted leader and figure. Detail B05 |
+| UI17 | LineIcon | Primitive | Both | In review | 22 September 2026 | Twelve icons at 1.4px stroke in pen blue. Detail B07 |
 | UI18 | Wordmark | Primitive | Both | In review | 22 September 2026 | Three sizes, light and on navy |
 | UI19 | BidRail | Composite | Both | Not started |  |  |
 | UI20 | BidSlider | Composite | App | Not started |  |  |
