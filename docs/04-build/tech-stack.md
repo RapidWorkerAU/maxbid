@@ -33,7 +33,7 @@ Source: MaxBid Project Workbook, tab 15 Tech Stack.
 | Bundle budgets | size-limit and Next.js bundle analyzer in CI | Fails the build when a route grows past budget |  |
 | Installable web app | Web app manifest with Serwist service worker | Offline bid view and home screen install |  |
 | Agent rules | CLAUDE.md and AGENTS.md at repo root | Claude Code and Codex follow the same architecture rules |  |
-| Styling | Tailwind CSS v4 with CSS variable tokens and restyled shadcn/ui | One token set drives site and app, light and dark |  |
+| Styling | Tailwind CSS v4 with CSS variable tokens and restyled shadcn/ui | One token set drives site and app. Light theme only in V1 per decision record 0001 |  |
 | Marketing content | MDX in the repo for static pages, database driven pages for guides and breakdowns | Version controlled copy, programmatic scale | Sanity or Payload CMS later |
 | Social images | Next.js ImageResponse (Open Graph image generation) | Branded share cards per page |  |
 | Search tooling | Google Search Console, Bing Webmaster Tools, IndexNow | Indexing and monitoring. Bing feeds several AI answer engines |  |

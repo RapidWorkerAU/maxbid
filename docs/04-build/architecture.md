@@ -23,9 +23,9 @@ Source: MaxBid Project Workbook, tab 39 Build Architecture.
 | --- | --- | --- | --- |
 | apps/web | Public site at maxbid.com.au | Marketing pages, calculators, value guides, breakdowns | Imports sections from packages/ui. Mostly static and server rendered. |
 | apps/app | Product at app.maxbid.com.au | Triage, lot detail, docket, watchlist, bid view, settings | Installable web app. noindex. |
-| packages/tokens | Design tokens | CSS variables, Tailwind preset, light and dark themes | Tab 17 and 33 values live here only. |
+| packages/tokens | Design tokens | CSS variables, Tailwind preset, one light theme | The values in docs/03-design/design-system.md live here only. Dark mode is out of scope for V1 per decision record 0001. |
 | packages/ui | Component library | Primitives, composites and sections | Catalogued in Storybook. |
-| packages/calc | Bid engine | Bid limits, GST, cost totals, scenarios, confidence | Pure TypeScript, no UI. Tested against tab 10. |
+| packages/calc | Bid engine | Bid limits, GST, cost totals, scenarios, confidence | Pure TypeScript, no UI. Tested against docs/02-specs/bid-calculation.md. |
 | packages/content | Words | Disclaimer library, standard phrases, glossary definitions | DS01 to DS35 as named exports. |
 | packages/db | Data access | Supabase generated types, typed queries, RLS test helpers | Generated type files exempt from line limits. |
 | packages/config | Shared config | ESLint, TypeScript, Prettier, Vitest and Playwright settings | Line limits defined once here. |
@@ -64,9 +64,9 @@ Source: MaxBid Project Workbook, tab 39 Build Architecture.
 | UI16 | LeaderLine | Primitive | Both | Label, dotted leader and figure on one line |
 | UI17 | LineIcon | Primitive | Both | Category and action icons in 1.4px pen blue stroke |
 | UI18 | Wordmark | Primitive | Both | MaxBid logo with stop line |
-| UI19 | BidRail | Composite | Both | Price rail with target, absolute max and stop line markers and a live cursor |
+| UI19 | BidRail | Composite | Both | Price rail with target bid and limit bid markers, the stop line at the break even bid, and a live cursor |
 | UI20 | BidSlider | Composite | App | Proposed bid slider linked to profit readout |
-| UI21 | BidLimits | Composite | Both | Target, absolute max and break even with How this was calculated expander |
+| UI21 | BidLimits | Composite | Both | Target bid, limit bid and break even bid with How this was calculated expander |
 | UI22 | EvidenceRow | Composite | App | One comparable with badges, tags, price, adjustment, reason and exclude |
 | UI23 | PriceLine | Composite | Both | All comparables on one axis with weighted marks and scenario band |
 | UI24 | SpecTable | Composite | Both | Enriched specs grouped by source class with conflict flags |
@@ -96,6 +96,10 @@ Source: MaxBid Project Workbook, tab 39 Build Architecture.
 | UI48 | TriageTable | Section | App | Filterable ranked lots with shortlist and credit bar |
 | UI49 | LotDetail | Section | App | Identification, spec sheet, evidence, calculator. Split view on desktop, sheets on mobile |
 | UI50 | BidView | Section | App | Mobile bid cards with offline cache indicator |
+| UI51 | ChangesSummary | Composite | App | Changes from system panel listing field, system value, your value, who changed it and when. Covers F54 |
+| UI52 | SearchedNotFoundPanel | Composite | App | Every source queried, the number of results and what was not found. Covers F57 |
+| UI53 | CannotVerifyPanel | Composite | App | The general list plus category items the platform cannot verify. Covers F58 |
+| UI54 | ReportProblem | Composite | App | Report a problem action and form on a lot, identification or comparable. Covers F64 |
 
 ## File size rules
 
@@ -113,7 +117,7 @@ Source: MaxBid Project Workbook, tab 39 Build Architecture.
 
 **Folder per component.** packages/ui/composites/Docket/ holding Docket.tsx, Docket.stories.tsx, Docket.test.tsx, docket.types.ts, index.ts, plus child parts such as DocketLine.tsx.
 
-**Stories required.** Default, every state and variant, light and dark theme, 375px and 1440px viewports, long content and empty content.
+**Stories required.** Default, every state and variant, 375px and 1440px viewports, long content and empty content. The light theme is the only theme in V1.
 
 **Definition of done.** Tokens only, stories complete, axe check passes in the Storybook test runner, unit tests for any logic, under the line caps, props documented, visual snapshot approved.
 

@@ -11,7 +11,7 @@ Source: MaxBid Project Workbook, tab 09 Cost Fields.
 | GST on premium | Extracted | From auction terms | Yes | Creditable for registered users. |
 | Transport | Distance estimate | Rate per km and base fee by size class from cost profile | Yes | Entered GST inclusive. |
 | Removal or crane | User | Cost profile | Yes | Entered GST inclusive. |
-| Repairs | User | Cost profile, dollars or percentage of resale | Yes | Entered GST inclusive. |
+| Repairs | User | Cost profile, dollars or percentage of the selected resale scenario | Yes | Entered GST inclusive. A percentage applies to the GST inclusive resale the bid is calculated from, per decision record 0005. |
 | Replacement parts | User | Zero | Yes | Entered GST inclusive. |
 | Testing or certification | User | Cost profile | Yes | Entered GST inclusive. |
 | Cleaning and preparation | User | Cost profile | Yes | Entered GST inclusive. |
@@ -19,4 +19,4 @@ Source: MaxBid Project Workbook, tab 09 Cost Fields.
 | Selling fees | User (manual by decision D24) | Blank with warning flag | Yes | Entered GST inclusive. |
 | Other costs | User | Zero | Yes | Entered GST inclusive. |
 | Profit target | User | Profile default, dollars or percentage | Yes | Not a cost. Drives target bid. |
-| Minimum acceptable profit | User | Profile default | Yes | Drives absolute maximum bid. |
+| Minimum acceptable profit | User | Profile default | Yes | Not a cost. Drives the limit bid. |

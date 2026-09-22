@@ -1,6 +1,6 @@
 # MaxBid
 
-MaxBid (maxbid.com.au) helps Australian resellers work out the most they should pay for a lot at auction. It reads a Grays, Pickles or Lloyds catalogue, ranks every lot, and for chosen lots identifies the item, finds comparable sales, adds every cost and calculates a target bid, an absolute maximum and a stop line.
+MaxBid (maxbid.com.au) helps Australian resellers work out the most they should pay for a lot at auction. It reads a Grays, Pickles or Lloyds catalogue, ranks every lot, and for chosen lots identifies the item, finds comparable sales, adds every cost and calculates a target bid, a limit bid and a break even bid.
 
 ## Start here
 
@@ -35,7 +35,7 @@ MaxBid (maxbid.com.au) helps Australian resellers work out the most they should 
 7. Never type disclaimer text. Import it from @maxbid/content.
 8. Use tokens only. No hex values or arbitrary Tailwind values in components.
 9. Add use client only to the smallest interactive component that needs it.
-10. Write mobile styles first. Check every story at 375px before 1440px.
+10. Write mobile styles first. Base styles must work from 360px wide. Check and review every story at 375px before 1440px.
 11. Database changes are migrations in supabase/migrations with row level security and tests. Never change the hosted database by hand.
 12. Never commit secrets. Keys live only in .env.local files and Vercel settings.
 13. Before finishing a task, run pnpm check. It runs the size check, lint, type check and tests.
@@ -45,7 +45,7 @@ MaxBid (maxbid.com.au) helps Australian resellers work out the most they should 
 Full rules are in docs/03-design/brand-and-writing.md.
 
 1. Write complete sentences in plain, everyday Australian English.
-2. Explain terms such as target bid, absolute maximum, stop line, comparable and buyer's premium the first time they appear on a page.
+2. Explain terms such as target bid, limit bid, break even bid, stop line, comparable and buyer's premium the first time they appear on a page.
 3. Say what every figure is, for example an estimated profit of $4,000.
 4. Use active voice and say who does what.
 5. No slang, metaphors or clever phrasing in explanations, instructions, warnings or disclaimers.

@@ -34,7 +34,7 @@ Source: MaxBid Project Workbook, tab 32 Brand.
 | --- | --- | --- |
 | WR01 | Write complete sentences | Every sentence in body copy has a subject and a verb. No sentence fragments such as Every cost. Every credit. One number. |
 | WR02 | Use everyday words | Choose the word a customer would use. Say counts more towards the estimate rather than weighs the most. |
-| WR03 | Explain terms the first time | Define target bid, absolute maximum, stop line, comparable, buyer's premium, triage and credit where they first appear on a page. |
+| WR03 | Explain terms the first time | Define target bid, limit bid, break even bid, stop line, comparable, buyer's premium, triage and credit where they first appear on a page. |
 | WR04 | Say who does what | Use active voice. We reduced the price by 10 percent, rather than Price adjusted. |
 | WR05 | Keep the reason | One idea per sentence, but keep the linking words such as because, so and which that explain why. |
 | WR06 | No slang or metaphors in explanations | Avoid phrases such as knock out, receipts, your number or marks. Say what the thing actually is. |
@@ -86,3 +86,20 @@ Source: MaxBid Project Workbook, tab 32 Brand.
 
 **Consistency.** One name (MaxBid), one domain (maxbid.com.au), one description used everywhere: site, social, directories and schema. Pair the name with Australia in bios and early content so search engines and AI models separate MaxBid from overseas businesses with similar names.
 
+
+## Name candidates
+
+MaxBid is the selected name. The other candidates are kept as fallbacks in case the trade mark checks in O11 and R17 fail.
+
+Source: MaxBid Project Workbook, tab 21 Naming. Copied into this document by decision record 0007.
+
+| Name | Meaning | Strengths | Notes |
+| --- | --- | --- | --- |
+| MaxBid (selected) | Direct and literal. The most you should pay. | Instantly understood, matches the core output | maxbid.com is used by a US auction house and Maxbid is a crypto app name. Generic auction phrase. Trade mark search required. |
+| Hammerwise | Smart about the hammer price. | Clear meaning, memorable |  |
+| Lotwise | Wise about every lot. | Short, category neutral |  |
+| BidCeiling | The most you should pay. | Describes the core outcome |  |
+| Knockdown | Auction term for the fall of the hammer. | Strong auction language | Also means cheap, which fits resellers |
+| LotLogic | Logic applied to each lot. | Suits the evidence first positioning |  |
+| Bidproof | Bids backed by proof. | Reflects the transparency principle |  |
+| Hammerline | The line you do not cross. | Links to the stop line feature |  |

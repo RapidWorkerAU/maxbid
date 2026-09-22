@@ -48,7 +48,7 @@ Source: MaxBid Project Workbook, tab 38 UX Standards.
 
 ## Accessibility (WCAG 2.2 AA)
 
-**Contrast.** 4.5 to 1 for text and 3 to 1 for UI elements in both themes.
+**Contrast.** 4.5 to 1 for text and 3 to 1 for UI elements, checked on light pages and on navy panels.
 
 **Status.** Never colour alone. Every zone and badge has a text label.
 

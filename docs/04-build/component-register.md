@@ -71,3 +71,7 @@ This register is the sign off record for every component in packages/ui. It is t
 | UI48 | TriageTable | Section | App | Not started |  |  |
 | UI49 | LotDetail | Section | App | Not started |  |  |
 | UI50 | BidView | Section | App | Not started |  |  |
+| UI51 | ChangesSummary | Composite | App | Not started |  | Added for F54 |
+| UI52 | SearchedNotFoundPanel | Composite | App | Not started |  | Added for F57 |
+| UI53 | CannotVerifyPanel | Composite | App | Not started |  | Added for F58 |
+| UI54 | ReportProblem | Composite | App | Not started |  | Added for F64 |

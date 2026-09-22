@@ -13,7 +13,7 @@ Source: MaxBid Project Workbook, tab 16 Screens.
 | SC06A | Spec sheet section | Enriched specifications for the lot | Four source class groups, optional equipment checklist, conflict flags, source links, Report a problem, download PDF | Desktop first |
 | SC07 | Evidence panel | Show comparables | Comparable rows with match level badge, reason, differences, price, date checked, link, exclude toggle | Desktop first |
 | SC08 | Calculator panel | Costs and profit | Collapsed cost summary with expand, profit mode toggle, bid slider with green, amber and red zones, cash required and effective cost | Both |
-| SC09 | Watchlist | Track lots across auctions | List with countdown, target and absolute maximum, alert settings | Both |
+| SC09 | Watchlist | Track lots across auctions | List with countdown, target bid and limit bid, alert settings | Both |
 | SC10 | Mobile bid view | Use while bidding | One lot per card, very large target and maximum figures, stop line, swipe between lots | Mobile |
 | SC11 | Outcomes | Record results | Quick won or lost entry, hammer price, resale price later, accuracy indicator | Both |
 | SC12 | Cost profiles | Manage defaults | Profile list, editor for each cost line and transport rate | Desktop first |

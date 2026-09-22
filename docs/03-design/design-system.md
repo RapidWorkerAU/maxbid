@@ -10,7 +10,7 @@ Source: MaxBid Project Workbook, tab 17 Design System.
 
 **Density.** Table rows 36px on desktop with a comfortable option at 44px. Sticky table header and first column.
 
-**Numbers.** Whole dollars in tables, cents only in the calculator detail. Negative values in red with a minus sign replaced by parentheses in exports.
+**Numbers.** Whole dollars in tables, cents only in the calculator detail. The three bid figures always round down to the nearest dollar and are never rounded up. Every other figure rounds to the nearest dollar. Negative values in red with a minus sign replaced by parentheses in exports.
 
 **Accessibility.** WCAG 2.2 AA contrast on light pages and navy panels. Status never shown by colour alone: every zone and badge carries a text label.
 
@@ -27,7 +27,7 @@ Source: MaxBid Project Workbook, tab 17 Design System.
 | link | Links, icons, index numbers | #1B6FD1 | #7FC8F8 |  |
 | zone_green | Meets profit target | #1E7A52 | #6EE7B7 | Label: On target |
 | zone_amber | Profitable, below target | #B45309 | #FBBF24 | Label: Below target. Distinct from marker yellow |
-| zone_red | Break even or loss | #B91C1C | #F87171 | Label: Loss risk |
+| zone_red | At or above the break even bid | #B91C1C | #F87171 | Label: Loss risk |
 | tag_verified | Verified tag | #1E7A52 fill, white text |  |  |
 | tag_extracted | Extracted tag | #E6EDF4 fill, ink text |  |  |
 | tag_estimated | Estimated tag | #FFF4CC fill, ink text |  |  |
@@ -41,10 +41,10 @@ Source: MaxBid Project Workbook, tab 17 Design System.
 | --- | --- |
 | Match level badge | Pill with icon and text. Exact and Near exact solid. Spec and alternative outlined. Insufficient grey. |
 | Confidence badge | Pill with label and score on hover. |
-| Bid slider | Track coloured by zone with markers at target, absolute maximum and break even. Live readout of profit and return. |
+| Bid slider | Track coloured by zone with markers at the target bid, the limit bid and the break even bid. Live readout of profit and return. |
 | Cost summary | One line total with a chevron to expand line items. Flag icon when selling fees are blank. |
 | Evidence row | Source, price, date checked, match badge, one line reason, expand for differences, external link icon. |
-| Stop line | Marker yellow bar at the break even price, with a yellow Stop bidding panel in the phone bid view. |
+| Stop line | Marker yellow bar at the break even bid, with a yellow Stop bidding panel in the phone bid view. |
 
 
 # Visual Identity and CSS
@@ -93,7 +93,7 @@ Source: MaxBid Project Workbook, tab 33 Visual Identity.
 | ID | Area | Rule |
 | --- | --- | --- |
 | C01 | Tokens | All colour, type, spacing, radius and motion values defined once as CSS variables in the Tailwind v4 theme. Semantic names only: ink, surface, accent, zone_green. |
-| C02 | Theming | Light pages by default with a navy panel token set for headers and feature panels. A dark app theme can be added later from the same tokens. |
+| C02 | Theming | Light pages with a navy panel token set for headers and feature panels. Dark mode is out of scope for V1 per decision record 0001 and can be added later from the same tokens. |
 | C03 | Components | shadcn/ui restyled to the tokens. One component library shared by site and app. |
 | C04 | Layout | CSS grid for page structure, container queries for cards, logical properties for spacing. |
 | C05 | Fluid type | clamp based type scale so headings scale smoothly from phone to desktop. |

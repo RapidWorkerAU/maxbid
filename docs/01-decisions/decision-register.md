@@ -26,7 +26,7 @@ Source: MaxBid Project Workbook, tab 02 Decisions.
 | D18 | Triage | Triage filters | Category, value, location and closing time | Yes | Saved filter presets deferred to a later phase. |
 | D19 | Calculator | Profit target | Dollars or percentage return on cost, chosen per lot | Yes | Different lots suit different targets. |
 | D20 | Calculator | Default resale scenario | Conservative by default, switchable | Yes | Protects the user from bidding on optimism. |
-| D21 | Calculator | Bid limits shown | Target bid, absolute maximum and break even | Yes | Most I Would Pay defaults to the target bid. |
+| D21 | Calculator | Bid limits shown | Target bid, limit bid and break even bid | Yes | The most you should bid defaults to the target bid. Names set by decision record 0002. |
 | D22 | Costs | Cost field display | Collapsed summary, expand to edit line items | Yes | Keeps the lot table readable. |
 | D23 | Costs | GST handling | GST registered setting on the user profile, then automatic calculation | Yes | Shows cash required and effective cost after credits. |
 | D24 | Costs | Selling fees | No automatic channel fees. User adds manually | No | A visible flag warns when selling fees are blank so the max bid is not silently inflated. |
@@ -44,10 +44,10 @@ Source: MaxBid Project Workbook, tab 02 Decisions.
 | D36 | Tech | Account structure | Organisation and team accounts from day one | Yes | Supports you and Jason now and dealers later. |
 | D37 | Design | Device priority | Desktop first analysis with a mobile optimised bid view | Yes | Research at a desk, bid on the phone. |
 | D38 | Design | Visual style | Clean, data dense trading desk feel | Yes | Numbers first, calm colours, clear status signals. |
-| D39 | Design | Theme | Light and dark mode following system | Yes |  |
+| D39 | Design | Theme | Light pages only in V1. Dark mode is a later option | Yes | Amended by decision record 0001. |
 | D40 | Commercial | Pricing model | Subscription tiers with included credits and top up packs | Yes | Predictable revenue with usage based cost control. |
 | D41 | Commercial | Free entry | Free triage with limited catalogues, pay for deep analysis | Yes | Users see value before paying. |
-| D42 | Commercial | Name | Suggestions provided in this workbook | Yes | See tab 21. |
+| D42 | Commercial | Name | Suggestions provided in this workbook | Yes | Candidates are listed in docs/03-design/brand-and-writing.md. |
 | D43 | Legal | Positioning | Decision support tool, not valuation advice | Yes | Clear disclaimers in the product and the terms. |
 | D44 | Legal | Comparable display | Link, price, date and text summary. No copied images | Yes | Avoids copyright issues with third party photos. |
 | D45 | Legal | Auction data access | Respect site terms, rate limit, public pages only | Yes | Formal partnerships considered once there is traction. |
@@ -60,7 +60,7 @@ Source: MaxBid Project Workbook, tab 02 Decisions.
 | D52 | Configuration | Evidence weights, match levels, confidence formula | Hard coded, versioned and visible to users | Yes | Changed only by a versioned release with a public changelog. |
 | D53 | Configuration | Core maths and GST rate | Hard coded, never overridable | Yes | A legislative GST change is handled by a code release. |
 | D54 | Helper behaviour | User enters own resale price | Allowed. Labelled Your input with system confidence shown separately | Yes | The user may know more than the evidence. The system never presents their figure as its own. |
-| D55 | Helper behaviour | Bid above absolute maximum or break even | Warn and let them proceed | Yes | The platform advises and never blocks a bidding decision. |
+| D55 | Helper behaviour | Bid above the limit bid or the break even bid | Warn and let them proceed | Yes | The platform advises and never blocks a bidding decision. |
 | D56 | Helper behaviour | Insufficient evidence | No system bid. User can enter own resale to calculate | Yes |  |
 | D57 | Helper behaviour | Excluding comparables | Allowed with reason recorded and valuation shown before and after | Yes |  |
 | D58 | Helper behaviour | User supplied comparables | Allowed. Labelled User supplied, own weight category, private to the organisation | Yes | Never shared with other organisations. |
@@ -121,3 +121,18 @@ Source: MaxBid Project Workbook, tab 02 Decisions.
 | D113 | Build | File size limit | Hard cap 300 lines per file, target 150 | Yes | Enforced by lint in CI. Pages 80 lines, functions 80 lines. |
 | D114 | Brand | Writing style | Complete sentences in plain everyday words, with every term and figure explained | n/a | Replaces the short fragment style. Twelve writing rules and examples on tab 32. |
 | D115 | Build | Single sources of truth | Bid maths, design tokens and disclaimer text each live in one package | n/a | Calculator, app, exports and site can never drift apart. |
+
+## Decisions made after the discovery session
+
+Each one has a decision record in docs/01-decisions/records.
+
+| ID | Area | Question | Decision | Record | Rationale and implications |
+| --- | --- | --- | --- | --- | --- |
+| D116 | Design | Does V1 ship a dark theme | Light pages only. Dark mode is a later option | 0001 | No signed off prototype shows a dark screen. Amends D39, CS40, architecture.md and ux-standards.md. |
+| D117 | Calculator | What are the three bid figures called | Target bid, limit bid and break even bid | 0002 | Absolute maximum was misleading because the break even bid sits above it. Amends D21 and D55. |
+| D118 | Calculator | How are money figures rounded | Bid limits round down to whole dollars. Other figures round to the nearest dollar | 0003 | Rounding a bid limit up would advise a bid the evidence does not support. Amends CS02. |
+| D119 | Calculator | Formulas for return on cost, cash needed and GST credits | Added to docs/02-specs/bid-calculation.md with a worked example | 0004 | Required by F28 and F32, previously undocumented. |
+| D120 | Costs | Which resale figure does a repair percentage use | The selected scenario, GST inclusive, treated as a GST inclusive cost | 0005 | The repair estimate moves with the scenario. |
+| D121 | Triage | How is the opportunity score calculated | Dollar headroom adjusted for confidence, scaled against the best lot in the catalogue | 0006 | The old fraction ranked small lots above large ones. Replaces the formula in matching-and-valuation.md. |
+| D122 | Governance | What is the source of truth | The documents in docs. The workbook becomes a historical record | 0007 | A spreadsheet cannot be reviewed in a pull request. Amends docs/README.md. |
+| D123 | Accounts | Is F03 Roles a Must or a Should | Must in Phase 1 | 0008 | F52, the security policies and the settings matrix all depend on roles. |

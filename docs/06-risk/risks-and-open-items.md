@@ -22,7 +22,7 @@ Source: MaxBid Project Workbook, tab 22 Risks.
 | R14 | Commercial | Try before sign up abused and costs rise | 3 | 3 | 9 | Serve cached shared triage only, rate limit per IP, cap lots shown, bot protection |
 | R15 | Brand | Chosen name unavailable as domain or trade mark | 3 | 4 | 12 | Check ASIC, IP Australia and domains before any design work on the logo |
 | R16 | Brand | Branded search for MaxBid shows the US auction house and crypto app | 4 | 2 | 8 | Always search as MaxBid Australia in early content, Organization schema with Australian details, consistent handles, Google Business Profile, build branded mentions in AU communities |
-| R17 | Brand | MaxBid refused as a trade mark for being descriptive | 3 | 3 | 9 | Search and seek advice before filing. Register the stylised logo as well as the word. Fallback names on tab 21 |
+| R17 | Brand | MaxBid refused as a trade mark for being descriptive | 3 | 3 | 9 | Search and seek advice before filing. Register the stylised logo as well as the word. Fallback names are in docs/03-design/brand-and-writing.md |
 | R18 | Delivery | Components duplicated or files grow out of control during fast AI assisted builds | 4 | 3 | 12 | Library first rule in CLAUDE.md and AGENTS.md, lint caps fail CI, Storybook review before pages, monthly duplication check |
 | R19 | UX | Desktop polish drifts ahead of mobile or the reverse | 3 | 3 | 9 | Every story and test runs at 375px and 1440px, usability rounds on real phones |
 | R20 | Design | Marker yellow confused with the amber warning colour | 2 | 3 | 6 | Yellow only for actions and the bid figure, amber only for warnings with a text label, contrast tests in CI |

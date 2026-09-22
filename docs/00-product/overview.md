@@ -8,7 +8,7 @@ Source: MaxBid Project Workbook, tab 01 Summary.
 
 **Problem.** Resellers buying at auction guess at resale value, forget costs such as buyer's premium, GST, transport and repairs, and bid on emotion in the final seconds. Researching every lot manually across eBay, retailers and past auction results takes hours per catalogue.
 
-**Solution.** Paste a catalogue link or upload a PDF. The platform extracts every lot, runs a fast triage to rank opportunities, then performs deep analysis on the lots the user shortlists. Deep analysis identifies the item using text and photos, finds comparable sold and advertised prices, explains exactly what each comparable is and how it differs, and calculates target, absolute maximum and break even bids against the user's own costs and profit goal.
+**Solution.** Paste a catalogue link or upload a PDF. The platform extracts every lot, runs a fast triage to rank opportunities, then performs deep analysis on the lots the user shortlists. Deep analysis identifies the item using text and photos, finds comparable sold and advertised prices, explains exactly what each comparable is and how it differs, and calculates the target bid, the limit bid and the break even bid against the user's own costs and profit goal.
 
 **Core principle.** Transparency over false precision. Every value shows its evidence, the match level, the differences and a confidence rating. The system never presents a weak estimate as a verified value.
 
@@ -71,7 +71,7 @@ Source: MaxBid Project Workbook, tab 05 Scope.
 | Identification | Text and photo vision identification with user confirmation. | Category specific identification rules such as VIN and rego lookup for vehicles. |  |
 | Comparables | eBay active listings, web search results, retailer pages, auction realised results, internal outcome data. | eBay Marketplace Insights sold data if approved. Paid data partners for heavy equipment. | Scraping of sites whose terms prohibit it. |
 | Valuation | Match levels, evidence weighting, confidence score, conservative, expected and optimistic resale. | Category specific depreciation and condition models. | Formal valuation certificates. |
-| Calculator | Target, absolute maximum and break even bids. Profit slider. Editable cost lines. GST by profile. Cost profiles. Transport estimate. | Automatic channel selling fees as an optional helper. |  |
+| Calculator | Target bid, limit bid and break even bid. Profit slider. Editable cost lines. GST by profile. Cost profiles. Transport estimate. | Automatic channel selling fees as an optional helper. |  |
 | After analysis | Watchlist, closing soon alerts, outcome recording, PDF bid sheet, CSV export. | Saved search alerts for new undervalued lots. Price drop alerts. Margin dashboard. | Automated bidding on behalf of users. |
 | Accounts | Organisations with members and roles. Email and Google sign in. | Stripe billing, credits, top ups, free tier limits. | Enterprise SSO. |
 | Platforms | Mobile first responsive web app. Installable progressive web app with offline watchlist and bid view. | Richer offline support. | Native mobile apps. |
@@ -93,7 +93,7 @@ Source: MaxBid Project Workbook, tab 06 User Journey.
 | 5 | Deep analysis | User waits or returns later. Lots fill in as they complete. | Vision identification, comparable search, match grading, valuation and bid calculation. | Lot detail |
 | 6 | Confirm identification | User confirms or corrects the identified product. | Correction stored. Lot revalued automatically. | Lot detail |
 | 7 | Review evidence | User reads the match explanation and opens comparable links. | Evidence shown with match level, differences, date checked and confidence. | Lot detail, evidence panel |
-| 8 | Adjust costs and profit | User expands cost lines, edits repairs or transport, sets profit in dollars or percentage, moves the bid slider. | Target, absolute maximum and break even bids recalculate instantly. | Lot detail, calculator |
+| 8 | Adjust costs and profit | User expands cost lines, edits repairs or transport, sets profit in dollars or percentage, moves the bid slider. | The target bid, the limit bid and the break even bid recalculate instantly. | Lot detail, calculator |
 | 9 | Watch and export | User adds lots to the watchlist and downloads the PDF bid sheet. | Closing soon alerts scheduled. Bid sheet generated. | Watchlist, export |
-| 10 | Bid | User bids on the auction site using the mobile bid view. | Mobile view shows lot, target bid, absolute maximum and a clear stop line. | Mobile bid view |
+| 10 | Bid | User bids on the auction site using the mobile bid view. | Mobile view shows the lot, the target bid, the limit bid and a clear stop line at the break even bid. | Mobile bid view |
 | 11 | Record outcome | User records won or lost, final hammer price and later the actual resale price. | Outcome stored as verified evidence and used to measure accuracy. | Outcomes |

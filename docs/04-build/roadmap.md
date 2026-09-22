@@ -12,7 +12,7 @@ Source: MaxBid Project Workbook, tab 23 Roadmap.
 | Phase 1 | Week 3 | Triage engine | Pickles and Lloyds extractors, triage identification and rough valuation, opportunity score, email on completion | Ranked triage for all three sources |
 | Phase 1 | Week 4 | Triage interface | Triage table, filters, shortlist, credit preview, progress screen | User can shortlist lots |
 | Phase 1 | Week 5 | Deep analysis | Vision identification, confirmation and editing, comparable search across sources, match grading | Evidence panel populated |
-| Phase 1 | Week 6 | Valuation and calculator | Weighting, scenarios, confidence, bid limits, slider, cost lines, cost profiles, GST engine with unit tests matching tab 10 | Bid limits correct to the cent |
+| Phase 1 | Week 6 | Valuation and calculator | Weighting, scenarios, confidence, bid limits, slider, cost lines, cost profiles, GST engine with unit tests matching docs/02-specs/bid-calculation.md | Bid limits correct to the cent |
 | Phase 1 | Week 7 | After analysis | Transport estimate, watchlist, closing alerts, outcome recording, PDF bid sheet, CSV, mobile bid view | Full journey usable |
 | Phase 1 | Week 8 | Hardening and live use | Cost logging review, error handling, test on real auctions, record outcomes, fix accuracy issues | Internal MVP in use |
 | Phase 2 | Month 3 | Marketing site | Full marketing site from tab 34, try before sign up, onboarding flow, schema, sitemaps, Search Console and Bing Webmaster Tools, Auction Breakdown template, first four breakdowns published | Site live and indexed |
