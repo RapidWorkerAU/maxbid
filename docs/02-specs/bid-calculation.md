@@ -66,7 +66,7 @@ Cash needed on the day uses the costs as entered, not the effective costs, becau
 3. Every other money figure rounds to the nearest dollar for display. The calculator detail may show cents where the design system allows it.
 4. Rounding applies to the displayed figure only. Stored values keep their cents.
 
-## Worked example (must pass as a test)
+## Worked examples 1 and 2, a GST registered buyer (must pass as a test)
 
 A GST registered buyer, resale $18,500 including GST, premium 16.5 percent with GST on the hammer and the premium, other costs $3,930 including GST, target profit $4,000 and minimum acceptable profit $1,500.
 
@@ -86,4 +86,36 @@ At the target bid of $7,936.01 the position is:
 | Estimated profit | $4,000.00 |
 | Return on cost | 31.2 percent |
 
-These values are tested in packages/calc/src/bidLimits.test.ts. The rounded column shows the limit bid at $10,081 rather than $10,082, which is the rounding rule doing its job.
+The rounded column shows the limit bid at $10,081 rather than $10,082, which is the rounding rule doing its job.
+
+## Worked example 3, a buyer who is not registered for GST (must pass as a test)
+
+The same lot and the same costs as worked example 1, bought by someone who is not registered for GST. They cannot claim the GST back, so the GST on the hammer price and on the premium becomes a real cost to them and lands in k, which rises from 1.165 to 1.2815. They also do not net the GST off the resale price or off their costs.
+
+| Result | Unrounded | Shown to the user |
+| --- | --- | --- |
+| Target bid | $8,248.15 | $8,248 |
+| Limit bid | $10,198.99 | $10,198 |
+| Break even bid | $11,369.49 | $11,369 |
+
+At the target bid of $8,248.15 the position is:
+
+| Result | Value |
+| --- | --- |
+| Cash needed on the day | $14,500.00 |
+| GST credits | $0.00 |
+| Cost after GST credits | $14,500.00 |
+| Estimated profit | $4,000.00 |
+| Return on cost | 27.6 percent |
+
+Two things are worth noting. The break even bid is the same $11,369.49 for both buyers, because the GST scales the resale, the costs and k by the same 1.1 and cancels out. The unregistered buyer reaches the same $4,000 profit, but needs $400 more cash on the day and earns a lower return on cost, because their money is tied up in GST they never get back.
+
+## Where these examples are tested
+
+All three worked examples are tested in packages/calc, and the tests fail if any figure on this page changes.
+
+| Example | Test file |
+| --- | --- |
+| 1, the three bid figures | packages/calc/src/bidLimits.test.ts |
+| 2 and 3, the position at a bid | packages/calc/src/position.test.ts |
+| The figures shown to the user | packages/calc/src/rounding.test.ts |
