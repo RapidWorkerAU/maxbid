@@ -1,0 +1,12 @@
+{
+  "recommendations": [
+    "anthropic.claude-code",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "bradlc.vscode-tailwindcss",
+    "editorconfig.editorconfig",
+    "vitest.explorer",
+    "ms-playwright.playwright",
+    "yoavbls.pretty-ts-errors"
+  ]
+}

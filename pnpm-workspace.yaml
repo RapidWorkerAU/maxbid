@@ -1,0 +1,10 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+# Packages allowed to run install scripts (pnpm 11 and later).
+allowBuilds:
+  supabase: true
+  esbuild: true
+  sharp: true
+  "@tailwindcss/oxide": true
+  unrs-resolver: true

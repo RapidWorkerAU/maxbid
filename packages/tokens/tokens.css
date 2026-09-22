@@ -1,0 +1,30 @@
+/* MaxBid Blueprint design tokens. Source: workbook tabs 17 and 33. */
+/* Every colour, font and radius used anywhere comes from this file. */
+@theme {
+  --color-navy: #0e2a47;
+  --color-page: #f4f7fa;
+  --color-surface: #ffffff;
+  --color-surface-muted: #e6edf4;
+  --color-line: #c9d6e3;
+  --color-cyan: #7fc8f8;
+  --color-accent: #ffd23f;
+  --color-ink: #0e1b2b;
+  --color-ink-muted: #4a5a6d;
+  --color-ink-on-navy: #ffffff;
+  --color-ink-muted-on-navy: #b7cde3;
+  --color-link: #1b6fd1;
+  --color-zone-green: #1e7a52;
+  --color-zone-amber: #b45309;
+  --color-zone-red: #b91c1c;
+  --color-tag-verified: #1e7a52;
+  --color-tag-extracted: #e6edf4;
+  --color-tag-estimated: #fff4cc;
+  --color-tag-your-input: #1b6fd1;
+  --color-confidence-insufficient: #6b7280;
+
+  --font-sans: var(--font-barlow, 'Barlow'), system-ui, sans-serif;
+  --font-mono: var(--font-space-mono, 'Space Mono'), ui-monospace, monospace;
+
+  --radius-sm: 2px;
+  --radius-md: 2px;
+}

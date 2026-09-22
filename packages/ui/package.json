@@ -1,0 +1,28 @@
+{
+  "name": "@maxbid/ui",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./primitives/*": "./src/primitives/*/index.ts",
+    "./composites/*": "./src/composites/*/index.ts",
+    "./sections/*": "./src/sections/*/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "echo no lint configured yet",
+    "test": "echo no tests yet"
+  },
+  "peerDependencies": {
+    "react": ">=19",
+    "react-dom": ">=19"
+  },
+  "devDependencies": {
+    "@storybook/react-vite": "^10.6.0",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "react": ">=19",
+    "react-dom": ">=19",
+    "typescript": "^5.9.3"
+  }
+}
