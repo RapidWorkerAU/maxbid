@@ -1,21 +1,14 @@
--- Helper functions for the first migration.
+-- Functions that read the tables, and the triggers that use them.
 -- Source: docs/02-specs/security-and-rls.md and docs/02-specs/configuration.md.
+--
+-- This runs after the tables, because a function declared `language sql` is
+-- parsed and validated when it is created. Only plpgsql resolves its tables
+-- at run time.
 --
 -- The membership helpers are SECURITY DEFINER on purpose. A policy on
 -- organisation_members that calls a function which reads organisation_members
 -- would recurse forever under row level security. These functions read only
--- the memberships of the caller, so the hole is one row wide.
-
--- Keeps updated_at honest without every caller remembering to set it.
-create or replace function public.set_updated_at()
-returns trigger
-language plpgsql
-as $$
-begin
-  new.updated_at = now();
-  return new;
-end;
-$$;
+-- the memberships of the caller, so the exception is one row wide.
 
 -- Is the caller a member of this organisation.
 create or replace function public.is_org_member(target_org uuid)
@@ -169,3 +162,13 @@ begin
   return new;
 end;
 $$;
+
+-- A new auth user always gets a profile.
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute function public.handle_new_user();
+
+-- Organisation locks are enforced here, not only in the interface.
+create trigger enforce_locks_on_user_preferences
+  before insert or update on public.user_preferences
+  for each row execute function public.enforce_org_locks();

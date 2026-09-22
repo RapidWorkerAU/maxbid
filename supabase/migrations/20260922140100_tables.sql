@@ -123,13 +123,3 @@ begin
   end loop;
 end;
 $$;
-
--- A new auth user always gets a profile.
-create trigger on_auth_user_created
-  after insert on auth.users
-  for each row execute function public.handle_new_user();
-
--- Organisation locks are enforced here, not only in the interface.
-create trigger enforce_locks_on_user_preferences
-  before insert or update on public.user_preferences
-  for each row execute function public.enforce_org_locks();
