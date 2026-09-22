@@ -1,0 +1,1 @@
+Run pnpm check and fix every failure. Then review the changed files against the rules in AGENTS.md: file size, tokens only, no duplicated maths, disclaimers from packages/content, writing rules and component register status. Report anything you changed and anything you could not fix.

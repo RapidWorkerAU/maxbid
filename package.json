@@ -23,6 +23,10 @@
     "e2e": "playwright test"
   },
   "devDependencies": {
-    "supabase": "^2.117.0"
+    "@playwright/test": "^1.63.0",
+    "prettier": "^3.9.8",
+    "supabase": "^2.117.0",
+    "turbo": "^2.11.2",
+    "typescript": "^5.9.3"
   }
 }
