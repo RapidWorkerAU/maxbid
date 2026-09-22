@@ -23,6 +23,10 @@
     "@vitest/browser": "^4.1.11",
     "@vitest/browser-playwright": "^4.1.11",
     "playwright": "^1.63.0",
-    "vitest": "^4.1.11"
+    "vitest": "^4.1.11",
+    "@maxbid/ui": "workspace:*",
+    "@maxbid/tokens": "workspace:*",
+    "@maxbid/content": "workspace:*",
+    "@maxbid/calc": "workspace:*"
   }
 }

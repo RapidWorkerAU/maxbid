@@ -36,21 +36,26 @@ function tagsIn(source) {
     .filter((tag) => TAG_VALUES.includes(tag));
 }
 
+// The register writes some names as words, such as Toggle group, while the
+// file has to be a valid identifier, ToggleGroup. Compare them without case
+// or spaces so the two can never drift apart over a space.
+const key = (name) => name.toLowerCase().replace(/\s+/g, '');
+
 const register = readRegister();
-const byComponent = new Map(register.map((row) => [row.component, row]));
+const byComponent = new Map(register.map((row) => [key(row.component), row]));
 const stories = findStories(UI_SRC);
 const seen = new Set();
 
 for (const path of stories) {
   const rel = relative(ROOT, path).split(sep).join('/');
   const component = path.split(sep).at(-1).replace('.stories.tsx', '');
-  const row = byComponent.get(component);
+  const row = byComponent.get(key(component));
 
   if (!row) {
     fail(`${rel} has no row in the component register. Add it before building it.`);
     continue;
   }
-  seen.add(component);
+  seen.add(key(component));
 
   const expected = STATUS_TAGS[row.status];
   const found = tagsIn(readFileSync(path, 'utf8'));
@@ -68,7 +73,7 @@ for (const path of stories) {
 
 // A component cannot be past Not started without a story to review.
 for (const row of register) {
-  if (row.status !== 'Not started' && !seen.has(row.component)) {
+  if (row.status !== 'Not started' && !seen.has(key(row.component))) {
     fail(`${row.id} ${row.component} is ${row.status} in the register but has no story file.`);
   }
 }

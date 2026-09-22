@@ -239,6 +239,18 @@ importers:
 
   apps/storybook:
     devDependencies:
+      '@maxbid/calc':
+        specifier: workspace:*
+        version: link:../../packages/calc
+      '@maxbid/content':
+        specifier: workspace:*
+        version: link:../../packages/content
+      '@maxbid/tokens':
+        specifier: workspace:*
+        version: link:../../packages/tokens
+      '@maxbid/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
       '@storybook/addon-a11y':
         specifier: ^10.6.0
         version: 10.6.0(storybook@10.6.0(@types/react@19.3.0)(prettier@3.9.8)(react@19.3.0))
@@ -403,6 +415,9 @@ importers:
 
   packages/ui:
     devDependencies:
+      '@maxbid/calc':
+        specifier: workspace:*
+        version: link:../calc
       '@maxbid/config':
         specifier: workspace:*
         version: link:../config

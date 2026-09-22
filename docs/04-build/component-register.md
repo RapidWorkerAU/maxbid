@@ -22,11 +22,11 @@ This register is the sign off record for every component in packages/ui. It is t
 | ID | Component | Layer | Used in | Status | Date | Notes |
 | --- | --- | --- | --- | --- | --- | --- |
 | UI01 | Button | Primitive | Both | In review | 22 September 2026 | Primary, secondary, ghost, danger, loading and disabled |
-| UI02 | Input | Primitive | Both | Not started |  |  |
-| UI03 | Toggle group | Primitive | Both | Not started |  |  |
-| UI04 | Money | Primitive | Both | Not started |  |  |
-| UI05 | MonoLabel | Primitive | Both | Not started |  |  |
-| UI06 | ProvenanceTag | Primitive | Both | Not started |  |  |
+| UI02 | Input | Primitive | Both | In review | 22 September 2026 | Text, number, URL and email. Label, hint and error. Mono variant |
+| UI03 | Toggle group | Primitive | Both | In review | 22 September 2026 | Named group with aria-pressed on every choice |
+| UI04 | Money | Primitive | Both | In review | 22 September 2026 | AUD, tabular figures, four sizes. Rounding from decision record 0003 |
+| UI05 | MonoLabel | Primitive | Both | In review | 22 September 2026 | Uppercase Space Mono data label. Detail B04 |
+| UI06 | ProvenanceTag | Primitive | Both | In review | 22 September 2026 | Verified, Extracted, Estimated, Your input |
 | UI07 | AiLabel | Primitive | Both | Not started |  |  |
 | UI08 | MatchBadge | Primitive | Both | Not started |  |  |
 | UI09 | ConfidenceBadge | Primitive | Both | Not started |  |  |
