@@ -21,7 +21,7 @@ This register is the sign off record for every component in packages/ui. It is t
 
 | ID | Component | Layer | Used in | Status | Date | Notes |
 | --- | --- | --- | --- | --- | --- | --- |
-| UI01 | Button | Primitive | Both | Draft | 22 September 2026 | Ghost, danger and loading states still to build |
+| UI01 | Button | Primitive | Both | In review | 22 September 2026 | Primary, secondary, ghost, danger, loading and disabled |
 | UI02 | Input | Primitive | Both | Not started |  |  |
 | UI03 | Toggle group | Primitive | Both | Not started |  |  |
 | UI04 | Money | Primitive | Both | Not started |  |  |
@@ -32,13 +32,13 @@ This register is the sign off record for every component in packages/ui. It is t
 | UI09 | ConfidenceBadge | Primitive | Both | Not started |  |  |
 | UI10 | ZoneLabel | Primitive | Both | Not started |  |  |
 | UI11 | InfoNote | Primitive | Both | Not started |  |  |
-| UI12 | StopLine | Primitive | Both | Not started |  |  |
+| UI12 | StopLine | Primitive | Both | In review | 22 September 2026 | Three thicknesses. Decorative unless given a label |
 | UI13 | SheetFrame | Primitive | Both | Not started |  |  |
 | UI14 | TitleBlock | Primitive | Web | Not started |  |  |
 | UI15 | DetailLabel | Primitive | Both | Not started |  |  |
 | UI16 | LeaderLine | Primitive | Both | Not started |  |  |
 | UI17 | LineIcon | Primitive | Both | Not started |  |  |
-| UI18 | Wordmark | Primitive | Both | Not started |  |  |
+| UI18 | Wordmark | Primitive | Both | In review | 22 September 2026 | Three sizes, light and on navy |
 | UI19 | BidRail | Composite | Both | Not started |  |  |
 | UI20 | BidSlider | Composite | App | Not started |  |  |
 | UI21 | BidLimits | Composite | Both | Not started |  |  |
