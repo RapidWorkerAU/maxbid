@@ -12,10 +12,11 @@ Updated at the end of every pull request. The current row is always the one to r
 | 2 | Rename the bid figures and add the position and rounding maths | Merged | 22 Sep 2026 |
 | 3 | Add the quality gates that the rule book assumes | Merged | 22 Sep 2026 |
 | 4 | Complete the token set and fix two accessibility failures | Merged | 22 Sep 2026 |
-| 5 | This build plan | In review |  |
-| 6 | W1.1 Button, StopLine and Wordmark to In review | Next |  |
+| 5 | This build plan | Merged | 22 Sep 2026 |
+| 6 | W1.1 Button, StopLine and Wordmark to In review | In review |  |
+| 7 | W1.2 Primitives A | Next |  |
 
-**Where we are.** Week 1, foundations. The rule book is settled, the bid maths is complete and tested to the cent, the quality gates run in CI, and the token set is complete and contrast tested. Nothing is built on top of them yet.
+**Where we are.** Week 1, foundations. The rule book, the bid maths, the quality gates and the token set are all done. The first three primitives are built and waiting on a Storybook review. Storybook now has the MF02 viewports, so every later component gets a 375px and a 1440px story.
 
 **Blocked and waiting on Ashleigh.** O01, O02, O03 and O05 block Week 2. O04 should be applied for now because approval takes time. O11 blocks promoting the waitlist page. See the Things only Ashleigh can do table at the end.
 
