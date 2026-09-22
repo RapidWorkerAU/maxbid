@@ -41,7 +41,7 @@ jobs:
       - name: Row level security tests
         run: pnpm test:rls
       - name: Generate the database types
-        run: supabase gen types typescript --local > packages/db/src/database.types.ts
+        run: pnpm db:types
       # Uploaded before the staleness check, so the generated file is always
       # available to download even when the check fails.
       - name: Upload the generated types
