@@ -1,6 +1,7 @@
 @import 'tailwindcss';
 @import '../../../packages/tokens/tokens.css';
 @source '../../../packages/ui/src';
+@source '../stories';
 
 body {
   background: var(--color-page);

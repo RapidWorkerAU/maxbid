@@ -21,7 +21,7 @@ This register is the sign off record for every component in packages/ui. It is t
 
 | ID | Component | Layer | Used in | Status | Date | Notes |
 | --- | --- | --- | --- | --- | --- | --- |
-| UI01 | Button | Primitive | Both | Not started |  |  |
+| UI01 | Button | Primitive | Both | Draft | 22 September 2026 | Ghost, danger and loading states still to build |
 | UI02 | Input | Primitive | Both | Not started |  |  |
 | UI03 | Toggle group | Primitive | Both | Not started |  |  |
 | UI04 | Money | Primitive | Both | Not started |  |  |
