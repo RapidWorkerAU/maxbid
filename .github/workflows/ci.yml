@@ -20,3 +20,36 @@ jobs:
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm test
+
+  # Row level security is kept out of pnpm check because it needs Docker, but
+  # R11 is scored impact 5, so it runs on every pull request.
+  database:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - name: Start local Supabase
+        run: supabase start
+      - name: Row level security tests
+        run: pnpm test:rls
+      - name: Generate the database types
+        run: pnpm db:types
+      # Uploaded before the staleness check, so the generated file is always
+      # available to download even when the check fails.
+      - name: Upload the generated types
+        uses: actions/upload-artifact@v4
+        with:
+          name: database-types
+          path: packages/db/src/database.types.ts
+      - name: Check the committed types are up to date
+        run: |
+          git diff --exit-code packages/db/src/database.types.ts \
+            || (echo "::error::Database types are stale. Run pnpm db:types and commit the result." && exit 1)

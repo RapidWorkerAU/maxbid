@@ -21,3 +21,9 @@ minimumReleaseAgeExclude:
   - '@typescript-eslint/visitor-keys@8.70.1'
   - jsdom@30.1.1
   - typescript-eslint@8.70.1
+  - '@supabase/auth-js@2.117.0'
+  - '@supabase/functions-js@2.117.0'
+  - '@supabase/postgrest-js@2.117.0'
+  - '@supabase/realtime-js@2.117.0'
+  - '@supabase/storage-js@2.117.0'
+  - '@supabase/supabase-js@2.117.0'
