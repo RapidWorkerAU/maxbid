@@ -27,11 +27,11 @@ This register is the sign off record for every component in packages/ui. It is t
 | UI04 | Money | Primitive | Both | In review | 22 September 2026 | AUD, tabular figures, four sizes. Rounding from decision record 0003 |
 | UI05 | MonoLabel | Primitive | Both | In review | 22 September 2026 | Uppercase Space Mono data label. Detail B04 |
 | UI06 | ProvenanceTag | Primitive | Both | In review | 22 September 2026 | Verified, Extracted, Estimated, Your input |
-| UI07 | AiLabel | Primitive | Both | Not started |  |  |
-| UI08 | MatchBadge | Primitive | Both | Not started |  |  |
-| UI09 | ConfidenceBadge | Primitive | Both | Not started |  |  |
-| UI10 | ZoneLabel | Primitive | Both | Not started |  |  |
-| UI11 | InfoNote | Primitive | Both | Not started |  |  |
+| UI07 | AiLabel | Primitive | Both | In review | 22 September 2026 | AI generated marker. Sits beside the provenance tag, never replaces it |
+| UI08 | MatchBadge | Primitive | Both | In review | 22 September 2026 | Six match levels. Solid, outlined and grey, each with its text label |
+| UI09 | ConfidenceBadge | Primitive | Both | In review | 22 September 2026 | Four bands worked out from the score, so label and number agree |
+| UI10 | ZoneLabel | Primitive | Both | In review | 22 September 2026 | On target, Below target, Loss risk. Solid and quiet tones |
+| UI11 | InfoNote | Primitive | Both | In review | 22 September 2026 | Muted 12px note with info icon. Text comes from packages/content |
 | UI12 | StopLine | Primitive | Both | In review | 22 September 2026 | Three thicknesses. Decorative unless given a label |
 | UI13 | SheetFrame | Primitive | Both | Not started |  |  |
 | UI14 | TitleBlock | Primitive | Web | Not started |  |  |
