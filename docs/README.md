@@ -28,7 +28,7 @@ When two sources disagree, the higher one wins. Report the conflict rather than 
 | 01-decisions | Every decision made so far, the decision records, and how to change one |
 | 02-specs | Features and acceptance criteria, bid maths, valuation, costs, unit costs, data sources, pipeline, database, security, configuration, transparency, disclaimers, governance, commercial and legal |
 | 03-design | Design system, brand and writing rules, name candidates, screens, UX standards and signed off prototypes |
-| 04-build | Architecture, tech stack, roadmap and success metrics, workflow, component register and first prompts |
+| 04-build | Architecture, tech stack, roadmap and success metrics, the build plan, workflow, component register and first prompts |
 | 05-website | SEO, value guides, AI search and marketing |
 | 06-risk | Risks and open items |
 | workbook | Historical record only. Not authority |
