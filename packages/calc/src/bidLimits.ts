@@ -1,62 +1,58 @@
-// Bid limit maths. Source: workbook tab 10. This is the only place these formulas may live.
+// The three bid figures. Source: docs/02-specs/bid-calculation.md.
+// Names set by decision record 0002. This is the only place these formulas may live.
 
-export const GST_RATE = 0.1;
+import { bidBasis } from './basis';
+import type { BidInputs, BidLimits } from './types';
 
-export type BidInputs = {
-  /** Expected resale price for the chosen scenario. */
-  resale: number;
-  resaleIncludesGst: boolean;
-  /** Buyer's premium as a fraction, for example 0.165. */
-  premiumRate: number;
-  gstOnHammer: boolean;
-  gstOnPremium: boolean;
-  /** Transport, repairs, fees and other costs added together. */
-  otherCosts: number;
-  otherCostsIncludeGst: boolean;
-  gstRegistered: boolean;
-};
-
-export type BidLimits = {
-  targetBid: number;
-  absoluteMax: number;
-  breakEven: number;
-  costPerHammerDollar: number;
-  netResale: number;
-  effectiveOtherCosts: number;
-};
-
-function basics(i: BidInputs) {
-  const g = GST_RATE;
-  const netResale = i.gstRegistered && i.resaleIncludesGst ? i.resale / (1 + g) : i.resale;
-  const effectiveOtherCosts =
-    i.gstRegistered && i.otherCostsIncludeGst ? i.otherCosts / (1 + g) : i.otherCosts;
-  const hammerFactor = 1 + (i.gstRegistered ? 0 : i.gstOnHammer ? g : 0);
-  const premiumFactor = i.premiumRate * (1 + (i.gstRegistered ? 0 : i.gstOnPremium ? g : 0));
-  return { netResale, effectiveOtherCosts, k: hammerFactor + premiumFactor };
+/** No bid figure is ever less than zero. Step 7 of the spec. */
+function atLeastZero(value: number): number {
+  return Math.max(0, value);
 }
 
-/** Bid limits when profit targets are dollar amounts. */
+/**
+ * The three bid figures when the profit targets are dollar amounts.
+ * Steps 4 to 6 of the spec.
+ */
 export function bidLimits(i: BidInputs, targetProfit: number, minProfit: number): BidLimits {
-  const { netResale, effectiveOtherCosts, k } = basics(i);
-  const limit = (profit: number) => Math.max(0, (netResale - effectiveOtherCosts - profit) / k);
+  const basis = bidBasis(i);
+  const bidFor = (profit: number) =>
+    atLeastZero(
+      (basis.netResale - basis.effectiveOtherCosts - profit) / basis.costPerHammerDollar,
+    );
   return {
-    targetBid: limit(targetProfit),
-    absoluteMax: limit(minProfit),
-    breakEven: limit(0),
-    costPerHammerDollar: k,
-    netResale,
-    effectiveOtherCosts,
+    ...basis,
+    targetBid: bidFor(targetProfit),
+    limitBid: bidFor(minProfit),
+    breakEvenBid: bidFor(0),
   };
 }
 
-/** Highest hammer bid that still returns the given fraction on cost, for example 0.25. */
+/**
+ * The highest hammer bid that still returns the given fraction on cost, for
+ * example 0.25 for a 25 percent return. Formula 1 of decision record 0004.
+ */
 export function bidForReturn(i: BidInputs, returnOnCost: number): number {
-  const { netResale, effectiveOtherCosts, k } = basics(i);
-  return Math.max(0, (netResale - effectiveOtherCosts * (1 + returnOnCost)) / (k * (1 + returnOnCost)));
+  const basis = bidBasis(i);
+  const r = 1 + returnOnCost;
+  return atLeastZero(
+    (basis.netResale - basis.effectiveOtherCosts * r) / (basis.costPerHammerDollar * r),
+  );
 }
 
-/** Estimated profit at a given hammer bid. */
-export function profitAt(i: BidInputs, hammer: number): number {
-  const { netResale, effectiveOtherCosts, k } = basics(i);
-  return netResale - (hammer * k + effectiveOtherCosts);
+/**
+ * The three bid figures when the profit targets are returns on cost rather
+ * than dollar amounts. The break even bid is the same either way, because a
+ * return of zero is the same as a profit of zero.
+ */
+export function bidLimitsForReturn(
+  i: BidInputs,
+  targetReturn: number,
+  minReturn: number,
+): BidLimits {
+  return {
+    ...bidBasis(i),
+    targetBid: bidForReturn(i, targetReturn),
+    limitBid: bidForReturn(i, minReturn),
+    breakEvenBid: bidForReturn(i, 0),
+  };
 }
