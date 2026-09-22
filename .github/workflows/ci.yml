@@ -40,8 +40,16 @@ jobs:
         run: supabase start
       - name: Row level security tests
         run: pnpm test:rls
-      - name: Check the generated types are up to date
+      - name: Generate the database types
+        run: supabase gen types typescript --local > packages/db/src/database.types.ts
+      # Uploaded before the staleness check, so the generated file is always
+      # available to download even when the check fails.
+      - name: Upload the generated types
+        uses: actions/upload-artifact@v4
+        with:
+          name: database-types
+          path: packages/db/src/database.types.ts
+      - name: Check the committed types are up to date
         run: |
-          supabase gen types typescript --local > packages/db/src/database.types.ts
           git diff --exit-code packages/db/src/database.types.ts \
             || (echo "::error::Database types are stale. Run pnpm db:types and commit the result." && exit 1)
