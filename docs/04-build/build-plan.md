@@ -14,9 +14,12 @@ Updated at the end of every pull request. The current row is always the one to r
 | 4 | Complete the token set and fix two accessibility failures | Merged | 22 Sep 2026 |
 | 5 | This build plan | Merged | 22 Sep 2026 |
 | 6 | W1.1 Button, StopLine and Wordmark to In review | In review |  |
-| 7 | W1.2 Primitives A | Next |  |
+| 7 | W1.2 Primitives A: Input, Toggle group, Money, MonoLabel, ProvenanceTag | In review |  |
+| 8 | W1.3 Primitives B: AiLabel, MatchBadge, ConfidenceBadge, ZoneLabel, InfoNote | In review |  |
+| 9 | W1.4 Primitives C: SheetFrame, TitleBlock, DetailLabel, LeaderLine, LineIcon | In review |  |
+| 10 | W1.5 First migration and row level security | Next, needs a plan first |  |
 
-**Where we are.** Week 1, foundations. The rule book, the bid maths, the quality gates and the token set are all done. The first three primitives are built and waiting on a Storybook review. Storybook now has the MF02 viewports, so every later component gets a 375px and a 1440px story.
+**Where we are.** Week 1, foundations. All 18 primitives are built and waiting on one Storybook review. Next is the first database migration, which stops for a plan first.
 
 **Blocked and waiting on Ashleigh.** O01, O02, O03 and O05 block Week 2. O04 should be applied for now because approval takes time. O11 blocks promoting the waitlist page. See the Things only Ashleigh can do table at the end.
 
