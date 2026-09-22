@@ -16,9 +16,9 @@ Source: MaxBid Project Workbook, tab 17 Design System.
 
 | Token | Use | Light pages | On navy panels | Notes |
 | --- | --- | --- | --- | --- |
-| background | Page background | #F4F7FA |  | Drafting white |
+| page | Page background | #F4F7FA |  | Drafting white. Named page in code and here, per decision record 0010 |
 | surface | Cards, tables and search panel | #FFFFFF | #0E2A47 | Navy is the panel colour for headers, bid limits and sign up |
-| surface_muted | Table headers on light, photo placeholders, chips | #E6EDF4 | rgba(255,255,255,0.14) |  |
+| surface_muted | Table headers on light, photo placeholders, chips | #E6EDF4 | rgba(255,255,255,0.14) | Status and link text does not go on this surface. See decision record 0010 |
 | border | Hairlines and dividers | #C9D6E3 | #7FC8F8 at 50 percent | Double inset frame lines on navy panels |
 | ink | Primary text | #0E1B2B | #FFFFFF |  |
 | ink_muted | Secondary text and notes | #4A5A6D | #B7CDE3 | Disclaimer notes use this |
@@ -35,7 +35,27 @@ Source: MaxBid Project Workbook, tab 17 Design System.
 | confidence_high | High confidence | #1E7A52 | #6EE7B7 |  |
 | confidence_medium | Medium confidence | #0E1B2B | #FFFFFF |  |
 | confidence_low | Low confidence | #B45309 | #FBBF24 |  |
-| confidence_insufficient | Not enough evidence | #6B7280 | #9CA3AF |  |
+| confidence_insufficient | Not enough evidence | #5B6472 | #9CA3AF | Darkened from #6B7280 by decision record 0009 to meet AA |
+
+## Spacing, radius and motion
+
+Set by decision record 0010. These live in packages/tokens and nowhere else.
+
+**Spacing.** A 4px base scale, plus three named values taken from the rules above. Standard table rows are 36px and comfortable rows are 44px, which is the density switch C09 asks for. The minimum touch target is 44px, per MF03.
+
+**Radius.** 2px on every corner. Hairline borders rather than shadows.
+
+**Motion.** Every animation using these sits inside a reduced motion media query, per C08.
+
+| Token | Value | Use |
+| --- | --- | --- |
+| duration_fast | 120ms | Hovers, focus rings, tag changes |
+| duration_base | 200ms | Expanding cost lines, sheets |
+| duration_slow | 320ms | Page and panel transitions |
+| ease_standard | cubic-bezier(0.2, 0, 0, 1) | Movement that starts fast and settles |
+| ease_out | cubic-bezier(0, 0, 0.2, 1) | Things entering the screen |
+
+**Breakpoints.** 640, 768, 1024 and 1280px, as MF01 sets out. These are the Tailwind defaults, so nothing redefines them.
 
 | Component | Specification |
 | --- | --- |

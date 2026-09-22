@@ -7,10 +7,8 @@ import React from 'react';
 import register from 'virtual:component-register';
 
 // Every status carries a text label, so colour is never the only signal.
-// Not started uses ink_muted rather than confidence_insufficient, because
-// that token does not reach 4.5 to 1 on the page background.
 const STATUS_CLASS: Record<string, string> = {
-  'Not started': 'text-ink-muted',
+  'Not started': 'text-confidence-insufficient',
   Draft: 'text-ink-muted',
   'In review': 'text-zone-amber',
   Approved: 'text-zone-green',
@@ -18,7 +16,7 @@ const STATUS_CLASS: Record<string, string> = {
 };
 
 const HEADINGS = ['ID', 'Component', 'Layer', 'Used in', 'Status', 'Date', 'Notes'];
-const CELL = 'border-b border-surface-muted px-2 py-1.5 text-left align-top';
+const CELL = 'border-b border-border px-2 py-1.5 text-left align-top';
 
 function summary() {
   const counts = new Map<string, number>();
@@ -64,7 +62,7 @@ function ComponentRegisterPage() {
         <thead>
           <tr>
             {HEADINGS.map((heading) => (
-              <th key={heading} scope="col" className="border-b-2 border-line px-2 py-1.5 text-left">
+              <th key={heading} scope="col" className="border-b-2 border-border px-2 py-1.5 text-left">
                 {heading}
               </th>
             ))}

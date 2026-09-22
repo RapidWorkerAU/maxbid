@@ -1,30 +1,78 @@
-/* MaxBid Blueprint design tokens. Source: workbook tabs 17 and 33. */
-/* Every colour, font and radius used anywhere comes from this file. */
+/* MaxBid Blueprint design tokens.
+   Source: docs/03-design/design-system.md. Decision records 0009 and 0010.
+   Every colour, font, radius, spacing and motion value used anywhere comes
+   from this file. Nothing else defines them. */
 @theme {
-  --color-navy: #0e2a47;
+  /* Surfaces */
   --color-page: #f4f7fa;
   --color-surface: #ffffff;
   --color-surface-muted: #e6edf4;
-  --color-line: #c9d6e3;
-  --color-cyan: #7fc8f8;
-  --color-accent: #ffd23f;
+  --color-navy: #0e2a47;
+  --color-surface-muted-on-navy: rgba(255, 255, 255, 0.14);
+
+  /* Lines. border is the hairline on light pages, line is the drafting
+     cyan used for frames and labels on navy. */
+  --color-border: #c9d6e3;
+  --color-border-on-navy: rgba(127, 200, 248, 0.5);
+  --color-line: #7fc8f8;
+
+  /* Text */
   --color-ink: #0e1b2b;
   --color-ink-muted: #4a5a6d;
   --color-ink-on-navy: #ffffff;
   --color-ink-muted-on-navy: #b7cde3;
+
+  /* Action and links. Marker yellow is only for the main action and the
+     most you should bid figure. Never for status, never as a text colour. */
+  --color-accent: #ffd23f;
   --color-link: #1b6fd1;
+  --color-link-on-navy: #7fc8f8;
+
+  /* Profit zones. Every zone also carries a text label. */
   --color-zone-green: #1e7a52;
   --color-zone-amber: #b45309;
   --color-zone-red: #b91c1c;
-  --color-tag-verified: #1e7a52;
-  --color-tag-extracted: #e6edf4;
-  --color-tag-estimated: #fff4cc;
-  --color-tag-your-input: #1b6fd1;
-  --color-confidence-insufficient: #6b7280;
+  --color-zone-green-on-navy: #6ee7b7;
+  --color-zone-amber-on-navy: #fbbf24;
+  --color-zone-red-on-navy: #f87171;
 
+  /* Provenance tags. Each is a fill colour with the text colour noted. */
+  --color-tag-verified: #1e7a52; /* white text */
+  --color-tag-extracted: #e6edf4; /* ink text */
+  --color-tag-estimated: #fff4cc; /* ink text */
+  --color-tag-your-input: #1b6fd1; /* white text */
+
+  /* Confidence. insufficient is #5B6472 per decision record 0009, because
+     the previous #6B7280 failed AA on the page and on surface_muted. */
+  --color-confidence-high: #1e7a52;
+  --color-confidence-medium: #0e1b2b;
+  --color-confidence-low: #b45309;
+  --color-confidence-insufficient: #5b6472;
+  --color-confidence-high-on-navy: #6ee7b7;
+  --color-confidence-medium-on-navy: #ffffff;
+  --color-confidence-low-on-navy: #fbbf24;
+  --color-confidence-insufficient-on-navy: #9ca3af;
+
+  /* Type */
   --font-sans: var(--font-barlow, 'Barlow'), system-ui, sans-serif;
   --font-mono: var(--font-space-mono, 'Space Mono'), ui-monospace, monospace;
 
+  /* Sharp geometry. 2px corners, hairline borders, no shadows. */
   --radius-sm: 2px;
   --radius-md: 2px;
+
+  /* Spacing. The 4px base scale, plus the named values the documents state.
+     row and row-comfortable drive the C09 density switch. */
+  --spacing: 0.25rem;
+  --spacing-row: 36px;
+  --spacing-row-comfortable: 44px;
+  --spacing-touch-min: 44px;
+
+  /* Motion. Decision record 0010. Every animation that uses these sits
+     inside a prefers-reduced-motion query, per C08. */
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --duration-slow: 320ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
 }
