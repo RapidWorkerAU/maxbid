@@ -15,12 +15,13 @@
     "test": "turbo run test",
     "storybook": "pnpm --filter @maxbid/storybook storybook",
     "check:size": "node scripts/check-file-size.mjs",
-    "check": "pnpm check:size && pnpm lint && pnpm typecheck && pnpm test",
+    "check": "pnpm check:size && pnpm check:tags && pnpm lint && pnpm typecheck && pnpm test",
     "db:start": "supabase start",
     "db:stop": "supabase stop",
     "db:reset": "supabase db reset",
     "db:types": "supabase gen types typescript --local > packages/db/src/database.types.ts",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "check:tags": "node scripts/check-story-tags.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0",
