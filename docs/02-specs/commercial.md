@@ -21,7 +21,7 @@ Source: MaxBid Project Workbook, tab 18 Commercial.
 
 **Annual plans.** Two months free on annual billing.
 
-**Pricing rule.** Price per credit must stay well above the deep analysis cost per lot on tab 19. Every tier should hold at least 30 percent gross margin at full usage. First draft prices failed this test and were revised.
+**Pricing rule.** Price per credit must stay well above the deep analysis cost per lot in docs/02-specs/unit-costs.md. Every tier should hold at least 30 percent gross margin at full usage. First draft prices failed this test and were revised.
 
 
 

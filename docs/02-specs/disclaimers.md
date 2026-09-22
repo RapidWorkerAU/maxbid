@@ -10,8 +10,8 @@ Source: MaxBid Project Workbook, tab 30 Disclaimers.
 | DS02 | Every lot detail footer | Always | Estimate only, based on the evidence listed and checked on [date]. Condition and working order have not been verified. |
 | DS03 | Insufficient evidence | Lot has no defensible comparable | We could not find enough reliable evidence to estimate a resale value for this lot. Enter your own resale estimate to calculate a bid. |
 | DS04 | Resale override | User enters own resale | This bid uses your resale estimate of [amount], not the system estimate of [amount]. System confidence does not apply to your figure. |
-| DS05 | Above absolute maximum | Proposed bid exceeds limit | This bid is above your absolute maximum of [amount]. Estimated profit is below your minimum of [amount]. |
-| DS06 | Above break even | Proposed bid exceeds break even | At this bid you would make an estimated loss of [amount]. |
+| DS05 | Above the limit bid | Proposed bid exceeds the limit bid | This bid is above your limit bid of [amount]. Estimated profit is below your minimum of [amount]. |
+| DS06 | Above the break even bid | Proposed bid exceeds the break even bid | At this bid you would make an estimated loss of [amount]. |
 | DS07 | Optimistic reliance | Target only met on optimistic value | Your profit target is only met at the optimistic resale value. That value needs good condition and strong demand. |
 | DS08 | Specification mismatch | Higher or lower specification comparable | No exact match was found. This comparable has [more or fewer] features than the lot, so its price has been adjusted [down or up] by [percent]. |
 | DS09 | Stale price | Checked more than seven days ago | This price was checked on [date]. Refresh to check current listings. |
@@ -27,6 +27,7 @@ Source: MaxBid Project Workbook, tab 30 Disclaimers.
 | DS19 | Method update | Newer method version released | A newer valuation method is available. This result uses version [version]. Recalculate to use the latest method. |
 | DS20 | Accuracy page | Accuracy page header | Accuracy is measured against outcomes recorded by users for each category. Past accuracy does not guarantee future results. |
 | DS21 | Triage figures | Triage table | Triage figures are rough estimates from a quick check. Run deep analysis before bidding. |
+| DS22 | Submit for review | User submits a shared data correction | Thanks. Your correction applies to your organisation now. It will apply to everyone once reviewed. |
 | DS23 | Spec sheet header and PDF footer | Every spec sheet | Specifications are taken from the sources linked beside each item. Model specifications describe the model, not this item, unless also listed under Observed on this lot or Auctioneer stated. Details we could not verify are marked Not verified and are not presented as fact. We recommend independent checks before bidding. |
 | DS24 | Specification conflict | Sources disagree on a field | Sources disagree on this detail. Check the item or ask the auctioneer before relying on it. |
 | DS25 | Not identified | Item cannot be identified | We could not identify this item from the description and photos, so no specifications have been added. Enter the brand and model if you know them. |
@@ -40,7 +41,6 @@ Source: MaxBid Project Workbook, tab 30 Disclaimers.
 | DS33 | Match reason | Beside each AI match reason | AI generated from the listing details shown. |
 | DS34 | Optional equipment checklist | Checklist footer | Options marked Not verified may or may not be fitted. Confirm before bidding. |
 | DS35 | Standard recommendation phrase | Used wherever a check is recommended | We recommend independent checks before bidding. |
-| DS22 | Submit for review | User submits a shared data correction | Thanks. Your correction applies to your organisation now. It will apply to everyone once reviewed. |
 
 ## Placement and style rules
 

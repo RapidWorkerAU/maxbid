@@ -72,9 +72,14 @@ Source: MaxBid Project Workbook, tab 08 Matching Logic.
 
 ## Opportunity score for triage (0 to 100)
 
-**Headroom.** Rough target bid minus current bid (or starting bid), divided by rough target bid.
+Set by decision record 0006. The score ranks lots by the dollars a user could make, adjusted for how much the evidence supports the estimate.
 
-**Score.** Headroom multiplied by triage confidence factor (High 1.0, Medium 0.75, Low 0.5), scaled to 0 to 100 and capped. Lots with a negative headroom score zero.
+**Headroom.** The rough target bid less the current bid. Where there is no current bid, use the opening bid. Where there is neither, use zero. Negative headroom counts as zero.
 
-**Tie break.** Higher absolute dollar headroom ranks first.
+**Weighted headroom.** Headroom multiplied by the triage confidence factor: High 1.0, Medium 0.75, Low 0.5, and zero where there is not enough evidence.
 
+**Displayed score.** Weighted headroom divided by the highest weighted headroom in that catalogue, multiplied by 100, rounded down. The best lot in any catalogue scores 100.
+
+**Tie break.** The earliest closing time ranks first, because that lot needs the user's attention soonest.
+
+**Scope.** The score compares lots within one catalogue. It is not comparable across auctions, because it is scaled against the best lot in its own catalogue. It is calculated at pipeline stage S6, once every lot has a rough valuation.

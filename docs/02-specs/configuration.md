@@ -17,8 +17,8 @@ Source: MaxBid Project Workbook, tab 26 Config Principles.
 | CP09 | User figures are never presented as system figures | When a user overrides a value, the override is marked, the system value stays visible and system confidence is not applied to the user's figure. |
 | CP10 | Nothing silently changes | Method updates, data refreshes and overrides are always visible. Past results stay reproducible under the method version that produced them. |
 | CP11 | Plain factual language | Warnings and disclaimers state the risk and the reason in plain, neutral words. No legal padding in the interface, full terms one tap away. |
-| CP13 | Model data is not unit data | Specifications from a manufacturer describe the model, not the item at auction. They are never shown as confirmed for the lot unless observed in the photos or stated by the auctioneer. |
 | CP12 | Disclaimers where the risk is | Short notes appear beside the figure they relate to, not as page banners. Every export carries the footer disclaimer, source tags and analysis date. |
+| CP13 | Model data is not unit data | Specifications from a manufacturer describe the model, not the item at auction. They are never shown as confirmed for the lot unless observed in the photos or stated by the auctioneer. |
 
 
 # Settings Matrix
@@ -30,7 +30,7 @@ Source: MaxBid Project Workbook, tab 27 Settings Matrix.
 | ID | Setting | Layer | Type | Who can change | Org lock | Default | Reach of change | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | CS01 | Bid limit formulas | Platform | Hard coded | Code release | No | Tab 10 formulas | Everyone | Visible in How this was calculated |
-| CS02 | Calculation order and rounding | Platform | Hard coded | Code release | No | Round to whole dollars for display, cents internally | Everyone |  |
+| CS02 | Calculation order and rounding | Platform | Hard coded | Code release | No | Bid figures round down to whole dollars. Other figures round to the nearest dollar. Cents kept internally | Everyone | Decision record 0003 |
 | CS03 | GST rate | Platform | Hard coded | Code release | No | 10 percent | Everyone | Legislative change handled by release |
 | CS04 | Match level definitions | Platform | Hard coded | Code release | No | Tab 08 | Everyone | Published on methodology page |
 | CS05 | Evidence type weights | Platform | Hard coded | Code release | No | Tab 08 | Everyone | Versioned |
@@ -58,7 +58,7 @@ Source: MaxBid Project Workbook, tab 27 Settings Matrix.
 | CS27 | Default cost profile | Organisation | Org setting | Owner or admin | Fixed |  | Organisation |  |
 | CS28 | Default profit mode | Organisation | Org setting | Owner or admin | Fixed | Dollars | Organisation |  |
 | CS29 | Default target profit | Organisation | Org setting | Owner or admin | Floor |  | Organisation | Floor means members can raise but not lower |
-| CS30 | Minimum acceptable profit | Organisation | Org setting | Owner or admin | Floor |  | Organisation | Drives absolute maximum bid |
+| CS30 | Minimum acceptable profit | Organisation | Org setting | Owner or admin | Floor |  | Organisation | Drives the limit bid |
 | CS31 | Default resale scenario | Organisation | Org setting | Owner or admin | Fixed | Conservative | Organisation |  |
 | CS32 | Transport rate per km and base fee | Organisation | Org setting | Owner or admin | Floor | In cost profile | Organisation |  |
 | CS33 | Default alert lead time | Organisation | Org setting | Owner or admin | No | 30 minutes | Organisation |  |
@@ -68,7 +68,7 @@ Source: MaxBid Project Workbook, tab 27 Settings Matrix.
 | CS37 | Personal base location | User | User preference | The user | Subject to org lock | Inherits org | That user |  |
 | CS38 | Alert lead time | User | User preference | The user | No | Inherits org | That user |  |
 | CS39 | Notification channels | User | User preference | The user | No | Email and push | That user |  |
-| CS40 | Theme | User | User preference | The user | No | Follow system | That user |  |
+| CS40 | Theme | User | User preference | The user | No | Light. Dark mode is not available in V1 | That user | Decision record 0001 |
 | CS41 | Table density and columns | User | User preference | The user | No | Standard | That user |  |
 | CS42 | Default triage filters | User | User preference | The user | No | None | That user |  |
 | CS43 | Identification (brand, model, year, specs) | Lot | Lot input | Buyer or above | No | System identification | That lot in that org | Can also be submitted for shared review |
@@ -123,8 +123,8 @@ Source: MaxBid Project Workbook, tab 28 Override Rules.
 | Situation | Reason | Response | Behaviour | Message |
 | --- | --- | --- | --- | --- |
 | Proposed bid above target | Slider enters amber zone | Inform | Zone label changes to Below target. |  |
-| Proposed bid above absolute maximum | Profit falls below minimum | Warn | Warning shown beside the bid. User can proceed. | DS05 |
-| Proposed bid above break even | Estimated loss | Warn | Red warning with estimated loss amount. User can proceed. | DS06 |
+| Proposed bid above the limit bid | Profit falls below minimum | Warn | Warning shown beside the bid. User can proceed. | DS05 |
+| Proposed bid above the break even bid | Estimated loss | Warn | Red warning with estimated loss amount. User can proceed. | DS06 |
 | Profit only met on optimistic scenario | Relies on favourable outcome | Warn | Warning on the lot and in the bid sheet. | DS07 |
 | Resale override entered | User knows more than evidence | Inform | Value tagged Your input, system value retained. | DS04 |
 | Resale override above optimistic value | Above all evidence | Warn | Warning that the figure is above every comparable found. | DS04 |

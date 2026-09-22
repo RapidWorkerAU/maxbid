@@ -12,7 +12,7 @@ Source: MaxBid Project Workbook, tab 34 Website SEO.
 | /methodology | Methodology | How auction valuations work | Article | Public version of tabs 08 and 10. Key trust and AI citation asset |
 | /accuracy | Accuracy | Is it accurate | Dataset, Article | Published accuracy by category (tab 31) |
 | /changelog | Changelog | Trust and freshness | Article per entry | Method and data source releases |
-| /calculators/max-bid | Max bid calculator | auction max bid calculator, buyer's premium calculator | WebApplication | Free public calculator from tab 10. Strong link magnet |
+| /calculators/max-bid | Max bid calculator | auction max bid calculator, buyer's premium calculator | WebApplication | Free public calculator using the maths in docs/02-specs/bid-calculation.md. Strong link magnet |
 | /calculators/gst-auction | GST on auction purchases | GST on auction items Australia | WebApplication, FAQPage | Free calculator with plain explanation and not tax advice note |
 | /auctions/grays | Grays guide | Grays buyer's premium, how to buy on Grays | Article, FAQPage | One guide per supported auction house. Premium facts dated and sourced |
 | /auctions/pickles | Pickles guide | As above for Pickles | Article, FAQPage |  |

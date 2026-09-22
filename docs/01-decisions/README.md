@@ -1,6 +1,6 @@
 # Changing a decision
 
-1. Copy records/0000-template.md to a new file with the next number, for example records/0001-choose-inngest.md.
+1. Copy records/0000-template.md to a new file with the next number, for example records/0009-choose-inngest.md.
 2. Fill it in and set the status to Proposed.
 3. Ashleigh approves or rejects it. Only Ashleigh sets Accepted.
 4. Once accepted, update the decision register and any affected spec in the same pull request.

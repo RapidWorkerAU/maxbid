@@ -32,7 +32,7 @@ Source: MaxBid Project Workbook, tab 13 Database.
 | cost_profiles |  | min_return_pct | numeric(6,4) | Yes |  |  |
 | cost_profiles |  | transport_base_fee | numeric(12,2) | Yes |  |  |
 | cost_profiles |  | transport_rate_per_km | numeric(8,2) | Yes |  |  |
-| cost_profiles |  | repair_mode | text | No |  | dollars or percent_of_resale |
+| cost_profiles |  | repair_mode | text | No |  | dollars or percent_of_resale. A percentage applies to the GST inclusive resale the bid is calculated from, per decision record 0005 |
 | cost_profiles |  | repair_value | numeric(12,4) | Yes |  |  |
 | cost_profiles |  | defaults | jsonb | No |  | Other line item defaults keyed by cost field |
 | categories | Category tree and category specific rules. | id | uuid | No | PK |  |

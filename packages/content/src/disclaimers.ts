@@ -13,10 +13,10 @@ export const DS03 = "We could not find enough reliable evidence to estimate a re
 /** Resale override. Trigger: User enters own resale */
 export const DS04 = "This bid uses your resale estimate of [amount], not the system estimate of [amount]. System confidence does not apply to your figure.";
 
-/** Above absolute maximum. Trigger: Proposed bid exceeds limit */
-export const DS05 = "This bid is above your absolute maximum of [amount]. Estimated profit is below your minimum of [amount].";
+/** Above the limit bid. Trigger: Proposed bid exceeds the limit bid */
+export const DS05 = "This bid is above your limit bid of [amount]. Estimated profit is below your minimum of [amount].";
 
-/** Above break even. Trigger: Proposed bid exceeds break even */
+/** Above the break even bid. Trigger: Proposed bid exceeds the break even bid */
 export const DS06 = "At this bid you would make an estimated loss of [amount].";
 
 /** Optimistic reliance. Trigger: Target only met on optimistic value */

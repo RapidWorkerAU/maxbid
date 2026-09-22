@@ -8,7 +8,7 @@ Source: MaxBid Project Workbook, tab 07 Features.
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | F01 | Accounts | Sign in | Email magic link and Google sign in through Supabase Auth. | Must | 1 |  | User can sign in and out on desktop and mobile. |
 | F02 | Accounts | Organisations | Every user belongs to an organisation. Data is scoped to the organisation. | Must | 1 | Sign in | Two members of one organisation see the same analyses. Other organisations see nothing. |
-| F03 | Accounts | Roles | Owner, admin, buyer and viewer roles. | Should | 1 | Organisations | Viewer cannot edit costs or spend credits. |
+| F03 | Accounts | Roles | Owner, admin, buyer and viewer roles. | Must | 1 | Organisations | Viewer cannot edit costs or spend credits. |
 | F04 | Accounts | Profile settings | GST registered, base location, default cost profile, default profit target. | Must | 1 | Organisations | Changing GST registration recalculates all open lots. |
 | F05 | Input | URL submission | Paste a Grays, Pickles or Lloyds URL. Platform detected automatically. | Must | 1 |  | Unsupported URLs show a clear message and offer PDF upload. |
 | F06 | Input | PDF upload | Upload an auction catalogue PDF for extraction. | Must | 1 |  | Lots extracted from a text PDF and a scanned PDF with at least 90 percent completeness in testing. |
@@ -20,7 +20,7 @@ Source: MaxBid Project Workbook, tab 07 Features.
 | F12 | Processing | Progress and email | Live progress bar and email when triage completes. | Must | 1 | Background jobs | Email arrives within five minutes of completion. |
 | F13 | Triage | Quick identification | Low cost model identifies each lot from text and the primary photo. | Must | 1 | Background jobs | Category and product type assigned to every lot. |
 | F14 | Triage | Rough valuation | One search pass returns a rough resale range and rough max bid. | Must | 1 | Quick identification | Range shown with a triage confidence label. |
-| F15 | Triage | Opportunity score | Score from 0 to 100 ranking lots by likely margin and confidence. | Must | 1 | Rough valuation | Table sorted by score by default. |
+| F15 | Triage | Opportunity score | Score from 0 to 100 ranking lots by dollar headroom adjusted for confidence, per decision record 0006. | Must | 1 | Rough valuation | Table sorted by score by default. |
 | F16 | Triage | Filters | Category, value range, location and closing time. | Must | 1 | Triage table | Filters combine and persist for the session. |
 | F17 | Triage | Shortlist and credit preview | Tick lots for deep analysis. Show credits required before confirming. | Must | 1 | Credits ledger | User cannot exceed available credits. |
 | F18 | Deep analysis | Vision identification | Larger model reads all lot photos including data plates and labels. | Must | 1 | Background jobs | Brand and model extracted from plate photos in testing. |
@@ -32,18 +32,18 @@ Source: MaxBid Project Workbook, tab 07 Features.
 | F24 | Valuation | Evidence weighting | Weight comparables by type, match level and age. | Must | 1 | Match grading | Weights visible in the evidence panel. |
 | F25 | Valuation | Resale scenarios | Conservative, expected and optimistic resale values. | Must | 1 | Evidence weighting | Conservative drives the default max bid. |
 | F26 | Valuation | Confidence score | High, medium, low or insufficient based on the confidence model. | Must | 1 | Evidence weighting | Insufficient lots show no max bid unless the user enters a resale price. |
-| F27 | Calculator | Bid limits | Target bid, absolute maximum and break even. | Must | 1 | Resale scenarios | Matches tab 10 formulas to the cent. |
+| F27 | Calculator | Bid limits | Target bid, limit bid and break even bid. | Must | 1 | Resale scenarios | Matches docs/02-specs/bid-calculation.md to the cent. |
 | F28 | Calculator | Profit target | Dollars or percentage return on cost, set per lot. | Must | 1 | Bid limits | Switching mode recalculates instantly. |
 | F29 | Calculator | Bid slider | Proposed hammer bid slider linked to profit and return. | Must | 1 | Bid limits | Green, amber and red zones match target and minimum settings. |
 | F30 | Calculator | Editable cost lines | Collapsed summary that expands to editable line items. | Must | 1 | Cost profiles | Edits save per lot and recalculate instantly. |
 | F31 | Calculator | Selling fee flag | Warn when selling fees are blank. | Must | 1 | Editable cost lines | Flag visible on the lot row and in the bid sheet. |
-| F32 | Calculator | GST engine | Cash required and effective cost after credits based on profile. | Must | 1 | Profile settings | Matches tab 10 for registered and unregistered cases. |
+| F32 | Calculator | GST engine | Cash needed on the day and cost after GST credits based on profile. | Must | 1 | Profile settings | Matches docs/02-specs/bid-calculation.md for registered and unregistered cases. |
 | F33 | Calculator | Cost profiles | Multiple saved profiles of default costs. | Must | 1 | Organisations | New lots inherit the selected profile. |
 | F34 | Calculator | Transport estimate | Distance from base to lot location multiplied by rate per km plus base fee by size class. | Should | 1 | Routing API | Estimate shown with distance and editable. |
 | F35 | After analysis | Watchlist | Save lots across auctions. | Must | 1 |  | Watchlist shows live closing countdown. |
 | F36 | After analysis | Closing soon alerts | Email and push alerts before a watchlisted lot closes. | Should | 1 | Watchlist | Alert timing set by the user. |
 | F37 | After analysis | Outcome recording | Won or lost, hammer price, actual resale price and date. | Must | 1 |  | Outcome feeds internal comparables. |
-| F38 | After analysis | PDF bid sheet | One line per lot with target and absolute maximum, readable on a phone. | Must | 1 | Bid limits | Generates in under ten seconds for 50 lots. |
+| F38 | After analysis | PDF bid sheet | One line per lot with the target bid and the limit bid, readable on a phone. | Must | 1 | Bid limits | Generates in under ten seconds for 50 lots. |
 | F39 | After analysis | CSV export | Full lot data with costs and bids. | Should | 1 |  | Opens cleanly in Excel. |
 | F40 | Mobile | Mobile bid view | Large type view of watchlisted lots with target, maximum and stop line. | Must | 1 | Watchlist | Usable one handed on a phone. |
 | F41 | Admin | Platform admin | Manage auction platforms, premium defaults, categories and extractor health. | Should | 1 |  | Admin can update a platform default without a deploy. |
