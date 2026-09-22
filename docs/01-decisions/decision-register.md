@@ -136,3 +136,5 @@ Each one has a decision record in docs/01-decisions/records.
 | D121 | Triage | How is the opportunity score calculated | Dollar headroom adjusted for confidence, scaled against the best lot in the catalogue | 0006 | The old fraction ranked small lots above large ones. Replaces the formula in matching-and-valuation.md. |
 | D122 | Governance | What is the source of truth | The documents in docs. The workbook becomes a historical record | 0007 | A spreadsheet cannot be reviewed in a pull request. Amends docs/README.md. |
 | D123 | Accounts | Is F03 Roles a Must or a Should | Must in Phase 1 | 0008 | F52, the security policies and the settings matrix all depend on roles. |
+| D124 | Design | confidence_insufficient fails WCAG AA | Darken it from #6B7280 to #5B6472 | 0009 | Failed at 4.49 on the page and 4.09 on surface_muted. Found by the axe gate on its first run. |
+| D125 | Design | Complete the token set, and where status colour may not go | Status and link text never sits on surface_muted. Names, spacing and motion settled | 0010 | Lightening surface_muted enough to pass would leave it 1.022 to 1 against the page, which destroys its purpose. |
