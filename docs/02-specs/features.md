@@ -13,7 +13,7 @@ Source: MaxBid Project Workbook, tab 07 Features.
 | F05 | Input | URL submission | Paste a Grays, Pickles or Lloyds URL. Platform detected automatically. | Must | 1 |  | Unsupported URLs show a clear message and offer PDF upload. |
 | F06 | Input | PDF upload | Upload an auction catalogue PDF for extraction. | Must | 1 |  | Lots extracted from a text PDF and a scanned PDF with at least 90 percent completeness in testing. |
 | F07 | Input | Grays extractor | Structured extraction of lots, photos, location, closing time, current bid and terms. | Must | 1 | Extraction service | All lots from a 300 lot catalogue extracted with correct lot numbers. |
-| F08 | Input | Pickles extractor | As above for Pickles. | Must | 1 | Extraction service | As above. |
+| F08 | Input | Pickles extractor | As above for Pickles. | Must | 2 | Written permission from Pickles | Blocked by decision record 0012. Pickles prohibits automated access. Build only once permission is in writing. |
 | F09 | Input | Lloyds extractor | As above for Lloyds. | Must | 1 | Extraction service | As above. |
 | F10 | Input | Buyer's premium extraction | Read premium rates and GST terms from each auction's terms. Fall back to platform default. | Must | 1 | Extractors | Premium shown with its source and is editable. |
 | F11 | Processing | Background jobs | Durable jobs with retries and fan out per lot. | Must | 1 |  | A failed lot retries without restarting the catalogue. |

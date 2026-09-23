@@ -9,7 +9,7 @@ Source: MaxBid Project Workbook, tab 02 Decisions.
 | D01 | Strategy | Primary goal | Build for us first, commercialise once proven | Yes | Proves accuracy on real money before selling it. Keeps early costs low. |
 | D02 | Strategy | V1 market | All auction categories | No | Broader appeal. Requires a category agnostic engine and progressive category rules. Accuracy will vary by category and must be shown honestly. |
 | D03 | Strategy | Primary paying user | Resellers and flippers buying for profit | n/a | Profit maths and bid limits are the core of the product. |
-| D04 | Input | Auction sources in V1 | Grays, Pickles and Lloyds | Yes | Three structured, high volume sources. Each needs its own extractor. |
+| D04 | Input | Auction sources in V1 | Grays and Lloyds, plus PDF upload. Pickles removed | Yes | Amended by decision record 0012. Pickles prohibits automated access in robots.txt and in clause 9(b)(vi) of its terms. It returns if they permit it. |
 | D05 | Input | Submission method | URL plus PDF catalogue upload | Yes | PDF upload covers any auctioneer not yet supported. |
 | D06 | Input | Geographic scope | Australia only | Yes | Consistent currency, GST, freight and comparables. |
 | D07 | Data | Comparable price gathering | eBay API, web search API and retailer sites | Yes | Uses official APIs where possible and limits scraping risk. |
@@ -139,3 +139,4 @@ Each one has a decision record in docs/01-decisions/records.
 | D124 | Design | confidence_insufficient fails WCAG AA | Darken it from #6B7280 to #5B6472 | 0009 | Failed at 4.49 on the page and 4.09 on surface_muted. Found by the axe gate on its first run. |
 | D125 | Design | Complete the token set, and where status colour may not go | Status and link text never sits on surface_muted. Names, spacing and motion settled | 0010 | Lightening surface_muted enough to pass would leave it 1.022 to 1 against the page, which destroys its purpose. |
 | D126 | Data | Is raw_extract a real table or a stale name for lots.raw | A real table. The payload is kept as it arrived, before parsing | 0011 | S2 stores a payload before any lot exists, a half failed parse must replay without refetching, and R01 needs old payloads reprocessable under a new extractor. |
+| D127 | Input | Pickles prohibits automated access | Remove Pickles from V1 and ask them for permission | 0012 | Their terms say except as expressly permitted by Pickles, so permission is the route, not a better extractor. |

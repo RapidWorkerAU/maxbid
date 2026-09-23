@@ -21,11 +21,12 @@ Updated at the end of every pull request. The current row is always the one to r
 | 11 | All 18 primitives Approved, and W1.6 sign in, organisations, terms, AppShell | In review |  |
 | 12 | W1.7 Waitlist holding page | In review |  |
 | 13 | W2.3 Ingestion schema, auctions, lots and analyses | In review |  |
-| 14 | W2.1 Inngest setup. Needs an account and O05 | Next |  |
+| 14 | O05 site access findings and decision record 0012 | In review |  |
+| 15 | W6.1 The valuation maths | Next |  |
 
 **Where we are.** Week 1 is built. All 18 primitives are Approved. The database, row level security, accounts, the terms gate, the app shell and the waitlist page are all in. Week 2 cannot start until O01, O02 and O05 are closed, which are all Ashleigh tasks.
 
-**Blocked and waiting on Ashleigh.** O01 is decided, Inngest, and O02 is decided, Firecrawl, but both still need accounts. O05, reading the auction terms of use, blocks every extractor and has no shortcut. O03 blocks Week 3. O04 should be applied for now because approval takes time. O11 blocks promoting the waitlist page.
+**Blocked and waiting on Ashleigh.** O05 is part closed. Lloyds is cleared, Pickles is prohibited and out of V1, and the Grays terms still need reading in a browser. Inngest and Firecrawl are chosen but need accounts. O03 blocks Week 3. O04 should be applied for now because approval takes time. O11 blocks promoting the waitlist page.
 
 ## How to read this
 
@@ -70,7 +71,7 @@ Exit criteria: Grays and PDF catalogues extracted.
 | W2.1 | Choose the job runner and build the fan out spike. Closes O01 | D32, pipeline.md, tech-stack.md | M | a, c, d |
 | W2.2 | Choose the extraction service. Closes O02 | D34, data-sources.md | M | a, c, d |
 | W2.3 | Migration: auction_platforms, auctions, lots, lot_images, analyses, analysis_lots, raw extract | database.md, security-and-rls.md shared tables | L | a |
-| W2.4 | Ingest and extract stages S1 and S2 for Grays | F05, F07, S1, S2. D45 rate limits and public pages only | L | a |
+| W2.4 | Ingest and extract stages S1 and S2 for Grays | F05, F07, S1, S2. Needs the Grays terms read first, see decision record 0012 | L | a, d |
 | W2.5 | PDF upload and parsing with OCR fallback | F06, S2. Storage buckets in security-and-rls.md | L | a, d |
 | W2.6 | Normalise stage S3: lot records, premium terms parsing, platform default fallback | F10, S3. D25. DS12 | M | a |
 
@@ -82,8 +83,8 @@ Exit criteria: a ranked triage for all three sources.
 
 | ID | Title | Specs | Size | Checkpoint |
 | --- | --- | --- | --- | --- |
-| W3.1 | Pickles extractor | F08, S2. O05 must be closed first | M | a |
-| W3.2 | Lloyds extractor | F09, S2. O05 must be closed first | M | a |
+| ~~W3.1~~ | Pickles extractor. **Removed from V1** by decision record 0012. Pickles prohibits automated access | F08, now Phase 2 | n/a | Blocked |
+| W3.2 | Lloyds extractor | F09, S2. Cleared by docs/02-specs/site-access.md | M | a |
 | W3.3 | Triage identification stage S4 | F13, S4. D33 smaller model. ai_runs logging | L | a, d |
 | W3.4 | Choose the web search API and build triage valuation stage S5. Closes O03 | F14, S5, D35. data-sources.md | L | a, c, d |
 | W3.5 | Opportunity score and rank and notify stage S6, with the triage email | F15, F12, S6. Decision record 0006. Resend | M | a, d |

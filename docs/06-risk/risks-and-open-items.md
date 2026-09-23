@@ -7,7 +7,7 @@ Source: MaxBid Project Workbook, tab 22 Risks.
 | ID | Category | Risk | Likelihood | Impact | Rating | Mitigation |
 | --- | --- | --- | --- | --- | --- | --- |
 | R01 | Technical | Auction site structure changes break an extractor | 4 | 3 | 12 | Extractor health checks, admin alerts, PDF fallback, versioned extractors |
-| R02 | Technical | Auction site blocks automated access | 3 | 4 | 12 | Managed extraction, rate limits, compliance with terms, partnership approach later |
+| R02 | Technical | Auction site blocks automated access | 3 | 4 | 12 | Materialised for Pickles on 23 September 2026: robots.txt and clause 9(b)(vi) both prohibit it. Decision record 0012 removes Pickles from V1 pending permission. Managed extraction, rate limits, compliance with terms |
 | R03 | Data | Sold price data is hard to obtain | 4 | 4 | 16 | Apply for eBay Marketplace Insights early, use auction realised results, build internal outcomes |
 | R04 | Accuracy | Wrong identification leads to a wrong value | 3 | 5 | 15 | Vision on plates, mandatory user confirmation, confidence scoring, evidence visible |
 | R05 | Accuracy | Weak comparables in broad categories | 4 | 4 | 16 | Honest match levels, insufficient evidence state, category rules added progressively |
@@ -40,7 +40,7 @@ Source: MaxBid Project Workbook, tab 25 Open Items.
 | O02 | Choose between Firecrawl and Browserbase | Test both on one catalogue from each auction house | Ashleigh | Phase 0 |
 | O03 | Choose between Brave Search API and SerpAPI | Compare result quality on 20 sample lots | Ashleigh | Phase 0 |
 | O04 | Apply for eBay Marketplace Insights access | Submit application through the eBay developer program | Ashleigh | Phase 0 |
-| O05 | Review Grays, Pickles and Lloyds terms of use | Read terms and record any restrictions on automated access | Ashleigh | Phase 0 |
+| O05 | Review Grays, Pickles and Lloyds terms of use | Closed for Pickles and Lloyds by docs/02-specs/site-access.md. Grays terms still unread, see decision record 0012 | Ashleigh | Part closed |
 | O06 | Which categories get specific rules first | Rank by what we buy most and where generic matching is weakest | Ashleigh and Jason | Phase 1 |
 | O07 | Calibrate matching and confidence weights | Compare against recorded outcomes after the first 30 won lots | Ashleigh | Phase 1 |
 | O08 | Product name | Closed. MaxBid selected | Ashleigh and Jason | Closed |
