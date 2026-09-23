@@ -59,6 +59,13 @@ Source: MaxBid Project Workbook, tab 13 Database.
 | auctions |  | premium_source | text | No |  | extracted, platform_default, user |
 | auctions |  | raw_terms | text | Yes |  |  |
 | auctions |  | extracted_at | timestamptz | Yes |  |  |
+| raw_extract | The payload as it arrived from the extractor, before parsing. Decision record 0011. | id | uuid | No | PK |  |
+| raw_extract |  | auction_id | uuid | No | FK auctions |  |
+| raw_extract |  | source_url | text | Yes |  | Null for a PDF upload |
+| raw_extract |  | page | integer | No | Unique with auction | Catalogues paginate |
+| raw_extract |  | payload | jsonb | No |  | Exactly what the extractor returned |
+| raw_extract |  | extractor_version | text | No |  | So an old payload can be reprocessed under a new extractor |
+| raw_extract |  | fetched_at | timestamptz | No |  |  |
 | analyses | An organisation's analysis of an auction. | id | uuid | No | PK |  |
 | analyses |  | org_id | uuid | No | FK organisations |  |
 | analyses |  | auction_id | uuid | No | FK auctions |  |
@@ -114,9 +121,9 @@ Source: MaxBid Project Workbook, tab 13 Database.
 | lot_identifications |  | is_current | boolean | No |  |  |
 | lot_identifications |  | confirmed_by | uuid | Yes | FK profiles | Set when user confirms |
 | lot_identifications |  | ai_run_id | uuid | Yes | FK ai_runs |  |
-| analysis_lots | Per organisation state of each lot in an analysis. | id | uuid | No | PK |  |
+| analysis_lots | Per organisation state of each lot in an analysis. One lot appears once per analysis, per decision record 0011. | id | uuid | No | PK |  |
 | analysis_lots |  | analysis_id | uuid | No | FK analyses |  |
-| analysis_lots |  | lot_id | uuid | No | FK lots |  |
+| analysis_lots |  | lot_id | uuid | No | FK lots, unique with analysis_id |  |
 | analysis_lots |  | status | text | No |  | triaged, shortlisted, deep_running, valued, failed |
 | analysis_lots |  | triage_low | numeric(12,2) | Yes |  |  |
 | analysis_lots |  | triage_high | numeric(12,2) | Yes |  |  |
