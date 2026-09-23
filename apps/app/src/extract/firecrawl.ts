@@ -37,18 +37,43 @@ async function waitForTurn(host: string): Promise<void> {
   lastFetchByHost.set(host, Date.now());
 }
 
-/** Reads robots.txt for a host, cached for an hour rather than for a build. */
+/**
+ * Reads robots.txt for a host, cached for an hour rather than for a build.
+ *
+ * Three outcomes, and the difference matters.
+ *
+ * A 404 means the site publishes no robots.txt, so there are no rules.
+ *
+ * A readable file means we obey what it says.
+ *
+ * Anything else, a connection reset or a 403, means we do not know what the
+ * rules are. Grays resets connections intermittently, and treating that as
+ * "no rules" would turn a failure to ask into permission to proceed. So this
+ * throws, and the caller does not fetch.
+ */
 export async function robotsFor(origin: string, fetcher = fetch) {
   const cached = robotsByHost.get(origin);
   if (cached && Date.now() - cached.readAt < ROBOTS_TTL_MS) return cached.rules;
 
-  const response = await fetcher(`${origin}/robots.txt`, {
-    headers: { 'User-Agent': USER_AGENT },
-  });
+  let text: string;
+  try {
+    const response = await fetcher(`${origin}/robots.txt`, {
+      headers: { 'User-Agent': USER_AGENT },
+    });
+    if (response.status === 404) text = '';
+    else if (response.ok) text = await response.text();
+    else {
+      throw new SiteAccessError(
+        `Could not read robots.txt at ${origin}: the site answered ${response.status}. We do not fetch a page without knowing its rules.`,
+      );
+    }
+  } catch (cause) {
+    if (cause instanceof SiteAccessError) throw cause;
+    throw new SiteAccessError(
+      `Could not reach robots.txt at ${origin}. We do not fetch a page without knowing its rules.`,
+    );
+  }
 
-  // No robots.txt means no rules. A refusal is not permission, so treat
-  // anything other than a readable file as no rules rather than guessing.
-  const text = response.ok ? await response.text() : '';
   const rules = parseRobots(text, 'maxbidbot');
   robotsByHost.set(origin, { rules, readAt: Date.now() });
   return rules;
