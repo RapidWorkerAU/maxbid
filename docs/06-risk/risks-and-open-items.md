@@ -40,7 +40,7 @@ Source: MaxBid Project Workbook, tab 25 Open Items.
 | O02 | Choose between Firecrawl and Browserbase | Test both on one catalogue from each auction house | Ashleigh | Phase 0 |
 | O03 | Choose between Brave Search API and SerpAPI | Compare result quality on 20 sample lots | Ashleigh | Phase 0 |
 | O04 | Apply for eBay Marketplace Insights access | Submit application through the eBay developer program | Ashleigh | Phase 0 |
-| O05 | Review Grays, Pickles and Lloyds terms of use | Closed for Pickles and Lloyds by docs/02-specs/site-access.md. Grays terms still unread, see decision record 0012 | Ashleigh | Part closed |
+| O05 | Review Grays, Pickles and Lloyds terms of use | Closed by docs/02-specs/site-access.md. Grays and Lloyds cleared, Pickles prohibited, see decision record 0012 | Ashleigh | Closed |
 | O06 | Which categories get specific rules first | Rank by what we buy most and where generic matching is weakest | Ashleigh and Jason | Phase 1 |
 | O07 | Calibrate matching and confidence weights | Compare against recorded outcomes after the first 30 won lots | Ashleigh | Phase 1 |
 | O08 | Product name | Closed. MaxBid selected | Ashleigh and Jason | Closed |

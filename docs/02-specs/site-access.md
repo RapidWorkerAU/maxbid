@@ -10,7 +10,7 @@ D45 commits us to respecting each site's terms and robots rules, public pages on
 
 | Site | robots.txt | Terms of use | May we extract? |
 | --- | --- | --- | --- |
-| Grays | Permits the pages we need | Not yet read, see below | Unconfirmed |
+| Grays | Permits the pages we need | No clause found | Yes, with care |
 | Pickles | Disallows the pages we need | Prohibits scraping | **No, not without permission** |
 | Lloyds | Permits everything | No clause found | Yes, with care |
 
@@ -20,9 +20,11 @@ D45 commits us to respecting each site's terms and robots rules, public pages on
 
 **robots.txt.** Permissive. It disallows only `/Services/*`, `/Mobile/*`, `/login.aspx`, `/cartsummary.aspx`, `/changetimezone.aspx`, one ACCC statement page and `*.axd` files. Catalogue and lot pages are not disallowed. A sitemap is published at `https://www.grays.com/sitemap.xml`.
 
-**Terms of use.** **Not read.** The terms page at `content.aspx?block=Terms_Of_Use_GOL` is rendered by JavaScript and returned no readable text to either of the tools available here. This is a gap, not a clearance.
+**Terms of use.** Read in a browser by Ashleigh on 23 September 2026, because the page is rendered by JavaScript and returns no readable text to automated tools. Searching it for robot, scrape, automated and extract found **no clause** on any of them.
 
-**What this means.** robots.txt permits the pages we need, but robots.txt is not the terms of use, and one does not stand in for the other. **Somebody has to open that page in a browser and read it before a Grays extractor is built.**
+**What this means.** Nothing in the Grays terms prohibits automated access, and robots.txt permits the pages we need. A Grays extractor may be built, under the rules at the foot of this page.
+
+**The limit of that finding.** A keyword search is not a legal review. It would not catch a restriction written as systematic retrieval, data mining, or a general limit on commercial use of content. Two things already cover that ground: D44 keeps third party images out of the product and uses our own text summaries instead, and O10 puts the terms in front of a lawyer before public launch. Recheck this page then.
 
 ## Pickles
 

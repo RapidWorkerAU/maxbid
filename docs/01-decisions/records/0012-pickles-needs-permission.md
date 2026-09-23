@@ -44,4 +44,4 @@ R02, an auction site blocking automated access, is rated 12. This is that risk a
 2. docs/02-specs/features.md moves F08 to Phase 2 and notes the condition.
 3. docs/04-build/build-plan.md drops W3.1, the Pickles extractor, from Week 3.
 4. docs/06-risk/risks-and-open-items.md records R02 as materialised for Pickles, and O05 as closed by docs/02-specs/site-access.md.
-5. Grays is still unconfirmed. Its terms page is rendered by JavaScript and could not be read here. A Grays extractor waits until somebody opens that page in a browser and reads it.
+5. Grays is cleared. Ashleigh read the terms page in a browser on 23 September 2026 and found no clause on robots, scraping, automated access or extraction. A keyword search is not a legal review, so O10 rechecks it before public launch.

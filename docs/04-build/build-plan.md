@@ -26,7 +26,7 @@ Updated at the end of every pull request. The current row is always the one to r
 
 **Where we are.** Week 1 is built. All 18 primitives are Approved. The database, row level security, accounts, the terms gate, the app shell and the waitlist page are all in. Week 2 cannot start until O01, O02 and O05 are closed, which are all Ashleigh tasks.
 
-**Blocked and waiting on Ashleigh.** O05 is part closed. Lloyds is cleared, Pickles is prohibited and out of V1, and the Grays terms still need reading in a browser. Inngest and Firecrawl are chosen but need accounts. O03 blocks Week 3. O04 should be applied for now because approval takes time. O11 blocks promoting the waitlist page.
+**Blocked and waiting on Ashleigh.** O05 is closed. Grays and Lloyds are cleared, Pickles is prohibited and out of V1. Inngest and Firecrawl are chosen but need accounts. O03 blocks Week 3. O04 should be applied for now because approval takes time. O11 blocks promoting the waitlist page.
 
 ## How to read this
 
@@ -71,7 +71,7 @@ Exit criteria: Grays and PDF catalogues extracted.
 | W2.1 | Choose the job runner and build the fan out spike. Closes O01 | D32, pipeline.md, tech-stack.md | M | a, c, d |
 | W2.2 | Choose the extraction service. Closes O02 | D34, data-sources.md | M | a, c, d |
 | W2.3 | Migration: auction_platforms, auctions, lots, lot_images, analyses, analysis_lots, raw extract | database.md, security-and-rls.md shared tables | L | a |
-| W2.4 | Ingest and extract stages S1 and S2 for Grays | F05, F07, S1, S2. Needs the Grays terms read first, see decision record 0012 | L | a, d |
+| W2.4 | Ingest and extract stages S1 and S2 for Grays | F05, F07, S1, S2. Cleared by docs/02-specs/site-access.md | L | a |
 | W2.5 | PDF upload and parsing with OCR fallback | F06, S2. Storage buckets in security-and-rls.md | L | a, d |
 | W2.6 | Normalise stage S3: lot records, premium terms parsing, platform default fallback | F10, S3. D25. DS12 | M | a |
 
