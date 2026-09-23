@@ -42,3 +42,60 @@ export async function createTenants(): Promise<Tenants> {
 
   return { orgA, orgB, ownerA, buyerA, viewerA, ownerB, profileA: data.id as string };
 }
+
+export type AuctionFixture = {
+  auctionId: string;
+  lotId: string;
+  analysisId: string;
+};
+
+/** A shared auction with one lot, plus an analysis of it owned by orgA. */
+export async function createAuction(tenants: Tenants): Promise<AuctionFixture> {
+  const admin = serviceClient();
+
+  const platform = await admin
+    .from('auction_platforms')
+    .insert({ slug: `grays-${crypto.randomUUID()}`, name: 'Grays', extractor_version: '0.1.0' })
+    .select('id')
+    .single();
+  if (platform.error) throw platform.error;
+
+  const auction = await admin
+    .from('auctions')
+    .insert({
+      platform_id: platform.data.id,
+      source_url: `https://example.test/${crypto.randomUUID()}`,
+      title: 'Woodworking machinery, Perth',
+      premium_source: 'extracted',
+      premium_pct: 0.165,
+    })
+    .select('id')
+    .single();
+  if (auction.error) throw auction.error;
+
+  const lot = await admin
+    .from('lots')
+    .insert({ auction_id: auction.data.id, lot_number: 'LOT-001', title: 'Edgebander' })
+    .select('id')
+    .single();
+  if (lot.error) throw lot.error;
+
+  const analysis = await admin
+    .from('analyses')
+    .insert({
+      org_id: tenants.orgA,
+      auction_id: auction.data.id,
+      created_by: tenants.ownerA.id,
+      source_type: 'url',
+    })
+    .select('id')
+    .single();
+  if (analysis.error) throw analysis.error;
+
+  const analysisLot = await admin
+    .from('analysis_lots')
+    .insert({ analysis_id: analysis.data.id, lot_id: lot.data.id, opportunity_score: 74 });
+  if (analysisLot.error) throw analysisLot.error;
+
+  return { auctionId: auction.data.id, lotId: lot.data.id, analysisId: analysis.data.id };
+}
