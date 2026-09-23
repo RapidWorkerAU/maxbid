@@ -12,7 +12,7 @@ Source: MaxBid Project Workbook, tab 15 Tech Stack.
 | Database and auth | Supabase Postgres, Auth, Storage, pgvector | RLS for multi tenancy, vector search for product matching | Neon plus Clerk |
 | Background jobs | Inngest | Durable steps, retries, fan out, schedules. Chosen in decision record 0013 | Trigger.dev, Supabase Queues |
 | AI | Claude API. Haiku class for triage, Sonnet class for deep analysis and vision | Strong vision and structured output | Model agnostic layer later |
-| Page extraction | Firecrawl or Browserbase | Rendered pages without running our own browsers | Self hosted Playwright |
+| Page extraction | Firecrawl | Rendered pages without running our own browsers. Chosen in decision record 0014 | Browserbase, self hosted Playwright |
 | PDF parsing | Text extraction with OCR fallback, then Claude structuring | Handles scanned catalogues | Claude PDF input directly |
 | Web search | Brave Search API or SerpAPI | Predictable structured results | Claude web search tool |
 | Marketplace data | eBay Browse API, Marketplace Insights if approved | Official access | Search API results |

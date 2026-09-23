@@ -37,7 +37,7 @@ Source: MaxBid Project Workbook, tab 25 Open Items.
 | ID | Item | How to close | Owner | When |
 | --- | --- | --- | --- | --- |
 | O01 | Choose between Inngest and Trigger.dev | Closed. Inngest, by decision record 0013 | Ashleigh | Closed |
-| O02 | Choose between Firecrawl and Browserbase | Test both on one catalogue from each auction house | Ashleigh | Phase 0 |
+| O02 | Choose between Firecrawl and Browserbase | Closed. Firecrawl, by decision record 0014 | Ashleigh | Closed |
 | O03 | Choose between Brave Search API and SerpAPI | Compare result quality on 20 sample lots | Ashleigh | Phase 0 |
 | O04 | Apply for eBay Marketplace Insights access | Submit application through the eBay developer program | Ashleigh | Phase 0 |
 | O05 | Review Grays, Pickles and Lloyds terms of use | Closed by docs/02-specs/site-access.md. Grays and Lloyds cleared, Pickles prohibited, see decision record 0012 | Ashleigh | Closed |

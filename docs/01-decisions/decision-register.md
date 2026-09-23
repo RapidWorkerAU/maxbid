@@ -39,7 +39,7 @@ Source: MaxBid Project Workbook, tab 02 Decisions.
 | D31 | Tech | Core stack | Next.js, Supabase and Vercel | Yes | Matches existing skills and the HSES Online stack. |
 | D32 | Tech | Background jobs | Inngest | Yes | Settled by decision record 0013. Fan out per lot is the shape of the pipeline, and the free tier covers the internal MVP. |
 | D33 | Tech | AI provider | Claude API for extraction, vision and matching | Yes | Smaller model for triage, larger model for deep analysis. |
-| D34 | Tech | Auction page extraction | Managed service such as Firecrawl or Browserbase | Yes | Handles JavaScript rendering and anti bot measures without self hosting. |
+| D34 | Tech | Auction page extraction | Firecrawl | Yes | Settled by decision record 0014. We only read public pages, so the browser control Browserbase sells is capability we may not use. |
 | D35 | Tech | Web search | Dedicated search API such as Brave or SerpAPI | Yes | Structured, predictable results and cost. |
 | D36 | Tech | Account structure | Organisation and team accounts from day one | Yes | Supports you and Jason now and dealers later. |
 | D37 | Design | Device priority | Desktop first analysis with a mobile optimised bid view | Yes | Research at a desk, bid on the phone. |
@@ -141,3 +141,4 @@ Each one has a decision record in docs/01-decisions/records.
 | D126 | Data | Is raw_extract a real table or a stale name for lots.raw | A real table. The payload is kept as it arrived, before parsing | 0011 | S2 stores a payload before any lot exists, a half failed parse must replay without refetching, and R01 needs old payloads reprocessable under a new extractor. |
 | D127 | Input | Pickles prohibits automated access | Remove Pickles from V1 and ask them for permission | 0012 | Their terms say except as expressly permitted by Pickles, so permission is the route, not a better extractor. |
 | D128 | Tech | Inngest or Trigger.dev | Inngest | 0013 | Closes O01. Trigger.dev caps concurrency at 5 on its free tier, which cannot run a 300 lot fan out. |
+| D129 | Tech | Firecrawl or Browserbase | Firecrawl | 0014 | Closes O02. Per page billing suits a per page budget, and we never sign in or fill a form. |
