@@ -35,6 +35,232 @@ export type Database = {
   }
   public: {
     Tables: {
+      analyses: {
+        Row: {
+          auction_id: string
+          cost_profile_id: string | null
+          created_at: string
+          created_by: string
+          id: string
+          org_id: string
+          pdf_path: string | null
+          premium_override_pct: number | null
+          progress_pct: number
+          source_type: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          auction_id: string
+          cost_profile_id?: string | null
+          created_at?: string
+          created_by: string
+          id?: string
+          org_id: string
+          pdf_path?: string | null
+          premium_override_pct?: number | null
+          progress_pct?: number
+          source_type: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          auction_id?: string
+          cost_profile_id?: string | null
+          created_at?: string
+          created_by?: string
+          id?: string
+          org_id?: string
+          pdf_path?: string | null
+          premium_override_pct?: number | null
+          progress_pct?: number
+          source_type?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analyses_auction_id_fkey"
+            columns: ["auction_id"]
+            isOneToOne: false
+            referencedRelation: "auctions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analyses_cost_profile_id_fkey"
+            columns: ["cost_profile_id"]
+            isOneToOne: false
+            referencedRelation: "cost_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analyses_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analyses_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      analysis_lots: {
+        Row: {
+          analysis_id: string
+          created_at: string
+          id: string
+          is_watchlisted: boolean
+          lot_id: string
+          opportunity_score: number | null
+          status: string
+          triage_high: number | null
+          triage_low: number | null
+          triage_max_bid: number | null
+          updated_at: string
+        }
+        Insert: {
+          analysis_id: string
+          created_at?: string
+          id?: string
+          is_watchlisted?: boolean
+          lot_id: string
+          opportunity_score?: number | null
+          status?: string
+          triage_high?: number | null
+          triage_low?: number | null
+          triage_max_bid?: number | null
+          updated_at?: string
+        }
+        Update: {
+          analysis_id?: string
+          created_at?: string
+          id?: string
+          is_watchlisted?: boolean
+          lot_id?: string
+          opportunity_score?: number | null
+          status?: string
+          triage_high?: number | null
+          triage_low?: number | null
+          triage_max_bid?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analysis_lots_analysis_id_fkey"
+            columns: ["analysis_id"]
+            isOneToOne: false
+            referencedRelation: "analyses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analysis_lots_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "lots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      auction_platforms: {
+        Row: {
+          created_at: string
+          default_premium_gst: boolean
+          default_premium_pct: number | null
+          extractor_version: string
+          id: string
+          is_active: boolean
+          name: string
+          slug: string
+          updated_at: string
+          url_patterns: string[]
+        }
+        Insert: {
+          created_at?: string
+          default_premium_gst?: boolean
+          default_premium_pct?: number | null
+          extractor_version?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          slug: string
+          updated_at?: string
+          url_patterns?: string[]
+        }
+        Update: {
+          created_at?: string
+          default_premium_gst?: boolean
+          default_premium_pct?: number | null
+          extractor_version?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          slug?: string
+          updated_at?: string
+          url_patterns?: string[]
+        }
+        Relationships: []
+      }
+      auctions: {
+        Row: {
+          closes_at: string | null
+          created_at: string
+          extracted_at: string | null
+          id: string
+          location_text: string | null
+          platform_id: string
+          premium_gst: boolean | null
+          premium_pct: number | null
+          premium_source: string
+          raw_terms: string | null
+          source_url: string | null
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          closes_at?: string | null
+          created_at?: string
+          extracted_at?: string | null
+          id?: string
+          location_text?: string | null
+          platform_id: string
+          premium_gst?: boolean | null
+          premium_pct?: number | null
+          premium_source?: string
+          raw_terms?: string | null
+          source_url?: string | null
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          closes_at?: string | null
+          created_at?: string
+          extracted_at?: string | null
+          id?: string
+          location_text?: string | null
+          platform_id?: string
+          premium_gst?: boolean | null
+          premium_pct?: number | null
+          premium_source?: string
+          raw_terms?: string | null
+          source_url?: string | null
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "auctions_platform_id_fkey"
+            columns: ["platform_id"]
+            isOneToOne: false
+            referencedRelation: "auction_platforms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cost_profiles: {
         Row: {
           created_at: string
@@ -96,6 +322,103 @@ export type Database = {
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lot_images: {
+        Row: {
+          created_at: string
+          id: string
+          lot_id: string
+          position: number
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lot_id: string
+          position?: number
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lot_id?: string
+          position?: number
+          updated_at?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lot_images_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "lots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lots: {
+        Row: {
+          auction_id: string
+          closes_at: string | null
+          created_at: string
+          current_bid: number | null
+          description: string | null
+          gst_on_hammer: boolean | null
+          id: string
+          lat: number | null
+          lng: number | null
+          location_text: string | null
+          lot_number: string
+          raw: Json
+          source_url: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          auction_id: string
+          closes_at?: string | null
+          created_at?: string
+          current_bid?: number | null
+          description?: string | null
+          gst_on_hammer?: boolean | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          location_text?: string | null
+          lot_number: string
+          raw?: Json
+          source_url?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          auction_id?: string
+          closes_at?: string | null
+          created_at?: string
+          current_bid?: number | null
+          description?: string | null
+          gst_on_hammer?: boolean | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          location_text?: string | null
+          lot_number?: string
+          raw?: Json
+          source_url?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lots_auction_id_fkey"
+            columns: ["auction_id"]
+            isOneToOne: false
+            referencedRelation: "auctions"
             referencedColumns: ["id"]
           },
         ]
@@ -258,6 +581,50 @@ export type Database = {
           },
         ]
       }
+      raw_extract: {
+        Row: {
+          auction_id: string
+          created_at: string
+          extractor_version: string
+          fetched_at: string
+          id: string
+          page: number
+          payload: Json
+          source_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          auction_id: string
+          created_at?: string
+          extractor_version: string
+          fetched_at?: string
+          id?: string
+          page?: number
+          payload: Json
+          source_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          auction_id?: string
+          created_at?: string
+          extractor_version?: string
+          fetched_at?: string
+          id?: string
+          page?: number
+          payload?: Json
+          source_url?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "raw_extract_auction_id_fkey"
+            columns: ["auction_id"]
+            isOneToOne: false
+            referencedRelation: "auctions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       terms_acceptances: {
         Row: {
           accepted_at: string
@@ -415,11 +782,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_edit_analysis: { Args: { target_analysis: string }; Returns: boolean }
       can_edit_org: { Args: { target_org: string }; Returns: boolean }
       create_organisation: { Args: { org_name: string }; Returns: string }
       is_org_admin: { Args: { target_org: string }; Returns: boolean }
       is_org_member: { Args: { target_org: string }; Returns: boolean }
       org_role: { Args: { target_org: string }; Returns: string }
+      owns_analysis: { Args: { target_analysis: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
