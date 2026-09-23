@@ -50,3 +50,15 @@ export type DisplayBidLimits = {
   limitBid: number;
   breakEvenBid: number;
 };
+
+/** How well a comparable matches the lot. Source: matching-and-valuation.md. */
+export type MatchLevel =
+  | 'exact'
+  | 'nearExact'
+  | 'higherSpec'
+  | 'lowerSpec'
+  | 'similarAlternative'
+  | 'insufficient';
+
+/** How much confidence the evidence supports. */
+export type ConfidenceLabel = 'high' | 'medium' | 'low' | 'insufficient';
