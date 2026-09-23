@@ -19,3 +19,4 @@ Thumbs.db
 !.env.example
 supabase/.branches
 supabase/.temp
+probe-output/

@@ -1,8 +1,12 @@
 import { describe, expect, it, vi } from 'vitest';
 import { SiteAccessError, USER_AGENT, assertAllowed, robotsFor } from './firecrawl';
 
-function fakeFetch(body: string, ok = true) {
-  return vi.fn(async () => ({ ok, text: async () => body })) as unknown as typeof fetch;
+function fakeFetch(body: string) {
+  return vi.fn(async () => ({
+    ok: true,
+    status: 200,
+    text: async () => body,
+  })) as unknown as typeof fetch;
 }
 
 // Each test uses its own host, because robots.txt is cached per origin.
@@ -19,8 +23,8 @@ describe('identifying ourselves', () => {
   it('sends that user agent when reading robots.txt', async () => {
     const fetcher = fakeFetch('User-agent: *\nDisallow:');
     await robotsFor(host(), fetcher);
-    const [, init] = (fetcher as unknown as ReturnType<typeof vi.fn>).mock.calls[0];
-    expect(init.headers['User-Agent']).toBe(USER_AGENT);
+    const calls = (fetcher as unknown as ReturnType<typeof vi.fn>).mock.calls;
+    expect(calls[0][1].headers['User-Agent']).toBe(USER_AGENT);
   });
 });
 
@@ -46,11 +50,33 @@ describe('obeying robots.txt', () => {
     await assertAllowed(`${origin}/b`, fetcher);
     expect((fetcher as unknown as ReturnType<typeof vi.fn>).mock.calls.length).toBe(1);
   });
+});
 
-  it('treats an unreadable robots.txt as no rules, not as permission to ignore it', async () => {
-    const origin = host();
-    const fetcher = fakeFetch('', false);
-    const rules = await robotsFor(origin, fetcher);
-    expect(rules).toEqual({ allow: [], disallow: [] });
+describe('when robots.txt cannot be read', () => {
+  it('treats a 404 as no rules, because the site publishes none', async () => {
+    const fetcher = vi.fn(async () => ({
+      ok: false,
+      status: 404,
+      text: async () => '',
+    })) as unknown as typeof fetch;
+    expect(await robotsFor(host(), fetcher)).toEqual({ allow: [], disallow: [] });
+  });
+
+  it('refuses to fetch when the connection fails', async () => {
+    // Grays resets connections intermittently. A failure to ask is not
+    // permission to proceed.
+    const fetcher = vi.fn(async () => {
+      throw new Error('ECONNRESET');
+    }) as unknown as typeof fetch;
+    await expect(assertAllowed(`${host()}/sale/1`, fetcher)).rejects.toThrow(SiteAccessError);
+  });
+
+  it('refuses to fetch when the site answers anything else', async () => {
+    const fetcher = vi.fn(async () => ({
+      ok: false,
+      status: 403,
+      text: async () => '',
+    })) as unknown as typeof fetch;
+    await expect(assertAllowed(`${host()}/sale/1`, fetcher)).rejects.toThrow(/do not fetch/);
   });
 });
