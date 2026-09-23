@@ -299,6 +299,9 @@ importers:
       '@maxbid/content':
         specifier: workspace:*
         version: link:../../packages/content
+      '@maxbid/db':
+        specifier: workspace:*
+        version: link:../../packages/db
       '@maxbid/tokens':
         specifier: workspace:*
         version: link:../../packages/tokens
