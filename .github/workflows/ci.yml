@@ -35,7 +35,9 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - uses: supabase/setup-cli@v1
         with:
-          version: latest
+          # Pinned to the version in the root devDependencies. Resolving "latest"
+          # asks the GitHub API and fails when the runner is rate limited.
+          version: 2.117.0
       - name: Start local Supabase
         run: supabase start
       - name: Row level security tests

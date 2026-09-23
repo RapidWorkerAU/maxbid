@@ -369,6 +369,47 @@ export type Database = {
           },
         ]
       }
+      waitlist_signups: {
+        Row: {
+          converted_org_id: string | null
+          created_at: string
+          email: string
+          founding_eligible: boolean
+          id: string
+          source: string | null
+          updated_at: string
+          utm: Json | null
+        }
+        Insert: {
+          converted_org_id?: string | null
+          created_at?: string
+          email: string
+          founding_eligible?: boolean
+          id?: string
+          source?: string | null
+          updated_at?: string
+          utm?: Json | null
+        }
+        Update: {
+          converted_org_id?: string | null
+          created_at?: string
+          email?: string
+          founding_eligible?: boolean
+          id?: string
+          source?: string | null
+          updated_at?: string
+          utm?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "waitlist_signups_converted_org_id_fkey"
+            columns: ["converted_org_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

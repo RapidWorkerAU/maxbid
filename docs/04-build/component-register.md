@@ -55,7 +55,7 @@ This register is the sign off record for every component in packages/ui. It is t
 | UI32 | OverrideMarker | Composite | App | Not started |  |  |
 | UI33 | LotRow | Composite | App | Not started |  |  |
 | UI34 | StatusLine | Composite | Both | Not started |  |  |
-| UI35 | EmailCapture | Composite | Web | Not started |  |  |
+| UI35 | EmailCapture | Composite | Web | In review | 23 September 2026 | Waitlist and breakdown sign up. Light surface only, see the note in the file |
 | UI36 | SiteHeader | Section | Web | Not started |  |  |
 | UI37 | SiteFooter | Section | Web | Not started |  |  |
 | UI38 | SheetHero | Section | Web | Not started |  |  |
