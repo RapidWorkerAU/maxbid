@@ -19,9 +19,10 @@ Updated at the end of every pull request. The current row is always the one to r
 | 9 | W1.4 Primitives C: SheetFrame, TitleBlock, DetailLabel, LeaderLine, LineIcon | In review |  |
 | 10 | W1.5 First migration and row level security | Merged | 22 Sep 2026 |
 | 11 | All 18 primitives Approved, and W1.6 sign in, organisations, terms, AppShell | In review |  |
-| 12 | W1.7 Waitlist holding page | Next |  |
+| 12 | W1.7 Waitlist holding page | In review |  |
+| 13 | W2.1 Choose the job runner. Needs O01 and O05 from Ashleigh | Next |  |
 
-**Where we are.** Week 1, nearly done. All 18 primitives are Approved. The database, row level security and the account tables are in. Sign in, organisation creation, the terms gate and the app shell are built and waiting on review. Only the waitlist page is left in Week 1.
+**Where we are.** Week 1 is built. All 18 primitives are Approved. The database, row level security, accounts, the terms gate, the app shell and the waitlist page are all in. Week 2 cannot start until O01, O02 and O05 are closed, which are all Ashleigh tasks.
 
 **Blocked and waiting on Ashleigh.** O01, O02, O03 and O05 block Week 2. O04 should be applied for now because approval takes time. O11 blocks promoting the waitlist page. See the Things only Ashleigh can do table at the end.
 
