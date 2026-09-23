@@ -3,3 +3,7 @@ export * from './basis';
 export * from './bidLimits';
 export * from './position';
 export * from './rounding';
+export * from './weights';
+export * from './percentile';
+export * from './valuation';
+export * from './confidence';
