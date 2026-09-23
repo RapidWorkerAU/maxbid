@@ -41,5 +41,3 @@ export const ingest = inngest.createFunction(
     return { analysisId, auctionId };
   },
 );
-
-export const functions = [ingest];

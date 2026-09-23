@@ -24,7 +24,7 @@ Updated at the end of every pull request. The current row is always the one to r
 | 14 | O05 site access findings and decision record 0012 | In review |  |
 | 15 | W6.1 The valuation maths | Next |  |
 
-**Where we are.** Week 1 is built. All 18 primitives are Approved. The database, row level security, accounts, the terms gate, the app shell and the waitlist page are all in. Week 2 cannot start until O01, O02 and O05 are closed, which are all Ashleigh tasks.
+**Where we are.** Week 1 is built and Week 2 is most of the way. O01, O02 and O05 are all closed. Inngest runs the pipeline, Firecrawl fetches pages under the site access rules, and the Grays extractor reads a real 90 lot catalogue into the database. Pickles is out of V1. Next is the PDF upload route, then triage in Week 3.
 
 **Blocked and waiting on Ashleigh.** O05 is closed. Grays and Lloyds are cleared, Pickles is prohibited and out of V1. Inngest and Firecrawl are chosen but need accounts. O03 blocks Week 3. O04 should be applied for now because approval takes time. O11 blocks promoting the waitlist page.
 
