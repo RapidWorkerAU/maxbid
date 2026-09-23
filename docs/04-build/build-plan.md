@@ -17,9 +17,11 @@ Updated at the end of every pull request. The current row is always the one to r
 | 7 | W1.2 Primitives A: Input, Toggle group, Money, MonoLabel, ProvenanceTag | In review |  |
 | 8 | W1.3 Primitives B: AiLabel, MatchBadge, ConfidenceBadge, ZoneLabel, InfoNote | In review |  |
 | 9 | W1.4 Primitives C: SheetFrame, TitleBlock, DetailLabel, LeaderLine, LineIcon | In review |  |
-| 10 | W1.5 First migration and row level security | Next, needs a plan first |  |
+| 10 | W1.5 First migration and row level security | Merged | 22 Sep 2026 |
+| 11 | All 18 primitives Approved, and W1.6 sign in, organisations, terms, AppShell | In review |  |
+| 12 | W1.7 Waitlist holding page | Next |  |
 
-**Where we are.** Week 1, foundations. All 18 primitives are built and waiting on one Storybook review. Next is the first database migration, which stops for a plan first.
+**Where we are.** Week 1, nearly done. All 18 primitives are Approved. The database, row level security and the account tables are in. Sign in, organisation creation, the terms gate and the app shell are built and waiting on review. Only the waitlist page is left in Week 1.
 
 **Blocked and waiting on Ashleigh.** O01, O02, O03 and O05 block Week 2. O04 should be applied for now because approval takes time. O11 blocks promoting the waitlist page. See the Things only Ashleigh can do table at the end.
 

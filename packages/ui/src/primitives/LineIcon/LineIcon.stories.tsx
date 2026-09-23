@@ -4,7 +4,7 @@ import { LINE_ICON_NAMES, LineIcon } from './LineIcon';
 const meta: Meta<typeof LineIcon> = {
   title: 'Primitives/LineIcon',
   component: LineIcon,
-  tags: ['in-review'],
+  tags: ['approved'],
   parameters: { layout: 'padded' },
   args: { name: 'search' },
 };

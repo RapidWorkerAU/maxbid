@@ -5,7 +5,7 @@ import { ToggleGroup } from './ToggleGroup';
 const meta: Meta<typeof ToggleGroup> = {
   title: 'Primitives/ToggleGroup',
   component: ToggleGroup,
-  tags: ['in-review'],
+  tags: ['approved'],
   parameters: { layout: 'padded' },
 };
 export default meta;

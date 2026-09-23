@@ -21,24 +21,24 @@ This register is the sign off record for every component in packages/ui. It is t
 
 | ID | Component | Layer | Used in | Status | Date | Notes |
 | --- | --- | --- | --- | --- | --- | --- |
-| UI01 | Button | Primitive | Both | In review | 22 September 2026 | Primary, secondary, ghost, danger, loading and disabled |
-| UI02 | Input | Primitive | Both | In review | 22 September 2026 | Text, number, URL and email. Label, hint and error. Mono variant |
-| UI03 | Toggle group | Primitive | Both | In review | 22 September 2026 | Named group with aria-pressed on every choice |
-| UI04 | Money | Primitive | Both | In review | 22 September 2026 | AUD, tabular figures, four sizes. Rounding from decision record 0003 |
-| UI05 | MonoLabel | Primitive | Both | In review | 22 September 2026 | Uppercase Space Mono data label. Detail B04 |
-| UI06 | ProvenanceTag | Primitive | Both | In review | 22 September 2026 | Verified, Extracted, Estimated, Your input |
-| UI07 | AiLabel | Primitive | Both | In review | 22 September 2026 | AI generated marker. Sits beside the provenance tag, never replaces it |
-| UI08 | MatchBadge | Primitive | Both | In review | 22 September 2026 | Six match levels. Solid, outlined and grey, each with its text label |
-| UI09 | ConfidenceBadge | Primitive | Both | In review | 22 September 2026 | Four bands worked out from the score, so label and number agree |
-| UI10 | ZoneLabel | Primitive | Both | In review | 22 September 2026 | On target, Below target, Loss risk. Solid and quiet tones |
-| UI11 | InfoNote | Primitive | Both | In review | 22 September 2026 | Muted 12px note with info icon. Text comes from packages/content |
-| UI12 | StopLine | Primitive | Both | In review | 22 September 2026 | Three thicknesses. Decorative unless given a label |
-| UI13 | SheetFrame | Primitive | Both | In review | 22 September 2026 | Double inset cyan frame on a navy panel. Detail B01 |
-| UI14 | TitleBlock | Primitive | Web | In review | 22 September 2026 | Label and value cells as a description list. Detail B02 |
-| UI15 | DetailLabel | Primitive | Both | In review | 22 September 2026 | Navy tab label such as Detail A. Detail B03 |
-| UI16 | LeaderLine | Primitive | Both | In review | 22 September 2026 | Label, dotted leader and figure. Detail B05 |
-| UI17 | LineIcon | Primitive | Both | In review | 22 September 2026 | Twelve icons at 1.4px stroke in pen blue. Detail B07 |
-| UI18 | Wordmark | Primitive | Both | In review | 22 September 2026 | Three sizes, light and on navy |
+| UI01 | Button | Primitive | Both | Approved | 23 September 2026 | Primary, secondary, ghost, danger, loading and disabled |
+| UI02 | Input | Primitive | Both | Approved | 23 September 2026 | Text, number, URL and email. Label, hint and error. Mono variant |
+| UI03 | Toggle group | Primitive | Both | Approved | 23 September 2026 | Named group with aria-pressed on every choice |
+| UI04 | Money | Primitive | Both | Approved | 23 September 2026 | AUD, tabular figures, four sizes. Rounding from decision record 0003 |
+| UI05 | MonoLabel | Primitive | Both | Approved | 23 September 2026 | Uppercase Space Mono data label. Detail B04 |
+| UI06 | ProvenanceTag | Primitive | Both | Approved | 23 September 2026 | Verified, Extracted, Estimated, Your input |
+| UI07 | AiLabel | Primitive | Both | Approved | 23 September 2026 | AI generated marker. Sits beside the provenance tag, never replaces it |
+| UI08 | MatchBadge | Primitive | Both | Approved | 23 September 2026 | Six match levels. Solid, outlined and grey, each with its text label |
+| UI09 | ConfidenceBadge | Primitive | Both | Approved | 23 September 2026 | Four bands worked out from the score, so label and number agree |
+| UI10 | ZoneLabel | Primitive | Both | Approved | 23 September 2026 | On target, Below target, Loss risk. Solid and quiet tones |
+| UI11 | InfoNote | Primitive | Both | Approved | 23 September 2026 | Muted 12px note with info icon. Text comes from packages/content |
+| UI12 | StopLine | Primitive | Both | Approved | 23 September 2026 | Three thicknesses. Decorative unless given a label |
+| UI13 | SheetFrame | Primitive | Both | Approved | 23 September 2026 | Double inset cyan frame on a navy panel. Detail B01 |
+| UI14 | TitleBlock | Primitive | Web | Approved | 23 September 2026 | Label and value cells as a description list. Detail B02 |
+| UI15 | DetailLabel | Primitive | Both | Approved | 23 September 2026 | Navy tab label such as Detail A. Detail B03 |
+| UI16 | LeaderLine | Primitive | Both | Approved | 23 September 2026 | Label, dotted leader and figure. Detail B05 |
+| UI17 | LineIcon | Primitive | Both | Approved | 23 September 2026 | Twelve icons at 1.4px stroke in pen blue. Detail B07 |
+| UI18 | Wordmark | Primitive | Both | Approved | 23 September 2026 | Three sizes, light and on navy |
 | UI19 | BidRail | Composite | Both | Not started |  |  |
 | UI20 | BidSlider | Composite | App | Not started |  |  |
 | UI21 | BidLimits | Composite | Both | Not started |  |  |
@@ -67,7 +67,7 @@ This register is the sign off record for every component in packages/ui. It is t
 | UI44 | PricingPlans | Section | Web | Not started |  |  |
 | UI45 | GuideLayout | Section | Web | Not started |  |  |
 | UI46 | MethodSteps | Section | Web | Not started |  |  |
-| UI47 | AppShell | Section | App | Not started |  |  |
+| UI47 | AppShell | Section | App | In review | 23 September 2026 | Sidebar on desktop, bottom tab bar on mobile, safe area aware |
 | UI48 | TriageTable | Section | App | Not started |  |  |
 | UI49 | LotDetail | Section | App | Not started |  |  |
 | UI50 | BidView | Section | App | Not started |  |  |

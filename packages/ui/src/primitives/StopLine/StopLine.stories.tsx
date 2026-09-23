@@ -4,7 +4,7 @@ import { StopLine } from './StopLine';
 const meta: Meta<typeof StopLine> = {
   title: 'Primitives/StopLine',
   component: StopLine,
-  tags: ['in-review'],
+  tags: ['approved'],
   parameters: { layout: 'padded' },
 };
 export default meta;

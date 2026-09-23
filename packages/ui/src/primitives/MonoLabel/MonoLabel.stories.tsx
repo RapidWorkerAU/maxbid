@@ -5,7 +5,7 @@ import { Money } from '../Money/Money';
 const meta: Meta<typeof MonoLabel> = {
   title: 'Primitives/MonoLabel',
   component: MonoLabel,
-  tags: ['in-review'],
+  tags: ['approved'],
   parameters: { layout: 'padded' },
   args: { children: 'Most you should bid' },
 };

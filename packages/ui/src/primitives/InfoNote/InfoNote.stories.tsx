@@ -7,7 +7,7 @@ import { MonoLabel } from '../MonoLabel/MonoLabel';
 const meta: Meta<typeof InfoNote> = {
   title: 'Primitives/InfoNote',
   component: InfoNote,
-  tags: ['in-review'],
+  tags: ['approved'],
   parameters: { layout: 'padded' },
   args: { children: DS21 },
 };

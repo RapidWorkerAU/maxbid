@@ -4,7 +4,7 @@ import { Input } from './Input';
 const meta: Meta<typeof Input> = {
   title: 'Primitives/Input',
   component: Input,
-  tags: ['in-review'],
+  tags: ['approved'],
   parameters: { layout: 'padded' },
   args: { id: 'catalogue-url', label: 'Auction catalogue link' },
 };

@@ -5,7 +5,7 @@ import { Money } from '../Money/Money';
 const meta: Meta<typeof LeaderLine> = {
   title: 'Primitives/LeaderLine',
   component: LeaderLine,
-  tags: ['in-review'],
+  tags: ['approved'],
   parameters: { layout: 'padded' },
 };
 export default meta;

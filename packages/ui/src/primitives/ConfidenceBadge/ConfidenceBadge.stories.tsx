@@ -4,7 +4,7 @@ import { ConfidenceBadge } from './ConfidenceBadge';
 const meta: Meta<typeof ConfidenceBadge> = {
   title: 'Primitives/ConfidenceBadge',
   component: ConfidenceBadge,
-  tags: ['in-review'],
+  tags: ['approved'],
   parameters: { layout: 'padded' },
   args: { score: 82 },
 };

@@ -6,7 +6,7 @@ import { MonoLabel } from '../MonoLabel/MonoLabel';
 const meta: Meta<typeof ProvenanceTag> = {
   title: 'Primitives/ProvenanceTag',
   component: ProvenanceTag,
-  tags: ['in-review'],
+  tags: ['approved'],
   parameters: { layout: 'padded' },
   args: { provenance: 'verified' },
 };

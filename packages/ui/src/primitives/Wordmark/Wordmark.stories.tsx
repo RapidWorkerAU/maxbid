@@ -4,7 +4,7 @@ import { Wordmark } from './Wordmark';
 const meta: Meta<typeof Wordmark> = {
   title: 'Primitives/Wordmark',
   component: Wordmark,
-  tags: ['in-review'],
+  tags: ['approved'],
 };
 export default meta;
 

@@ -6,7 +6,7 @@ import { ProvenanceTag } from '../ProvenanceTag/ProvenanceTag';
 const meta: Meta<typeof AiLabel> = {
   title: 'Primitives/AiLabel',
   component: AiLabel,
-  tags: ['in-review'],
+  tags: ['approved'],
   parameters: { layout: 'padded' },
 };
 export default meta;
