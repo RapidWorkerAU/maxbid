@@ -1,3 +1,8 @@
+overrides:
+  # One React across the workspace. Two copies break every hook.
+  react: 19.2.8
+  react-dom: 19.2.8
+
 packages:
   - "apps/*"
   - "packages/*"
@@ -8,7 +13,8 @@ allowBuilds:
   sharp: true
   "@tailwindcss/oxide": true
   unrs-resolver: true
-  protobufjs: set this to true or false
+  # Inngest pulls this in. It compiles protobuf definitions at install time.
+  protobufjs: true
 minimumReleaseAgeExclude:
   - '@typescript-eslint/eslint-plugin@8.70.1'
   - '@typescript-eslint/parser@8.70.1'
