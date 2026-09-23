@@ -37,7 +37,7 @@ Source: MaxBid Project Workbook, tab 02 Decisions.
 | D29 | After analysis | Alerts in V1 | Closing soon alerts for watchlisted lots | Yes | Saved search alerts deferred. |
 | D30 | After analysis | Exports | PDF bid sheet and CSV | Yes | Bid sheet designed to be used on a phone at the auction. |
 | D31 | Tech | Core stack | Next.js, Supabase and Vercel | Yes | Matches existing skills and the HSES Online stack. |
-| D32 | Tech | Background jobs | Inngest or Trigger.dev | Yes | Durable, retryable, long running steps with fan out per lot. |
+| D32 | Tech | Background jobs | Inngest | Yes | Settled by decision record 0013. Fan out per lot is the shape of the pipeline, and the free tier covers the internal MVP. |
 | D33 | Tech | AI provider | Claude API for extraction, vision and matching | Yes | Smaller model for triage, larger model for deep analysis. |
 | D34 | Tech | Auction page extraction | Managed service such as Firecrawl or Browserbase | Yes | Handles JavaScript rendering and anti bot measures without self hosting. |
 | D35 | Tech | Web search | Dedicated search API such as Brave or SerpAPI | Yes | Structured, predictable results and cost. |
@@ -140,3 +140,4 @@ Each one has a decision record in docs/01-decisions/records.
 | D125 | Design | Complete the token set, and where status colour may not go | Status and link text never sits on surface_muted. Names, spacing and motion settled | 0010 | Lightening surface_muted enough to pass would leave it 1.022 to 1 against the page, which destroys its purpose. |
 | D126 | Data | Is raw_extract a real table or a stale name for lots.raw | A real table. The payload is kept as it arrived, before parsing | 0011 | S2 stores a payload before any lot exists, a half failed parse must replay without refetching, and R01 needs old payloads reprocessable under a new extractor. |
 | D127 | Input | Pickles prohibits automated access | Remove Pickles from V1 and ask them for permission | 0012 | Their terms say except as expressly permitted by Pickles, so permission is the route, not a better extractor. |
+| D128 | Tech | Inngest or Trigger.dev | Inngest | 0013 | Closes O01. Trigger.dev caps concurrency at 5 on its free tier, which cannot run a 300 lot fan out. |

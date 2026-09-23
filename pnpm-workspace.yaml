@@ -8,6 +8,7 @@ allowBuilds:
   sharp: true
   "@tailwindcss/oxide": true
   unrs-resolver: true
+  protobufjs: set this to true or false
 minimumReleaseAgeExclude:
   - '@typescript-eslint/eslint-plugin@8.70.1'
   - '@typescript-eslint/parser@8.70.1'
@@ -27,3 +28,4 @@ minimumReleaseAgeExclude:
   - '@supabase/realtime-js@2.117.0'
   - '@supabase/storage-js@2.117.0'
   - '@supabase/supabase-js@2.117.0'
+  - inngest@4.21.0

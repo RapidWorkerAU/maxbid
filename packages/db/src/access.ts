@@ -10,8 +10,21 @@ export const SIGN_IN_PATH = '/sign-in';
 export const ONBOARDING_PATH = '/welcome';
 export const TERMS_PATH = '/terms';
 
-/** Paths a signed out visitor may reach. */
-const PUBLIC_PREFIXES = [SIGN_IN_PATH, '/auth', '/manifest.webmanifest', '/icons', '/favicon'];
+/**
+ * Paths a signed out visitor may reach.
+ *
+ * /api/inngest is here because Inngest authenticates with its signing key,
+ * not a session cookie. Redirecting it to sign in would silently break every
+ * background job.
+ */
+const PUBLIC_PREFIXES = [
+  SIGN_IN_PATH,
+  '/auth',
+  '/api/inngest',
+  '/manifest.webmanifest',
+  '/icons',
+  '/favicon',
+];
 
 export type Visitor = {
   signedIn: boolean;
