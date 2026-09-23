@@ -4,7 +4,7 @@ import { MatchBadge } from './MatchBadge';
 const meta: Meta<typeof MatchBadge> = {
   title: 'Primitives/MatchBadge',
   component: MatchBadge,
-  tags: ['in-review'],
+  tags: ['approved'],
   parameters: { layout: 'padded' },
   args: { level: 'exact' },
 };

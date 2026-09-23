@@ -4,7 +4,7 @@ import { DetailLabel } from './DetailLabel';
 const meta: Meta<typeof DetailLabel> = {
   title: 'Primitives/DetailLabel',
   component: DetailLabel,
-  tags: ['in-review'],
+  tags: ['approved'],
   parameters: { layout: 'padded' },
   args: { children: 'Detail A' },
 };

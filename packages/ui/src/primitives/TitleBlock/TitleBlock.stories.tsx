@@ -10,7 +10,7 @@ const entries = [
 const meta: Meta<typeof TitleBlock> = {
   title: 'Primitives/TitleBlock',
   component: TitleBlock,
-  tags: ['in-review'],
+  tags: ['approved'],
   parameters: { layout: 'padded' },
   args: { entries },
   decorators: [

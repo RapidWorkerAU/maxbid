@@ -4,12 +4,14 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./server": "./src/server.ts",
+    "./browser": "./src/browser.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
-    "test": "echo rls tests run through pnpm test:rls"
+    "test": "vitest run"
   },
   "devDependencies": {
     "typescript": "^5.9.3",
@@ -19,6 +21,7 @@
     "@types/node": "^22.20.0"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.117.0"
+    "@supabase/supabase-js": "^2.117.0",
+    "@supabase/ssr": "^0.12.7"
   }
 }

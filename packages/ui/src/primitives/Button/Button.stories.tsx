@@ -6,7 +6,7 @@ import { Button, ButtonLink } from './Button';
 const meta: Meta<typeof Button> = {
   title: 'Primitives/Button',
   component: Button,
-  tags: ['in-review'],
+  tags: ['approved'],
   args: { children: 'Analyse 12 lots' },
 };
 export default meta;

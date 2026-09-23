@@ -4,7 +4,7 @@ import { ZoneLabel } from './ZoneLabel';
 const meta: Meta<typeof ZoneLabel> = {
   title: 'Primitives/ZoneLabel',
   component: ZoneLabel,
-  tags: ['in-review'],
+  tags: ['approved'],
   parameters: { layout: 'padded' },
   args: { zone: 'onTarget' },
 };

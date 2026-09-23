@@ -41,7 +41,7 @@ for (const name of ['SUPABASE_URL', 'SUPABASE_ANON_KEY', 'SUPABASE_SERVICE_ROLE_
   }
 }
 
-const result = spawnSync('pnpm', ['--filter', '@maxbid/db', 'exec', 'vitest', 'run'], {
+const result = spawnSync('pnpm', ['--filter', '@maxbid/db', 'exec', 'vitest', 'run', '--config', 'vitest.db.config.ts'], {
   stdio: 'inherit',
   env,
   shell: process.platform === 'win32',

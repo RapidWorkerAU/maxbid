@@ -8,7 +8,7 @@ import { TitleBlock } from '../TitleBlock/TitleBlock';
 const meta: Meta<typeof SheetFrame> = {
   title: 'Primitives/SheetFrame',
   component: SheetFrame,
-  tags: ['in-review'],
+  tags: ['approved'],
   parameters: { layout: 'padded' },
 };
 export default meta;
