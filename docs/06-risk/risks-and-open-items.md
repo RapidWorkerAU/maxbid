@@ -36,7 +36,7 @@ Source: MaxBid Project Workbook, tab 25 Open Items.
 
 | ID | Item | How to close | Owner | When |
 | --- | --- | --- | --- | --- |
-| O01 | Choose between Inngest and Trigger.dev | Build a small spike of the fan out pattern on each | Ashleigh | Phase 0 |
+| O01 | Choose between Inngest and Trigger.dev | Closed. Inngest, by decision record 0013 | Ashleigh | Closed |
 | O02 | Choose between Firecrawl and Browserbase | Test both on one catalogue from each auction house | Ashleigh | Phase 0 |
 | O03 | Choose between Brave Search API and SerpAPI | Compare result quality on 20 sample lots | Ashleigh | Phase 0 |
 | O04 | Apply for eBay Marketplace Insights access | Submit application through the eBay developer program | Ashleigh | Phase 0 |

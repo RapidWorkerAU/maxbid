@@ -68,7 +68,7 @@ Exit criteria: Grays and PDF catalogues extracted.
 
 | ID | Title | Specs | Size | Checkpoint |
 | --- | --- | --- | --- | --- |
-| W2.1 | Choose the job runner and build the fan out spike. Closes O01 | D32, pipeline.md, tech-stack.md | M | a, c, d |
+| W2.1 | Inngest client, S1 ingest, platform detection. Closes O01 | D32, pipeline.md, decision record 0013 | M | a |
 | W2.2 | Choose the extraction service. Closes O02 | D34, data-sources.md | M | a, c, d |
 | W2.3 | Migration: auction_platforms, auctions, lots, lot_images, analyses, analysis_lots, raw extract | database.md, security-and-rls.md shared tables | L | a |
 | W2.4 | Ingest and extract stages S1 and S2 for Grays | F05, F07, S1, S2. Cleared by docs/02-specs/site-access.md | L | a |

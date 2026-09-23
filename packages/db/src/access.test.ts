@@ -24,6 +24,12 @@ describe('a signed out visitor', () => {
     expect(redirectFor(signedOut, '/auth/callback')).toBeNull();
   });
 
+  it('lets Inngest reach its own endpoint, which uses a signing key not a session', () => {
+    expect(isPublicPath('/api/inngest')).toBe(true);
+    expect(redirectFor(signedOut, '/api/inngest')).toBeNull();
+    expect(redirectFor(settled, '/api/inngest')).toBeNull();
+  });
+
   it('may reach the manifest and icons, so the app can still install', () => {
     expect(isPublicPath('/manifest.webmanifest')).toBe(true);
     expect(isPublicPath('/icons/icon-192.png')).toBe(true);
