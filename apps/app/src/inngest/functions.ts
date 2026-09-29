@@ -3,5 +3,6 @@
 
 import { extract } from './extract';
 import { ingest } from './ingest';
+import { triage } from './triageFunction';
 
-export const functions = [ingest, extract];
+export const functions = [ingest, extract, triage];
