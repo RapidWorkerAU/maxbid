@@ -143,15 +143,13 @@ describe('usage, which a valuation showed we were ignoring', () => {
     expect(SYSTEM_PROMPT).toMatch(/done much less than the lot[\s\S]*higherSpec/);
   });
 
-  it.each(['exact', 'nearExact', 'higherSpec', 'lowerSpec'])(
-    'caps a %s match at similarAlternative when the usage is not stated',
-    (matchLevel) => {
-      // An unknown difference is not the same as no difference, and on a used
-      // vehicle it is the difference that decides the price.
-      const [listing] = readListings(one({ matchLevel, usage: null }), 10);
-      expect(listing?.matchLevel).toBe('similarAlternative');
-    },
-  );
+  it('leaves the grade as the model gave it, because the page is not read yet', () => {
+    // Capping here held every comparable at similarAlternative even after a
+    // page fetch had found the reading, because the cap outlived its reason.
+    // valueLot applies it once it knows whether the usage is really unknown.
+    const [listing] = readListings(one({ matchLevel: 'exact', usage: null }), 10);
+    expect(listing?.matchLevel).toBe('exact');
+  });
 
   it('enforces the cap in code, not only in the prompt', () => {
     // The first version of this rule lived only in the prompt and said "use

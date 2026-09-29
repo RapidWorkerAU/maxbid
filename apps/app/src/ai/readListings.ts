@@ -95,13 +95,17 @@ export function userPromptFor(lot: string, results: ListingForReading[]): string
 }
 
 /**
- * The best a comparable can be graded when nobody stated its usage.
+ * The best a comparable can be graded when nobody knows its usage.
  *
- * Enforced here as well as asked for in the prompt, because a model reads
+ * Enforced in code as well as asked for in the prompt, because a model reads
  * "at best" as permission. The first version of this rule said "use nearExact
  * at best" and the model used nearExact on every row, which graded a
  * 549,752 kilometre Landcruiser higher than leaving the odometer out
  * altogether had. Decision record 0019.
+ *
+ * Applied by valueLot once the listing page has been read, not here. Capping
+ * on the snippet alone held every comparable at similarAlternative even after
+ * a page fetch had found the reading, because the cap outlived its reason.
  */
 export function capForUnknownUsage(level: ListingMatch): ListingMatch {
   const betterThanTheCap: ListingMatch[] = ['exact', 'nearExact', 'higherSpec', 'lowerSpec'];
@@ -168,7 +172,10 @@ export function readListings(reply: string, resultCount: number): ReadListing[] 
       advertised: row.advertised !== false,
       // Decision record 0019. A comparable whose usage nobody stated cannot be
       // an exact match, because an unknown difference is not no difference.
-      matchLevel: usage === null ? capForUnknownUsage(matchLevel) : matchLevel,
+      // Not capped here. The cap is for a comparable whose usage nobody
+      // knows, and at this point nobody has looked at the listing page yet.
+      // valueLot applies it once it has, in capForUnknownUsage.
+      matchLevel,
       reason,
       year,
       usage,
