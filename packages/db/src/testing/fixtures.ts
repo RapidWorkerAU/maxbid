@@ -67,7 +67,8 @@ export async function createAuction(tenants: Tenants): Promise<AuctionFixture> {
       source_url: `https://example.test/${crypto.randomUUID()}`,
       title: 'Woodworking machinery, Perth',
       premium_source: 'extracted',
-      premium_pct: 0.165,
+      // One band, which is what a single rate always meant. Decision record 0015.
+      premium_schedule: { bands: [{ upTo: null, kind: 'rate', rate: 0.165 }] },
     })
     .select('id')
     .single();
