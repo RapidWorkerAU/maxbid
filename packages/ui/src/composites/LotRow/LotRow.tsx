@@ -7,13 +7,20 @@ import { MonoLabel } from '../../primitives/MonoLabel';
  *
  * SC05 calls for a dense table, and a table is the right thing on a desktop
  * where a reseller compares a hundred lots at once. It is the wrong thing at
- * 360px, where six columns become unreadable. So this renders as a card on a
- * phone and as a table row from the medium breakpoint up, which is the same
+ * 360px, where six columns stop being readable. So this is a card on a phone
+ * and a table row from the medium breakpoint up, carrying the same
  * information either way rather than a cut down version of it.
  *
+ * Blueprint details that apply here. Rows are 36px standard and 44px
+ * comfortable, driven by the spacing tokens, which is the density switch C09
+ * asks for. Desktop table text is 15px and mobile is 16px. Lot numbers are
+ * Space Mono. Borders are hairlines and corners are 2px, never shadows, per
+ * B08. Marker yellow appears on nothing here, because B09 reserves it for the
+ * main action and the most you should bid figure, and neither is on this row.
+ *
  * Figures the pipeline has not produced yet are left out rather than shown
- * empty or filled with a placeholder. A blank where a resale range belongs is
- * a question; a zero is a wrong answer.
+ * empty. A blank where a resale range belongs is a question; a zero is a
+ * wrong answer.
  */
 export type LotRowLot = {
   id: string;
@@ -32,11 +39,21 @@ export type LotRowLot = {
 
 export type LotRowProps = {
   lot: LotRowLot;
+  /** C09. Standard is 36px, comfortable is 44px. */
+  density?: 'standard' | 'comfortable';
   /** Shown when the list lets the user shortlist lots. */
   selected?: boolean;
   onSelect?: (id: string, selected: boolean) => void;
   className?: string;
 };
+
+/** The column widths, shared with the header so the two line up exactly. */
+export const LOT_COLUMNS = 'md:grid-cols-[2rem_8rem_1fr_7rem_10rem]';
+
+const ROW_HEIGHT = {
+  standard: 'md:h-row',
+  comfortable: 'md:h-row-comfortable',
+} as const;
 
 /** How long until a lot closes, in words. Never a bare timestamp. */
 export function closesIn(closesAt: string, now: Date = new Date()): string {
@@ -63,7 +80,7 @@ function Checkbox({ lot, selected, onSelect }: LotRowProps) {
       // The lot number alone would read as a string of digits, so the label
       // names what is being chosen.
       aria-label={`Shortlist lot ${lot.lotNumber}, ${lot.title}`}
-      className="size-5 shrink-0 accent-marker"
+      className="size-5 shrink-0 rounded-sm accent-marker"
     />
   );
 }
@@ -71,34 +88,40 @@ function Checkbox({ lot, selected, onSelect }: LotRowProps) {
 function Condition({ note }: { note?: string | null }) {
   if (!note) return null;
   // A written off marker is a fact about the lot, not our judgement of it, so
-  // it is drawn as a bordered tag rather than in a zone colour. The zone
-  // colours mean go, caution and stop on a bid figure, and using one here
-  // would say we had decided something we have not.
+  // it is a bordered tag rather than a zone colour. The zone colours mean go,
+  // caution and stop on a bid figure, and one here would say we had decided
+  // something we have not. Space Mono, because it is a code, not a sentence.
   return (
-    <span className="inline-block rounded-sm border border-zone-amber px-1.5 py-0.5 font-sans text-xs font-semibold text-zone-amber">
+    <span className="inline-block whitespace-nowrap rounded-sm border border-zone-amber px-1 py-px font-mono text-[0.6875rem] uppercase leading-none text-zone-amber">
       {note}
     </span>
   );
 }
 
-export function LotRow({ lot, selected, onSelect, className = '' }: LotRowProps) {
+export function LotRow({
+  lot,
+  density = 'standard',
+  selected,
+  onSelect,
+  className = '',
+}: LotRowProps) {
   const closing = lot.closesAt ? closesIn(lot.closesAt) : null;
 
   return (
     <div
-      className={`grid grid-cols-[auto_1fr] items-start gap-x-3 gap-y-1 border-b border-line px-3 py-3 md:grid-cols-[auto_7rem_1fr_8rem_9rem] md:items-center md:gap-y-0 md:py-2 ${className}`}
+      className={`grid grid-cols-[auto_1fr] items-start gap-x-3 gap-y-1 border-b border-line/40 px-3 py-3 text-base md:items-center md:gap-y-0 md:py-0 md:text-[0.9375rem] ${LOT_COLUMNS} ${ROW_HEIGHT[density]} ${className}`}
     >
       <Checkbox lot={lot} selected={selected} onSelect={onSelect} />
 
-      <MonoLabel className="md:text-ink-muted">{lot.lotNumber}</MonoLabel>
+      <MonoLabel size="xs" className="md:tabular-nums">
+        {lot.lotNumber}
+      </MonoLabel>
 
-      <div className="col-start-2 md:col-start-auto">
-        <p className="font-sans text-sm font-semibold text-ink">{lot.title}</p>
-        {lot.identifiedAs ? (
-          <p className="mt-0.5 font-sans text-xs text-ink-muted">{lot.identifiedAs}</p>
-        ) : null}
-        {lot.conditionNote ? (
-          <p className="mt-1">
+      <div className="col-start-2 min-w-0 md:col-start-auto">
+        <p className="truncate font-sans font-semibold text-ink">{lot.title}</p>
+        {lot.identifiedAs || lot.conditionNote ? (
+          <p className="flex items-center gap-2 truncate font-sans text-xs text-ink-muted">
+            {lot.identifiedAs ? <span className="truncate">{lot.identifiedAs}</span> : null}
             <Condition note={lot.conditionNote} />
           </p>
         ) : null}
@@ -120,7 +143,7 @@ export function LotRow({ lot, selected, onSelect, className = '' }: LotRowProps)
           <ConfidenceBadge score={lot.confidence} />
         )}
         {closing ? (
-          <span className="font-sans text-xs text-ink-muted">{closing}</span>
+          <span className="whitespace-nowrap font-sans text-xs text-ink-muted">{closing}</span>
         ) : null}
       </div>
     </div>

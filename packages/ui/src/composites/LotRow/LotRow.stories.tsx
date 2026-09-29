@@ -136,3 +136,5 @@ export const ASaleOfThem: Story = {
     </div>
   ),
 };
+
+export const Comfortable: Story = { args: { density: 'comfortable' } };

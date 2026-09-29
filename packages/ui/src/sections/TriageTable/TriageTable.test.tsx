@@ -80,7 +80,7 @@ describe('shortlisting', () => {
 
   it('says how many are shortlisted', () => {
     render(<TriageTable lots={lots} selected={['1', '2']} onSelect={() => {}} />);
-    expect(screen.getByText('2 lots, 2 shortlisted')).toBeTruthy();
+    expect(screen.getByText(/2 lots.*2 shortlisted/)).toBeTruthy();
   });
 
   it('says nothing about shortlisting when none are', () => {

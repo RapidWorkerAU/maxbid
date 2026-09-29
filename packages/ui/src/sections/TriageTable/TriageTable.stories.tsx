@@ -79,3 +79,42 @@ export const ALongSale: Story = {
     })),
   },
 };
+
+export const ComfortableDensity: Story = {
+  // C09. The same table at 44px rows instead of 36px, through one token.
+  args: { density: 'comfortable' },
+};
+
+export const BothDensities: Story = {
+  render: (args) => (
+    <div className="flex flex-col gap-8">
+      <TriageTable {...args} density="standard" pendingNote={undefined} caption="Standard, 36px rows" />
+      <TriageTable {...args} density="comfortable" pendingNote={undefined} caption="Comfortable, 44px rows" />
+    </div>
+  ),
+};
+
+export const StickyHeader: Story = {
+  // The heading row stays put while a long sale scrolls under it.
+  args: {
+    lots: Array.from({ length: 40 }, (_, index) => ({
+      ...LOTS[index % LOTS.length]!,
+      id: `sticky-${index}`,
+      lotNumber: `${String(index + 1).padStart(4, '0')}-23502418`,
+    })),
+    pendingNote: undefined,
+  },
+  render: (args) => (
+    // A scrollable box needs keyboard access, or someone who cannot use a
+    // mouse cannot reach what is below the fold. The accessibility check
+    // caught this on the first version of this story.
+    <div
+      className="h-96 overflow-y-auto"
+      tabIndex={0}
+      role="region"
+      aria-label="Scrollable list of lots"
+    >
+      <TriageTable {...args} />
+    </div>
+  ),
+};

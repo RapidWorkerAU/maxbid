@@ -1,4 +1,4 @@
-import { LotRow, type LotRowLot } from '../../composites/LotRow';
+import { LOT_COLUMNS, LotRow, type LotRowLot } from '../../composites/LotRow';
 import { InfoNote } from '../../primitives/InfoNote';
 import { MonoLabel } from '../../primitives/MonoLabel';
 
@@ -10,13 +10,17 @@ import { MonoLabel } from '../../primitives/MonoLabel';
  * from a cost profile. They are left out rather than shown as empty columns,
  * because a blank where a resale range belongs invites the reader to supply
  * their own answer, and a placeholder figure next to a bid would be read as
- * advice.
+ * advice. The note at the top says what is missing.
  *
- * The table says plainly what it does not yet know, which is what the note at
- * the top is for.
+ * Blueprint details that apply here. The header sits on surface_muted and
+ * sticks while the list scrolls, per the density and stickiness rules. Column
+ * headings are uppercase Space Mono, per B04. The frame is a hairline with
+ * 2px corners rather than a shadow, per B08.
  */
 export type TriageTableProps = {
   lots: LotRowLot[];
+  /** C09. Standard is 36px rows, comfortable is 44px. */
+  density?: 'standard' | 'comfortable';
   /** The ids the user has shortlisted. */
   selected?: string[];
   onSelect?: (id: string, selected: boolean) => void;
@@ -29,9 +33,9 @@ export type TriageTableProps = {
 
 function Empty() {
   return (
-    <div className="border border-line px-4 py-8 text-center">
+    <div className="rounded-sm border border-line/60 px-4 py-10 text-center">
       <p className="font-sans font-semibold text-ink">No lots yet</p>
-      <p className="mt-1 font-sans text-sm text-ink-muted">
+      <p className="mx-auto mt-1 max-w-sm font-sans text-sm text-ink-muted">
         We have not read any lots from this catalogue. If the analysis is still
         running, this page fills in as it goes.
       </p>
@@ -39,21 +43,32 @@ function Empty() {
   );
 }
 
-/** The column headings, shown from the medium breakpoint up. */
+/** The column headings. Hidden on a phone, where each row is a card. */
 function Headings({ shortlisting }: { shortlisting: boolean }) {
   return (
-    <div className="hidden border-b border-line px-3 py-2 md:grid md:grid-cols-[auto_7rem_1fr_8rem_9rem] md:items-center md:gap-x-3">
-      {shortlisting ? <span className="size-5" aria-hidden /> : null}
-      <MonoLabel>Lot</MonoLabel>
-      <MonoLabel>Item</MonoLabel>
-      <MonoLabel className="text-right">Current bid</MonoLabel>
-      <MonoLabel className="text-right">Identified</MonoLabel>
+    <div
+      className={`sticky top-0 z-10 hidden border-b border-line bg-surface-muted px-3 py-2 md:grid md:items-center md:gap-x-3 ${LOT_COLUMNS}`}
+    >
+      {shortlisting ? <span aria-hidden /> : null}
+      <MonoLabel size="xs" tone="ink">
+        Lot
+      </MonoLabel>
+      <MonoLabel size="xs" tone="ink">
+        Item
+      </MonoLabel>
+      <MonoLabel size="xs" tone="ink" className="text-right">
+        Current bid
+      </MonoLabel>
+      <MonoLabel size="xs" tone="ink" className="text-right">
+        Identified
+      </MonoLabel>
     </div>
   );
 }
 
 export function TriageTable({
   lots,
+  density = 'standard',
   selected = [],
   onSelect,
   caption,
@@ -65,29 +80,43 @@ export function TriageTable({
   const chosen = new Set(selected);
   const shortlisting = Boolean(onSelect);
 
+  // A div rather than a section. A section with a name is a landmark, and a
+  // landmark is for a page level region such as navigation or main. A list of
+  // lots is content, and two of them on one page are indistinguishable to a
+  // screen reader, which is what the accessibility check objected to. The
+  // heading is what a screen reader user navigates by here.
   return (
-    <section className={className} aria-label={caption ?? 'Lots in this catalogue'}>
-      <header className="flex flex-wrap items-baseline justify-between gap-2">
-        {caption ? <h2 className="font-sans text-lg font-bold text-ink">{caption}</h2> : null}
-        <p className="font-sans text-sm text-ink-muted">
+    <div className={className}>
+      {/*
+        A div, not a header. A header outside a sectioning element is the
+        page banner landmark, so two tables on one page gave a document two
+        banners. This is a caption row, not the top of the page.
+      */}
+      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+        {caption ? (
+          <h2 className="font-sans text-lg font-bold text-ink">{caption}</h2>
+        ) : null}
+        <p className="font-mono text-xs uppercase tracking-wide text-ink-muted tabular-nums">
           {lots.length} {lots.length === 1 ? 'lot' : 'lots'}
-          {shortlisting && chosen.size > 0 ? `, ${chosen.size} shortlisted` : ''}
+          {shortlisting && chosen.size > 0 ? ` · ${chosen.size} shortlisted` : ''}
         </p>
-      </header>
+      </div>
 
       {pendingNote ? <InfoNote className="mt-3">{pendingNote}</InfoNote> : null}
 
-      <div className="mt-3 border-t border-line md:border-t-0">
+      {/* A hairline frame with 2px corners, per B08. No shadow. */}
+      <div className="mt-3 overflow-hidden rounded-sm border border-line/60">
         <Headings shortlisting={shortlisting} />
         {lots.map((lot) => (
           <LotRow
             key={lot.id}
             lot={lot}
+            density={density}
             selected={chosen.has(lot.id)}
             onSelect={onSelect}
           />
         ))}
       </div>
-    </section>
+    </div>
   );
 }
