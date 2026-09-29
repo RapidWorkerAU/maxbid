@@ -8,7 +8,8 @@
 --
 -- The shape stored here matches PremiumSchedule in packages/calc:
 --
---   {"bands": [{"upTo": 2000, "kind": "fixed", "amount": 495},
+--   {"includesGst": true,
+--    "bands": [{"upTo": 2000, "kind": "fixed", "amount": 495},
 --              {"upTo": null, "kind": "rate", "rate": 0.05}]}
 --
 -- An auction charging one percentage everywhere is a schedule holding one
@@ -35,6 +36,15 @@ begin
   end if;
 
   if jsonb_typeof(schedule) <> 'object' then
+    return false;
+  end if;
+
+  -- Whether the stated amounts already include GST. Decision record 0016.
+  -- Optional, because most schedules quote a figure before tax, but it must
+  -- be a plain true or false when it is there: a string would read as true
+  -- everywhere it is used and silently change what a buyer is charged.
+  if schedule -> 'includesGst' is not null
+     and jsonb_typeof(schedule -> 'includesGst') not in ('boolean', 'null') then
     return false;
   end if;
 

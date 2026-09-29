@@ -95,3 +95,23 @@ describe('a schedule the database refuses', () => {
     expect(error, 'the database should have refused this schedule').not.toBeNull();
   });
 });
+
+describe('whether the schedule includes GST', () => {
+  it('takes a schedule that says its amounts include GST', async () => {
+    const { error } = await store({
+      includesGst: true,
+      bands: [{ upTo: null, kind: 'fixed', amount: 495 }],
+    });
+    expect(error).toBeNull();
+  });
+
+  it('refuses a value that is not a plain true or false', async () => {
+    // "false" as a string reads as true everywhere it is used, and it would
+    // quietly change what a buyer is charged. Decision record 0016.
+    const { error } = await store({
+      includesGst: 'false',
+      bands: [{ upTo: null, kind: 'fixed', amount: 495 }],
+    });
+    expect(error).not.toBeNull();
+  });
+});

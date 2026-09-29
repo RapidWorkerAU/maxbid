@@ -21,8 +21,21 @@ export function bidBasis(i: BidInputs): BidBasis {
     effectiveOtherCosts:
       i.gstRegistered && i.otherCostsIncludeGst ? i.otherCosts / (1 + g) : i.otherCosts,
     hammerFactor: 1 + (!i.gstRegistered && i.gstOnHammer ? g : 0),
-    premiumFactor: 1 + (!i.gstRegistered && i.gstOnPremium ? g : 0),
+    premiumFactor: premiumFactorFor(i),
   };
+}
+
+/**
+ * What each dollar of the stated premium really costs this buyer.
+ *
+ * Three cases, and only one of them is a multiplier of 1. Where the schedule
+ * includes GST the charge is the stated amount, so a registered buyer who
+ * claims the GST back really pays the amount divided by 1.1.
+ */
+function premiumFactorFor(i: BidInputs): number {
+  const g = GST_RATE;
+  if (i.premium.includesGst) return i.gstRegistered ? 1 / (1 + g) : 1;
+  return 1 + (!i.gstRegistered && i.gstOnPremium ? g : 0);
 }
 
 /**

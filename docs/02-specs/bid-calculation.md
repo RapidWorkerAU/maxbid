@@ -18,7 +18,7 @@ The three rise in that order. The break even bid is always the highest of them, 
 
 1. Resale price for the chosen scenario, usually the conservative resale.
 2. Whether the resale price includes GST.
-3. The buyer's premium schedule, and whether GST applies to the hammer price and the premium.
+3. The buyer's premium schedule, whether its amounts already include GST, and whether GST applies to the hammer price and the premium.
 4. Other costs: transport, removal, repairs, parts, testing, cleaning, storage, selling fees and other. Entered including GST.
 5. Whether the buyer is registered for GST.
 6. Target profit and minimum acceptable profit, in dollars or as a return on cost.
@@ -56,6 +56,25 @@ used below.
 | $10,001 to $30,000 | 7 percent |
 | $30,001 to $40,000 | 6 percent |
 | $40,001 and above | 5 percent |
+
+### Where the premium already includes GST
+
+An auction may quote a premium that already has GST in it. The Grays vehicle
+sale does: both lot pages say "GST is included in the buyers premium", so the
+$495 in its table is the whole charge and nothing is added to it.
+
+A schedule records this. Where it is set:
+
+1. The buyer is charged the stated amount, whatever the GST setting says.
+2. A GST registered buyer claims back the GST inside that amount, which is the
+   amount less the amount divided by 1.1. On $495 that is $45. It is not the
+   amount multiplied by 0.1, because GST is a tenth of the price before tax,
+   not a tenth of the price after it.
+3. So each dollar of stated premium really costs a registered buyer 1 divided
+   by 1.1, and an unregistered buyer the whole dollar.
+
+Where it is not set, the premium is a figure before tax and GST is added where
+it applies, which is how every worked example on this page reads.
 
 ### Finding the highest bid within a budget
 
