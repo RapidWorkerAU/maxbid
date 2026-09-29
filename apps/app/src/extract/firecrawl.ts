@@ -1,4 +1,5 @@
 import Firecrawl, { type ScrapeOptions } from '@mendable/firecrawl-js';
+import { takeATurn } from './rateLimit';
 import { isAllowed, parseRobots } from './robots';
 
 // Fetching a catalogue page. Firecrawl, chosen by decision record 0014.
@@ -136,7 +137,12 @@ function firecrawl(): Firecrawl {
  */
 export async function fetchPage(url: string): Promise<FetchedPage> {
   await assertAllowed(url);
+  // Two different limits. One is about being a good guest on a host, the
+  // other is what the extraction service itself allows across every host.
+  // Only the second one fails hard, and the first harvest of a real sale
+  // read 18 lots of 36 before hitting it.
   await waitForTurn(new URL(url).host);
+  await takeATurn();
 
   const result = await firecrawl().scrape(url, SCRAPE_OPTIONS);
 
