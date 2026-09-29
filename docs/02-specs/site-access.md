@@ -105,3 +105,27 @@ organisation and every later analysis after that.
 
 The same rules apply as to any other page here. robots.txt is read and obeyed,
 requests are rate limited per host, and we identify ourselves honestly.
+
+## There is no public archive of past Grays sales
+
+Three routes were checked on 29 September 2026, looking for a way to find what
+past lots sold for.
+
+**Their search shows live lots only.** `grays.com/search?keywords=landcruiser`
+returns 32 results, every one of them counting down to a close. No closed lots,
+no sold prices, and no filter for completed auctions.
+
+**Their sitemap lists current inventory.** `motor-vehiclesmotor-cycles-lot-1`
+holds 298 lot pages, all modified today and marked to change daily, from sale
+numbers alongside the ones running now. It is what is for sale, not what has
+been sold.
+
+**A web search does reach past lot pages.** A closed lot page stays up and
+keeps its sold price, so `site:grays.com` plus the item finds some of them. The
+coverage is whatever a search engine happened to crawl while the lot was live,
+which is patchy: a 2008 Landcruiser returned five past sales and a 2006
+Mercedes ML320 returned none, though Grays has certainly sold both.
+
+So past results can be read one at a time when a search engine knows about
+them, and there is no index of them to work from. That is the constraint any
+plan for auction evidence has to live inside.
