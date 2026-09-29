@@ -44,24 +44,20 @@ function Empty() {
 }
 
 /** The column headings. Hidden on a phone, where each row is a card. */
-function Headings({ shortlisting }: { shortlisting: boolean }) {
+function Headings() {
   return (
     <div
-      className={`sticky top-0 z-10 hidden border-b border-line bg-surface-muted px-3 py-2 md:grid md:items-center md:gap-x-3 ${LOT_COLUMNS}`}
+      className={`sticky top-0 z-10 hidden h-row items-center border-b border-line bg-surface-muted px-3 md:grid md:gap-x-3 ${LOT_COLUMNS}`}
     >
-      {shortlisting ? <span aria-hidden /> : null}
-      <MonoLabel size="xs" tone="ink">
-        Lot
-      </MonoLabel>
-      <MonoLabel size="xs" tone="ink">
-        Item
-      </MonoLabel>
-      <MonoLabel size="xs" tone="ink" className="text-right">
-        Current bid
-      </MonoLabel>
-      <MonoLabel size="xs" tone="ink" className="text-right">
-        Identified
-      </MonoLabel>
+      {/* The empty cell above the checkbox column, so the headings sit over
+          the right cells whether the list shortlists or not. */}
+      <span aria-hidden />
+      <MonoLabel size="xs" tone="ink">Lot</MonoLabel>
+      <MonoLabel size="xs" tone="ink">Item</MonoLabel>
+      <MonoLabel size="xs" tone="ink">Identified as</MonoLabel>
+      <MonoLabel size="xs" tone="ink" className="text-right">Current bid</MonoLabel>
+      <MonoLabel size="xs" tone="ink" className="justify-self-end">Confidence</MonoLabel>
+      <MonoLabel size="xs" tone="ink" className="text-right">Closes</MonoLabel>
     </div>
   );
 }
@@ -106,7 +102,7 @@ export function TriageTable({
 
       {/* A hairline frame with 2px corners, per B08. No shadow. */}
       <div className="mt-3 overflow-hidden rounded-sm border border-line/60">
-        <Headings shortlisting={shortlisting} />
+        <Headings />
         {lots.map((lot) => (
           <LotRow
             key={lot.id}

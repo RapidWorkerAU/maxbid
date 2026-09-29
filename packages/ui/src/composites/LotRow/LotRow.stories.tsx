@@ -138,3 +138,73 @@ export const ASaleOfThem: Story = {
 };
 
 export const Comfortable: Story = { args: { density: 'comfortable' } };
+
+/**
+ * The layout check that the unit tests cannot do.
+ *
+ * Two rounds of this component shipped with green tests and a broken render:
+ * the lot number wrapped onto two lines, the title was cut off at full
+ * desktop width, and the identification overlapped the row below. Nothing in
+ * a unit test looks at geometry, so this measures the real thing in a real
+ * browser.
+ */
+export const FitsInOneRow: Story = {
+  globals: { viewport: { value: 'desktop1440' } },
+  args: {
+    lot: {
+      id: 'fit',
+      lotNumber: '0001-23502418',
+      title: '2016 Invented Utility Epsilon Turbo Diesel Dual Cab Four Wheel Drive With Canopy',
+      currentBid: 21700,
+      closesAt: new Date(Date.now() + 6.5 * 3600_000).toISOString(),
+      identifiedAs: 'Invented Utility, Epsilon, 2016, turbo diesel, dual cab, four wheel drive',
+      confidence: 71,
+      conditionNote: 'WOVR-INSPECTED',
+    },
+    onSelect: () => {},
+  },
+  play: async ({ canvasElement }) => {
+    const row = canvasElement.querySelector('div[class*="grid"]') as HTMLElement;
+    if (!row) throw new Error('The row did not render.');
+
+    // A standard row is 36px and holds one line. Anything taller means
+    // something wrapped.
+    const height = row.getBoundingClientRect().height;
+    if (height > 40) {
+      throw new Error(`The row is ${Math.round(height)}px tall, so something wrapped into a second line.`);
+    }
+
+    // Nothing may spill sideways out of the row.
+    if (row.scrollWidth > row.clientWidth + 1) {
+      throw new Error(
+        `The row overflows by ${row.scrollWidth - row.clientWidth}px, so a column is too narrow.`,
+      );
+    }
+
+    // The lot number is an identifier. Half of one is no use, so it must sit
+    // on one line and must not be cut short.
+    const lotNumber = [...row.querySelectorAll('*')].find(
+      (el) => el.textContent?.trim() === '0001-23502418',
+    ) as HTMLElement | undefined;
+    if (!lotNumber) throw new Error('The lot number did not render.');
+    if (lotNumber.getBoundingClientRect().height > 24) {
+      throw new Error('The lot number wrapped onto a second line.');
+    }
+    if (lotNumber.scrollWidth > lotNumber.clientWidth + 1) {
+      throw new Error('The lot number is cut off, and half an identifier is no use.');
+    }
+  },
+};
+
+export const FitsOnAPhone: Story = {
+  globals: { viewport: { value: 'mobile375' } },
+  args: FitsInOneRow.args,
+  play: async ({ canvasElement }) => {
+    const row = canvasElement.querySelector('div[class*="grid"]') as HTMLElement;
+    if (!row) throw new Error('The row did not render.');
+    // A card may be as tall as it needs, but it must never scroll sideways.
+    if (row.scrollWidth > row.clientWidth + 1) {
+      throw new Error(`The card overflows by ${row.scrollWidth - row.clientWidth}px at 375px.`);
+    }
+  },
+};

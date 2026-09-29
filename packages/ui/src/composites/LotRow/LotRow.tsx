@@ -8,19 +8,21 @@ import { MonoLabel } from '../../primitives/MonoLabel';
  * SC05 calls for a dense table, and a table is the right thing on a desktop
  * where a reseller compares a hundred lots at once. It is the wrong thing at
  * 360px, where six columns stop being readable. So this is a card on a phone
- * and a table row from the medium breakpoint up, carrying the same
- * information either way rather than a cut down version of it.
+ * and a table row from the medium breakpoint up.
  *
- * Blueprint details that apply here. Rows are 36px standard and 44px
- * comfortable, driven by the spacing tokens, which is the density switch C09
- * asks for. Desktop table text is 15px and mobile is 16px. Lot numbers are
- * Space Mono. Borders are hairlines and corners are 2px, never shadows, per
- * B08. Marker yellow appears on nothing here, because B09 reserves it for the
- * main action and the most you should bid figure, and neither is on this row.
+ * A 36px row holds one line of text. The first version of this stacked the
+ * title and the identification inside one, which wrapped the lot number onto
+ * two lines, cut the title off at full desktop width and let the second line
+ * overlap the row below. Every cell here is a single line, and anything too
+ * long is truncated with its full text on hover. The phone card is the place
+ * where things stack, because a card has the height for it.
  *
- * Figures the pipeline has not produced yet are left out rather than shown
- * empty. A blank where a resale range belongs is a question; a zero is a
- * wrong answer.
+ * Blueprint details. Rows are 36px standard and 44px comfortable through the
+ * spacing tokens, which is the density switch C09 asks for. Desktop table text
+ * is 15px and mobile is 16px. Lot numbers are Space Mono with tabular figures.
+ * Hairline borders and 2px corners, never shadows, per B08. Marker yellow
+ * appears nowhere, because B09 reserves it for the main action and the most
+ * you should bid figure, and this row carries neither.
  */
 export type LotRowLot = {
   id: string;
@@ -47,8 +49,16 @@ export type LotRowProps = {
   className?: string;
 };
 
-/** The column widths, shared with the header so the two line up exactly. */
-export const LOT_COLUMNS = 'md:grid-cols-[2rem_8rem_1fr_7rem_10rem]';
+/**
+ * The columns, shared with the heading row so the two line up exactly.
+ *
+ * The lot number column is wide enough for 0001-23502418 in Space Mono
+ * without wrapping, which the first version was not. The two flexible columns
+ * share what is left, with the item given the larger share because a
+ * catalogue title is the longest thing on the row.
+ */
+export const LOT_COLUMNS =
+  'md:grid-cols-[1.75rem_8.5rem_minmax(0,2fr)_minmax(0,1.4fr)_6.5rem_8.5rem_7.5rem]';
 
 const ROW_HEIGHT = {
   standard: 'md:h-row',
@@ -71,7 +81,9 @@ export function closesIn(closesAt: string, now: Date = new Date()): string {
 }
 
 function Checkbox({ lot, selected, onSelect }: LotRowProps) {
-  if (!onSelect) return null;
+  // The cell is always here, empty when the list does not shortlist, so the
+  // columns line up with the heading row either way.
+  if (!onSelect) return <span className="hidden md:block" aria-hidden />;
   return (
     <input
       type="checkbox"
@@ -80,7 +92,7 @@ function Checkbox({ lot, selected, onSelect }: LotRowProps) {
       // The lot number alone would read as a string of digits, so the label
       // names what is being chosen.
       aria-label={`Shortlist lot ${lot.lotNumber}, ${lot.title}`}
-      className="size-5 shrink-0 rounded-sm accent-marker"
+      className="size-4 shrink-0 rounded-sm accent-marker"
     />
   );
 }
@@ -92,7 +104,7 @@ function Condition({ note }: { note?: string | null }) {
   // caution and stop on a bid figure, and one here would say we had decided
   // something we have not. Space Mono, because it is a code, not a sentence.
   return (
-    <span className="inline-block whitespace-nowrap rounded-sm border border-zone-amber px-1 py-px font-mono text-[0.6875rem] uppercase leading-none text-zone-amber">
+    <span className="shrink-0 whitespace-nowrap rounded-sm border border-zone-amber px-1 py-px font-mono text-[0.625rem] uppercase leading-tight text-zone-amber">
       {note}
     </span>
   );
@@ -109,27 +121,43 @@ export function LotRow({
 
   return (
     <div
-      className={`grid grid-cols-[auto_1fr] items-start gap-x-3 gap-y-1 border-b border-line/40 px-3 py-3 text-base md:items-center md:gap-y-0 md:py-0 md:text-[0.9375rem] ${LOT_COLUMNS} ${ROW_HEIGHT[density]} ${className}`}
+      className={`grid grid-cols-[auto_1fr] items-center gap-x-3 gap-y-1 border-b border-line/40 px-3 py-2.5 text-base last:border-b-0 md:gap-y-0 md:py-0 md:text-[0.9375rem] ${LOT_COLUMNS} ${ROW_HEIGHT[density]} ${className}`}
     >
       <Checkbox lot={lot} selected={selected} onSelect={onSelect} />
 
-      <MonoLabel size="xs" className="md:tabular-nums">
+      {/* Lot number. One line, never wrapped: it is an identifier, and half
+          of one is no use to anybody. */}
+      <MonoLabel size="xs" className="whitespace-nowrap tabular-nums">
         {lot.lotNumber}
       </MonoLabel>
 
+      {/* Item. The longest thing on the row, so it gets the largest share and
+          truncates rather than pushing everything else out of line. */}
+      <div className="col-start-2 flex min-w-0 items-center gap-2 md:col-start-auto">
+        <span className="truncate font-sans font-semibold text-ink" title={lot.title}>
+          {lot.title}
+        </span>
+        <Condition note={lot.conditionNote} />
+      </div>
+
+      {/* What we decided it is. Its own column on a desktop, so it can never
+          sit on top of the row below. */}
       <div className="col-start-2 min-w-0 md:col-start-auto">
-        <p className="truncate font-sans font-semibold text-ink">{lot.title}</p>
-        {lot.identifiedAs || lot.conditionNote ? (
-          <p className="flex items-center gap-2 truncate font-sans text-xs text-ink-muted">
-            {lot.identifiedAs ? <span className="truncate">{lot.identifiedAs}</span> : null}
-            <Condition note={lot.conditionNote} />
-          </p>
-        ) : null}
+        {lot.identifiedAs ? (
+          <span
+            className="block truncate font-sans text-sm text-ink-muted"
+            title={lot.identifiedAs}
+          >
+            {lot.identifiedAs}
+          </span>
+        ) : (
+          <span className="font-sans text-xs text-ink-muted md:hidden">Not identified yet</span>
+        )}
       </div>
 
       <div className="col-start-2 md:col-start-auto md:text-right">
         {lot.currentBid === null || lot.currentBid === undefined ? (
-          <span className="font-sans text-xs text-ink-muted">No bid yet</span>
+          <span className="whitespace-nowrap font-sans text-xs text-ink-muted">No bid yet</span>
         ) : (
           <>
             <span className="font-sans text-xs text-ink-muted md:hidden">Current bid </span>
@@ -138,10 +166,13 @@ export function LotRow({
         )}
       </div>
 
-      <div className="col-start-2 flex flex-wrap items-center gap-2 md:col-start-auto md:justify-end">
+      <div className="col-start-2 md:col-start-auto md:justify-self-end">
         {lot.confidence === null || lot.confidence === undefined ? null : (
           <ConfidenceBadge score={lot.confidence} />
         )}
+      </div>
+
+      <div className="col-start-2 md:col-start-auto md:text-right">
         {closing ? (
           <span className="whitespace-nowrap font-sans text-xs text-ink-muted">{closing}</span>
         ) : null}
