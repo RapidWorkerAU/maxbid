@@ -20,6 +20,8 @@ export type AnalysisLotRecord = {
   lot_id: string;
   triage_low: number | string | null;
   triage_high: number | string | null;
+  triage_max_bid: number | string | null;
+  opportunity_score: number | null;
 };
 
 export type IdentificationRecord = {
@@ -58,7 +60,7 @@ export function toRows(
   const byLot = new Map(identifications.map((row) => [row.lot_id, row]));
   const rangeByLot = new Map(ranges.map((row) => [row.lot_id, row]));
 
-  return lots.map((lot) => {
+  const rows = lots.map((lot) => {
     const found = byLot.get(lot.id);
     const range = rangeByLot.get(lot.id);
     const confidence = asNumber(found?.confidence);
@@ -76,7 +78,19 @@ export function toRows(
       // its own would be read as a single estimate.
       resaleLow: asNumber(range?.triage_low),
       resaleHigh: asNumber(range?.triage_high),
+      maxBid: asNumber(range?.triage_max_bid),
+      score: range?.opportunity_score ?? null,
     };
+  });
+
+  // Best first, which is the whole point of scoring them. A lot with no score
+  // sits below every lot that has one, because it is not that it scored badly
+  // but that we could not say.
+  return rows.sort((a, b) => {
+    const scoreA = a.score ?? -1;
+    const scoreB = b.score ?? -1;
+    if (scoreA !== scoreB) return scoreB - scoreA;
+    return a.lotNumber.localeCompare(b.lotNumber);
   });
 }
 

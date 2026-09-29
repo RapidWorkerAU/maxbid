@@ -95,3 +95,40 @@ describe('the note above the table', () => {
     expect(pendingNoteFor(0, 0)).toBeUndefined();
   });
 });
+
+describe('the order of the list', () => {
+  const two = [
+    { ...lot, id: 'a', lot_number: '0001' },
+    { ...lot, id: 'b', lot_number: '0002' },
+  ];
+
+  it('puts the best lot first', () => {
+    // Decision record 0023. The score is why the list is in this order.
+    const rows = toRows(two, [], [
+      { lot_id: 'a', triage_low: null, triage_high: null, triage_max_bid: null, opportunity_score: 40 },
+      { lot_id: 'b', triage_low: null, triage_high: null, triage_max_bid: null, opportunity_score: 100 },
+    ]);
+    expect(rows.map((r) => r.id)).toEqual(['b', 'a']);
+  });
+
+  it('puts an unscored lot below every scored one', () => {
+    // Not that it scored badly, but that we could not say.
+    const rows = toRows(two, [], [
+      { lot_id: 'a', triage_low: null, triage_high: null, triage_max_bid: null, opportunity_score: null },
+      { lot_id: 'b', triage_low: null, triage_high: null, triage_max_bid: null, opportunity_score: 0 },
+    ]);
+    expect(rows.map((r) => r.id)).toEqual(['b', 'a']);
+  });
+
+  it('falls back to the lot number, so the same list reads the same way twice', () => {
+    const rows = toRows(two, [], []);
+    expect(rows.map((r) => r.lotNumber)).toEqual(['0001', '0002']);
+  });
+
+  it('carries the maximum bid through', () => {
+    const rows = toRows([two[0]!], [], [
+      { lot_id: 'a', triage_low: null, triage_high: null, triage_max_bid: '8499.50', opportunity_score: 100 },
+    ]);
+    expect(rows[0]?.maxBid).toBe(8499.5);
+  });
+});

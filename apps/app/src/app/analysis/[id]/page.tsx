@@ -33,7 +33,7 @@ export default async function AnalysisPage({ params }: { params: Promise<{ id: s
       .eq('is_current', true),
     supabase
       .from('analysis_lots')
-      .select('lot_id, triage_low, triage_high')
+      .select('lot_id, triage_low, triage_high, triage_max_bid, opportunity_score')
       .eq('analysis_id', id),
   ]);
 

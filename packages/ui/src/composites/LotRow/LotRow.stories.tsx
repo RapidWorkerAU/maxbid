@@ -240,3 +240,24 @@ export const WithoutEnoughEvidence: Story = {
     },
   },
 };
+
+export const FullyValued: Story = {
+  // Everything triage can produce: what it is, what it is bid to, what it is
+  // worth, the most to pay, and where it ranks in the catalogue.
+  args: {
+    lot: {
+      id: 'complete',
+      lotNumber: '0005-23502418',
+      title: '2008 Invented Cruiser Gamma Diesel',
+      currentBid: 11300,
+      closesAt: new Date(Date.now() + 6.5 * 3600_000).toISOString(),
+      identifiedAs: 'Invented Cruiser, Gamma, 2008, diesel',
+      confidence: 90,
+      resaleLow: 8500,
+      resaleHigh: 22500,
+      maxBid: 5240,
+      score: 100,
+    },
+    onSelect: () => {},
+  },
+};
