@@ -1,10 +1,15 @@
 // Grays closing times, as they appear on a catalogue page.
 //
-//   **Closes:** 25 Sep 26 [9.00 PM AEST](...)
+// Two forms, because Grays serves two catalogue layouts:
 //
-// Two digit years and a named Australian timezone, so this cannot go through
-// Date.parse. Getting it wrong moves a closing time by hours, and F35 puts a
-// live countdown in front of the user, so it is worth its own module.
+//   **Closes:** 25 Sep 26 [9.00 PM AEST](...)
+//   Ends in 6h: 51m: 51s
+//
+// The first is an instant. The second is a countdown, which only means
+// something alongside the moment the page was fetched. Two digit years and a
+// named Australian timezone rule out Date.parse. Getting either wrong moves a
+// closing time by hours, and F35 puts a live countdown in front of the user,
+// so this is worth its own module.
 
 const MONTHS: Record<string, number> = {
   jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5,
@@ -68,4 +73,34 @@ export function parseGraysClose(dateText: string, timeText: string): ParsedClose
   if (Number.isNaN(parsed.getTime())) return null;
 
   return { iso: parsed.toISOString(), zone };
+}
+
+/** How many seconds each unit in a countdown is worth. */
+const UNITS: Record<string, number> = { d: 86400, h: 3600, m: 60, s: 1 };
+
+/**
+ * Turns a countdown into an instant, using the moment the page was fetched.
+ *
+ * "6h: 51m: 51s" on its own says nothing. Added to the fetch time it becomes a
+ * closing time, accurate to about as long as the fetch took. That is why the
+ * fetch time is stored beside the page in raw_extract.
+ *
+ * Returns null when nothing is recognised, rather than treating an unreadable
+ * countdown as zero and closing the lot immediately.
+ */
+export function parseGraysCountdown(text: string, fetchedAt: string): string | null {
+  const from = new Date(fetchedAt);
+  if (Number.isNaN(from.getTime())) return null;
+
+  let seconds = 0;
+  let found = false;
+  for (const match of text.matchAll(/(\d+)\s*([dhms])\b/gi)) {
+    const unit = UNITS[match[2]!.toLowerCase()];
+    if (unit === undefined) continue;
+    seconds += Number(match[1]) * unit;
+    found = true;
+  }
+  if (!found) return null;
+
+  return new Date(from.getTime() + seconds * 1000).toISOString();
 }

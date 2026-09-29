@@ -9,6 +9,9 @@ import type { EmailCaptureState } from '@maxbid/ui/composites/EmailCapture';
 // from the browser can read or write it. This action uses the secret key,
 // which is server only.
 
+const WAITLIST_FAILED =
+  'We could not add you just now. Please try again in a moment.';
+
 export async function joinWaitlist(
   _previous: EmailCaptureState,
   form: FormData,
@@ -38,10 +41,15 @@ export async function joinWaitlist(
     // Already on the list. Telling them so would confirm the address is
     // registered, and it changes nothing for them either way.
     if (error && error.code !== '23505') {
-      return { status: 'error', message: 'We could not add you just now. Please try again.' };
+      // The reader gets a plain sentence. The server log gets the cause,
+      // because "please try again" is not something anyone can act on.
+      console.error('Waitlist insert failed:', error.code, error.message);
+      return { status: 'error', message: WAITLIST_FAILED };
     }
-  } catch {
-    return { status: 'error', message: 'We could not add you just now. Please try again.' };
+  } catch (cause) {
+    // A missing environment variable lands here, and the message says which.
+    console.error('Waitlist insert threw:', cause instanceof Error ? cause.message : cause);
+    return { status: 'error', message: WAITLIST_FAILED };
   }
 
   return { status: 'success' };

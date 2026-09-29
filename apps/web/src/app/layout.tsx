@@ -12,7 +12,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en-AU" className={`${barlow.variable} ${spaceMono.variable}`}>
+    // Browser extensions add attributes to html before React loads, which
+    // React reports as a hydration mismatch. This suppresses that for this
+    // element only, not for anything inside it.
+    <html suppressHydrationWarning lang="en-AU" className={`${barlow.variable} ${spaceMono.variable}`}>
       <body className="bg-page font-sans text-ink antialiased">{children}</body>
     </html>
   );

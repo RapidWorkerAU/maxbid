@@ -34,7 +34,13 @@ export function AnalysisProgress({
   return (
     <div className="max-w-2xl">
       <MonoLabel>Analysis</MonoLabel>
-      <h1 className="font-sans text-2xl font-bold">{title ?? 'Reading the catalogue'}</h1>
+      {/*
+        The fallback is a name for the page, not a description of what is
+        happening. "Reading the catalogue" was used here, and it sat directly
+        above "We could not finish this analysis", which said two opposite
+        things at once.
+      */}
+      <h1 className="font-sans text-2xl font-bold">{title ?? 'Catalogue analysis'}</h1>
       {sourceUrl ? (
         <p className="mt-1 truncate text-sm text-ink-muted">{sourceUrl}</p>
       ) : null}

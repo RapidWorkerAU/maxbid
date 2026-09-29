@@ -11,7 +11,9 @@ import { extractRequested, inngest } from './client';
 // if parsing breaks, the pages can be reprocessed without fetching a site we
 // promised in D45 to treat carefully.
 
-export const EXTRACTOR_VERSION = 'grays-markdown-1.0.0';
+// 1.1.0 added the card layout that the motor vehicle sales use. A stored page
+// records the version that read it, so a reprocess knows what it is replacing.
+export const EXTRACTOR_VERSION = 'grays-markdown-1.1.0';
 
 /** Lots are written in batches, so one huge catalogue is not one huge insert. */
 const BATCH_SIZE = 100;
@@ -82,7 +84,9 @@ export const extract = inngest.createFunction(
     });
 
     const lots = await step.run('parse-catalogue', async () => {
-      const parsed = parseGraysCatalogue(page.markdown);
+      // The fetch time matters: a motor vehicle catalogue gives closing times
+      // as a countdown, which only means something alongside it.
+      const parsed = parseGraysCatalogue(page.markdown, page.fetchedAt);
       // Throws when the page came back short. Better no catalogue than a
       // quietly incomplete one, which a user would bid against.
       assertComplete(parsed);

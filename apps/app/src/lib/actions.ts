@@ -1,6 +1,5 @@
 'use server';
 
-import { DS01 } from '@maxbid/content';
 import { redirect } from 'next/navigation';
 import { supabaseServer } from './supabase';
 
@@ -50,8 +49,6 @@ export async function acceptTerms(_previous: ActionResult | null, form: FormData
   redirect('/welcome');
 }
 
-/** The text a user is accepting. Imported, never typed. */
-export const TERMS_TEXT = DS01;
 
 /**
  * Creates an organisation and makes the caller its owner. F02.

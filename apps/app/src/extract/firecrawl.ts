@@ -1,4 +1,4 @@
-import Firecrawl from '@mendable/firecrawl-js';
+import Firecrawl, { type ScrapeOptions } from '@mendable/firecrawl-js';
 import { isAllowed, parseRobots } from './robots';
 
 // Fetching a catalogue page. Firecrawl, chosen by decision record 0014.
@@ -97,6 +97,26 @@ export type FetchedPage = {
   fetchedAt: string;
 };
 
+/**
+ * How every page is fetched.
+ *
+ * maxAge zero is the important one. Firecrawl otherwise serves a copy it took
+ * up to two days ago, and it did: the same catalogue came back with a
+ * byte identical countdown fourteen minutes apart, so the closing time worked
+ * out from it was fourteen minutes late. A stale current bid is worse again,
+ * because the whole product is telling someone what to bid against that
+ * figure. Fetching fresh every time costs more credits, and is the only
+ * honest option for a live auction.
+ *
+ * Exported so a test can hold this to it, since nothing else would notice if
+ * the option quietly went missing.
+ */
+export const SCRAPE_OPTIONS: ScrapeOptions = {
+  formats: ['markdown'],
+  onlyMainContent: true,
+  maxAge: 0,
+};
+
 let client: Firecrawl | undefined;
 
 function firecrawl(): Firecrawl {
@@ -118,10 +138,7 @@ export async function fetchPage(url: string): Promise<FetchedPage> {
   await assertAllowed(url);
   await waitForTurn(new URL(url).host);
 
-  const result = await firecrawl().scrape(url, {
-    formats: ['markdown'],
-    onlyMainContent: true,
-  });
+  const result = await firecrawl().scrape(url, SCRAPE_OPTIONS);
 
   const markdown = result?.markdown;
   if (!markdown) {

@@ -22,9 +22,10 @@ Updated at the end of every pull request. The current row is always the one to r
 | 12 | W1.7 Waitlist holding page | In review |  |
 | 13 | W2.3 Ingestion schema, auctions, lots and analyses | In review |  |
 | 14 | O05 site access findings and decision record 0012 | In review |  |
-| 15 | W6.1 The valuation maths | Next |  |
+| 15 | Diagnosable errors, the Grays card layout, and never reading a cached page | In review |  |
+| 16 | W2.6 Normalise stage S3, and the auction title | Next |  |
 
-**Where we are.** Week 1 is built and Week 2 is most of the way. O01, O02 and O05 are all closed. Inngest runs the pipeline, Firecrawl fetches pages under the site access rules, and the Grays extractor reads a real 90 lot catalogue into the database. Pickles is out of V1. Next is the PDF upload route, then triage in Week 3.
+**Where we are.** The whole path from a pasted catalogue link to lots in the database now works, run by a person rather than a test. A real Grays motor vehicle sale of 36 lots reads with every bid and every closing time, accurate to a quarter of a second against the time the lot pages state. Three defects came out of that first live run and are fixed: the parser knew only one of the two Grays layouts, Firecrawl was serving pages up to two days old, and the app had no way to report a missing environment variable. Next is S3, which is where an analysis currently stops.
 
 **Blocked and waiting on Ashleigh.** O05 is closed. Grays and Lloyds are cleared, Pickles is prohibited and out of V1. Inngest and Firecrawl are chosen but need accounts. O03 blocks Week 3. O04 should be applied for now because approval takes time. O11 blocks promoting the waitlist page.
 

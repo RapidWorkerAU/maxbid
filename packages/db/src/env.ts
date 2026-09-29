@@ -6,8 +6,11 @@
 
 function required(name: string, value: string | undefined): string {
   if (!value) {
+    // Both apps use this package, so the message must not name one of them.
+    // Run pnpm check:env to see which app is missing what.
     throw new Error(
-      `${name} is not set. Copy .env.example to apps/app/.env.local and fill it in.`,
+      `${name} is not set. Add it to the .env.local of the app you are running, ` +
+        'copying .env.example. Run pnpm check:env to see what is missing where.',
     );
   }
   return value;

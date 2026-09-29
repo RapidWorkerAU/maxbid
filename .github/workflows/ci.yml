@@ -20,6 +20,17 @@ jobs:
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm test
+      # A Next build catches what typecheck and tests cannot, such as a
+      # "use server" file exporting something that is not an async function.
+      # The values are placeholders: nothing here talks to a real service.
+      - name: Build both apps
+        run: pnpm build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_placeholder
+          SUPABASE_SECRET_KEY: sb_secret_placeholder
+          NEXT_PUBLIC_APP_URL: https://app.example.test
+          NEXT_PUBLIC_SITE_URL: https://example.test
 
   # Row level security is kept out of pnpm check because it needs Docker, but
   # R11 is scored impact 5, so it runs on every pull request.
