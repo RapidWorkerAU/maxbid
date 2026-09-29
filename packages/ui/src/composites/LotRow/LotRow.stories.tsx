@@ -7,7 +7,7 @@ import { LotRow } from './LotRow';
 const meta: Meta<typeof LotRow> = {
   title: 'Composites/LotRow',
   component: LotRow,
-  tags: ['approved'],
+  tags: ['in-review'],
   parameters: { layout: 'padded' },
   args: {
     lot: {
@@ -206,5 +206,37 @@ export const FitsOnAPhone: Story = {
     if (row.scrollWidth > row.clientWidth + 1) {
       throw new Error(`The card overflows by ${row.scrollWidth - row.clientWidth}px at 375px.`);
     }
+  },
+};
+
+export const WithAResaleRange: Story = {
+  args: {
+    lot: {
+      id: 'valued',
+      lotNumber: '0005-23502418',
+      title: '2008 Invented Cruiser Gamma Diesel',
+      currentBid: 11300,
+      closesAt: new Date(Date.now() + 6.5 * 3600_000).toISOString(),
+      identifiedAs: 'Invented Cruiser, Gamma, 2008, diesel',
+      confidence: 90,
+      resaleLow: 8500,
+      resaleHigh: 22500,
+    },
+  },
+};
+
+export const WithoutEnoughEvidence: Story = {
+  // Most lots start here. Saying so is better than a blank cell, which reads
+  // as a figure somebody forgot to fill in.
+  args: {
+    lot: {
+      id: 'unvalued',
+      lotNumber: '0006-23502418',
+      title: '2011 Invented Hatch Delta Petrol',
+      currentBid: 409,
+      closesAt: new Date(Date.now() + 6.5 * 3600_000).toISOString(),
+      identifiedAs: 'Invented Hatch, Delta, 2011, petrol',
+      confidence: 95,
+    },
   },
 };

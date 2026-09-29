@@ -37,6 +37,9 @@ export type LotRowLot = {
   confidence?: number | null;
   /** Anything the catalogue said about condition, such as a write off marker. */
   conditionNote?: string | null;
+  /** The rough resale range from triage. Both or neither. */
+  resaleLow?: number | null;
+  resaleHigh?: number | null;
 };
 
 export type LotRowProps = {
@@ -58,7 +61,7 @@ export type LotRowProps = {
  * catalogue title is the longest thing on the row.
  */
 export const LOT_COLUMNS =
-  'md:grid-cols-[1.75rem_8.5rem_minmax(0,2fr)_minmax(0,1.4fr)_6.5rem_8.5rem_7.5rem]';
+  'md:grid-cols-[1.75rem_8.5rem_minmax(0,2fr)_minmax(0,1.2fr)_6.5rem_9.5rem_8.5rem_7.5rem]';
 
 const ROW_HEIGHT = {
   standard: 'md:h-row',
@@ -163,6 +166,23 @@ export function LotRow({
             <span className="font-sans text-xs text-ink-muted md:hidden">Current bid </span>
             <Money amount={lot.currentBid} size="sm" />
           </>
+        )}
+      </div>
+
+      {/* What we think it is worth. A lot without enough evidence says so
+          rather than showing a blank, which would read as a figure nobody
+          bothered to fill in. */}
+      <div className="col-start-2 md:col-start-auto md:text-right">
+        {lot.resaleLow != null && lot.resaleHigh != null ? (
+          <span className="whitespace-nowrap font-mono text-sm tabular-nums text-ink">
+            <Money amount={lot.resaleLow} size="sm" />
+            {' to '}
+            <Money amount={lot.resaleHigh} size="sm" />
+          </span>
+        ) : (
+          <span className="whitespace-nowrap font-sans text-xs text-ink-muted">
+            Not enough evidence
+          </span>
         )}
       </div>
 

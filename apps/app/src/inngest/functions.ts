@@ -5,5 +5,6 @@ import { extract } from './extract';
 import { ingest } from './ingest';
 import { harvestResults } from './harvestFunction';
 import { triage } from './triageFunction';
+import { valueLots } from './valueFunction';
 
-export const functions = [ingest, extract, triage, harvestResults];
+export const functions = [ingest, extract, triage, valueLots, harvestResults];

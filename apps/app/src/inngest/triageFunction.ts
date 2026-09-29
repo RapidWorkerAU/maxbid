@@ -3,7 +3,7 @@
 
 import { createServiceSupabase } from '@maxbid/db/server';
 import { SpendCeilingError } from '../ai/pricing';
-import { inngest, triageRequested } from './client';
+import { inngest, triageRequested, valueRequested } from './client';
 import { assertBudgetLeft, identifyLot, storeIdentification } from './triage';
 
 /** How many lots are identified at once. Kind to the API and to the database. */
@@ -105,6 +105,15 @@ export const triage = inngest.createFunction(
         .eq('id', analysisId);
       if (error) throw new Error(`Could not update the analysis: ${error.message}`);
     });
+
+    // S5 works out what each lot is worth. Not sent when triage stopped for
+    // spend, because the ceiling is a limit on the analysis and not on a stage.
+    if (!stoppedForSpend && identified > 0) {
+      await step.sendEvent('start-valuation', {
+        name: valueRequested.name,
+        data: { analysisId, orgId },
+      });
+    }
 
     return { analysisId, lots: lots.length, identified, failed, withPhoto, stoppedForSpend };
   },

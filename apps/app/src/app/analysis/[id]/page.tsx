@@ -20,7 +20,7 @@ export default async function AnalysisPage({ params }: { params: Promise<{ id: s
 
   if (!data) notFound();
 
-  const [lots, identifications] = await Promise.all([
+  const [lots, identifications, ranges] = await Promise.all([
     supabase
       .from('lots')
       .select('id, lot_number, title, current_bid, closes_at')
@@ -31,9 +31,13 @@ export default async function AnalysisPage({ params }: { params: Promise<{ id: s
       .select('lot_id, brand, model, year, confidence, condition_notes')
       .eq('analysis_id', id)
       .eq('is_current', true),
+    supabase
+      .from('analysis_lots')
+      .select('lot_id, triage_low, triage_high')
+      .eq('analysis_id', id),
   ]);
 
-  const rows = toRows(lots.data ?? [], identifications.data ?? []);
+  const rows = toRows(lots.data ?? [], identifications.data ?? [], ranges.data ?? []);
   const identified = rows.filter((row) => row.identifiedAs).length;
 
   return (

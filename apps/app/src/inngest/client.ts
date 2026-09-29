@@ -36,4 +36,12 @@ export const triageRequested = eventType('analysis/triage.requested', {
   }>(),
 });
 
+/** S5. Every lot is identified and needs a rough resale range. */
+export const valueRequested = eventType('analysis/value.requested', {
+  schema: staticSchema<{
+    analysisId: string;
+    orgId: string;
+  }>(),
+});
+
 export const inngest = new Inngest({ id: 'maxbid' });
