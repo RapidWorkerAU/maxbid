@@ -11,6 +11,23 @@ import { createServiceSupabase } from '@maxbid/db/server';
 import { fetchPage } from '../extract/firecrawl';
 import { parseGraysPremium, parseGraysSaleTitle } from '../extract/graysPremium';
 
+/**
+ * When a sale finishes, which is when its last lot closes.
+ *
+ * The auction row had no closing time at all until this, because extraction
+ * writes one per lot and nothing rolled them up. The harvester looks for sales
+ * by that field, so without it a closed sale would never be found and its
+ * results never recorded.
+ */
+export function closesAtFrom(lots: { closesAt?: string }[]): string | null {
+  const times = lots
+    .map((lot) => lot.closesAt)
+    .filter((time): time is string => Boolean(time))
+    .map((time) => new Date(time).getTime())
+    .filter((time) => Number.isFinite(time));
+  return times.length > 0 ? new Date(Math.max(...times)).toISOString() : null;
+}
+
 export type AuctionTerms = {
   schedule: PremiumSchedule | null;
   /** Where the schedule came from, which DS12 shows the user. */
@@ -51,7 +68,11 @@ export function termsFrom(
  * Returns what it found so the step's output says plainly whether the premium
  * came from the auction or from a default.
  */
-export async function readAuctionTerms(auctionId: string, lotUrl: string) {
+export async function readAuctionTerms(
+  auctionId: string,
+  lotUrl: string,
+  closesAt: string | null = null,
+) {
   const supabase = createServiceSupabase();
 
   const auction = await supabase
@@ -78,6 +99,7 @@ export async function readAuctionTerms(auctionId: string, lotUrl: string) {
       // and includesGst inside the schedule says which. Decision record 0016.
       premium_gst: true,
       ...(terms.title ? { title: terms.title } : {}),
+      ...(closesAt ? { closes_at: closesAt } : {}),
       extracted_at: new Date().toISOString(),
     })
     .eq('id', auctionId);
@@ -87,5 +109,6 @@ export async function readAuctionTerms(auctionId: string, lotUrl: string) {
     premiumSource: terms.source,
     bands: terms.schedule?.bands.length ?? 0,
     title: terms.title,
+    closesAt,
   };
 }
