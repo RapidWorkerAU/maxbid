@@ -24,6 +24,7 @@ const APPS = {
       'FIRECRAWL_API_KEY',
       'INNGEST_EVENT_KEY',
       'INNGEST_SIGNING_KEY',
+      'INNGEST_DEV',
     ],
   },
 };
@@ -38,6 +39,7 @@ const REASONS = {
   INNGEST_SIGNING_KEY: 'hosted Inngest calling us back, not needed for the Dev Server',
   NEXT_PUBLIC_APP_URL: 'the link in a magic link email',
   NEXT_PUBLIC_SITE_URL: 'canonical URLs on the public site',
+  INNGEST_DEV: 'set to 1 locally, or the SDK rejects the Inngest Dev Server as unsigned',
 };
 
 function read(path) {
