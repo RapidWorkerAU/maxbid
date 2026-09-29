@@ -133,3 +133,27 @@ describe('what we think it is worth', () => {
     expect(screen.getByText('Not enough evidence')).toBeTruthy();
   });
 });
+
+describe('the most you should bid', () => {
+  it('shows it as a figure rounded down', () => {
+    // Decision record 0003. A bid figure is never rounded up, because that
+    // would advise a bid the evidence does not support.
+    render(<LotRow lot={{ ...lot, maxBid: 8499.99 }} />);
+    expect(screen.getByText('$8,499')).toBeTruthy();
+  });
+
+  it('says not yet rather than showing nothing', () => {
+    render(<LotRow lot={lot} />);
+    expect(screen.getByText('Not yet')).toBeTruthy();
+  });
+
+  it('shows the rank when the catalogue has been scored', () => {
+    render(<LotRow lot={{ ...lot, score: 100 }} />);
+    expect(screen.getByText('100')).toBeTruthy();
+  });
+
+  it('shows no rank before the catalogue is scored', () => {
+    render(<LotRow lot={lot} />);
+    expect(screen.queryByText('100')).toBeNull();
+  });
+});

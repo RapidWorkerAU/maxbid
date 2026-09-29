@@ -24,7 +24,7 @@ const PENDING =
 const meta: Meta<typeof TriageTable> = {
   title: 'Sections/TriageTable',
   component: TriageTable,
-  tags: ['approved'],
+  tags: ['in-review'],
   parameters: { layout: 'padded' },
   args: { lots: LOTS, caption: 'Invented Perth Motor Vehicle Auction', pendingNote: PENDING },
 };

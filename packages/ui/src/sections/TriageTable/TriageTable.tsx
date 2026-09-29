@@ -52,11 +52,13 @@ function Headings() {
       {/* The empty cell above the checkbox column, so the headings sit over
           the right cells whether the list shortlists or not. */}
       <span aria-hidden />
+      <MonoLabel size="xs" tone="ink" className="text-right">Rank</MonoLabel>
       <MonoLabel size="xs" tone="ink">Lot</MonoLabel>
       <MonoLabel size="xs" tone="ink">Item</MonoLabel>
       <MonoLabel size="xs" tone="ink">Identified as</MonoLabel>
       <MonoLabel size="xs" tone="ink" className="text-right">Current bid</MonoLabel>
       <MonoLabel size="xs" tone="ink" className="text-right">Worth about</MonoLabel>
+      <MonoLabel size="xs" tone="ink" className="text-right">Bid up to</MonoLabel>
       <MonoLabel size="xs" tone="ink" className="justify-self-end">Confidence</MonoLabel>
       <MonoLabel size="xs" tone="ink" className="text-right">Closes</MonoLabel>
     </div>

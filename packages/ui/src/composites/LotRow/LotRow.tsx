@@ -40,6 +40,10 @@ export type LotRowLot = {
   /** The rough resale range from triage. Both or neither. */
   resaleLow?: number | null;
   resaleHigh?: number | null;
+  /** The most it is worth paying, by the user's own figures. */
+  maxBid?: number | null;
+  /** 0 to 100, relative to the best lot in this catalogue. */
+  score?: number | null;
 };
 
 export type LotRowProps = {
@@ -61,7 +65,7 @@ export type LotRowProps = {
  * catalogue title is the longest thing on the row.
  */
 export const LOT_COLUMNS =
-  'md:grid-cols-[1.75rem_8.5rem_minmax(0,2fr)_minmax(0,1.2fr)_6.5rem_9.5rem_8.5rem_7.5rem]';
+  'md:grid-cols-[1.75rem_3rem_7.5rem_minmax(0,1.8fr)_minmax(0,1fr)_6rem_9rem_7rem_7rem]';
 
 const ROW_HEIGHT = {
   standard: 'md:h-row',
@@ -113,6 +117,52 @@ function Condition({ note }: { note?: string | null }) {
   );
 }
 
+function Score({ score }: { score?: number | null }) {
+  if (score === null || score === undefined) return <span className="hidden md:block" aria-hidden />;
+  return <span className="font-mono text-sm font-bold tabular-nums text-ink">{score}</span>;
+}
+
+function CurrentBid({ amount }: { amount?: number | null }) {
+  if (amount === null || amount === undefined) {
+    return <span className="whitespace-nowrap font-sans text-xs text-ink-muted">No bid yet</span>;
+  }
+  return (
+    <>
+      <span className="font-sans text-xs text-ink-muted md:hidden">Current bid </span>
+      <Money amount={amount} size="sm" />
+    </>
+  );
+}
+
+function Resale({ low, high }: { low?: number | null; high?: number | null }) {
+  if (low == null || high == null) {
+    return (
+      <span className="whitespace-nowrap font-sans text-xs text-ink-muted">
+        Not enough evidence
+      </span>
+    );
+  }
+  return (
+    <span className="whitespace-nowrap font-mono text-sm tabular-nums text-ink">
+      <Money amount={low} size="sm" />
+      {' to '}
+      <Money amount={high} size="sm" />
+    </span>
+  );
+}
+
+/** The figure the whole product exists to produce. Marker yellow, per B09. */
+function MaxBid({ amount }: { amount?: number | null }) {
+  if (amount === null || amount === undefined) {
+    return <span className="font-sans text-xs text-ink-muted">Not yet</span>;
+  }
+  return (
+    <span className="inline-block rounded-sm bg-marker px-1.5 py-0.5">
+      <Money amount={amount} rounding="down" size="sm" />
+    </span>
+  );
+}
+
 export function LotRow({
   lot,
   density = 'standard',
@@ -127,6 +177,11 @@ export function LotRow({
       className={`grid grid-cols-[auto_1fr] items-center gap-x-3 gap-y-1 border-b border-line/40 px-3 py-2.5 text-base last:border-b-0 md:gap-y-0 md:py-0 md:text-[0.9375rem] ${LOT_COLUMNS} ${ROW_HEIGHT[density]} ${className}`}
     >
       <Checkbox lot={lot} selected={selected} onSelect={onSelect} />
+
+      {/* The score, first, because it is why the list is in this order. */}
+      <div className="col-start-2 md:col-start-auto md:text-right">
+        <Score score={lot.score} />
+      </div>
 
       {/* Lot number. One line, never wrapped: it is an identifier, and half
           of one is no use to anybody. */}
@@ -159,31 +214,18 @@ export function LotRow({
       </div>
 
       <div className="col-start-2 md:col-start-auto md:text-right">
-        {lot.currentBid === null || lot.currentBid === undefined ? (
-          <span className="whitespace-nowrap font-sans text-xs text-ink-muted">No bid yet</span>
-        ) : (
-          <>
-            <span className="font-sans text-xs text-ink-muted md:hidden">Current bid </span>
-            <Money amount={lot.currentBid} size="sm" />
-          </>
-        )}
+        <CurrentBid amount={lot.currentBid} />
       </div>
 
       {/* What we think it is worth. A lot without enough evidence says so
           rather than showing a blank, which would read as a figure nobody
           bothered to fill in. */}
       <div className="col-start-2 md:col-start-auto md:text-right">
-        {lot.resaleLow != null && lot.resaleHigh != null ? (
-          <span className="whitespace-nowrap font-mono text-sm tabular-nums text-ink">
-            <Money amount={lot.resaleLow} size="sm" />
-            {' to '}
-            <Money amount={lot.resaleHigh} size="sm" />
-          </span>
-        ) : (
-          <span className="whitespace-nowrap font-sans text-xs text-ink-muted">
-            Not enough evidence
-          </span>
-        )}
+        <Resale low={lot.resaleLow} high={lot.resaleHigh} />
+      </div>
+
+      <div className="col-start-2 md:col-start-auto md:text-right">
+        <MaxBid amount={lot.maxBid} />
       </div>
 
       <div className="col-start-2 md:col-start-auto md:justify-self-end">
