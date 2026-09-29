@@ -8,3 +8,4 @@ export * from './weights';
 export * from './percentile';
 export * from './valuation';
 export * from './confidence';
+export * from './opportunity';

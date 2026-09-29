@@ -74,11 +74,13 @@ Source: MaxBid Project Workbook, tab 08 Matching Logic.
 
 Set by decision record 0006. The score ranks lots by the dollars a user could make, adjusted for how much the evidence supports the estimate.
 
-**Headroom.** The rough target bid less the current bid. Where there is no current bid, use the opening bid. Where there is neither, use zero. Negative headroom counts as zero.
+**Value.** The rough target bid, which is the most a lot is worth paying by the user's own figures. The current bid is not subtracted, per decision record 0023.
 
-**Weighted headroom.** Headroom multiplied by the triage confidence factor: High 1.0, Medium 0.75, Low 0.5, and zero where there is not enough evidence.
+**Weighted value.** Value multiplied by the triage confidence factor: High 1.0, Medium 0.75, Low 0.5, and zero where there is not enough evidence.
 
-**Displayed score.** Weighted headroom divided by the highest weighted headroom in that catalogue, multiplied by 100, rounded down. The best lot in any catalogue scores 100.
+**Displayed score.** Weighted value divided by the highest weighted value in that catalogue, multiplied by 100, rounded down. The best lot in any catalogue scores 100.
+
+**Why the current bid is not in this.** A catalogue is analysed hours before it closes, and bidders wait until the end. The Grays Perth sale of 29 September 2026 rose 51 per cent in its last six hours, and one lot rose from $1,809 to $7,200. A bid taken at analysis time records how early we looked, not what a lot will fetch. Decision record 0023 has the figures.
 
 **Tie break.** The earliest closing time ranks first, because that lot needs the user's attention soonest.
 
