@@ -50,6 +50,11 @@ Its dashboard is at http://localhost:8288, and it shows every run step by step, 
 
 ## The database
 
-Migrations are applied to the hosted project with `supabase db push`. That is Ashleigh's to run, per rule 11.
+Migrations are applied to the hosted project with `pnpm db:push`. That is Ashleigh's to run, per rule 11.
+
+The Supabase command line tool is a project dependency, not a global install,
+so plain `supabase` is not a command anywhere. That is deliberate: CI pins the
+same version, so this machine and CI cannot drift apart. Run it through pnpm,
+either as `pnpm db:push` or as `pnpm exec supabase <anything>`.
 
 There is no local database on this machine, because Docker Desktop needs WSL 2 and it is not installed. CI starts a real Postgres for every pull request and runs the row level security tests there, so the policies are still checked on every change.
