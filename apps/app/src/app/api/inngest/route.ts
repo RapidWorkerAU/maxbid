@@ -1,6 +1,6 @@
 import { serve } from 'inngest/next';
 import { inngest } from '../../../inngest/client';
-import { functions } from '../../../inngest/ingest';
+import { functions } from '../../../inngest/functions';
 
 // The endpoint Inngest calls to run our functions.
 //
