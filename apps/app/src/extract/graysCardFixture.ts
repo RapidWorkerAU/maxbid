@@ -52,6 +52,12 @@ function card(lot: CardLot, position: number, countdown = CARD_COUNTDOWN) {
     `${BREAK}`,
     `Lot ${lot.printed}Used${BREAK}`,
     `${BREAK}`,
+    `![Odometer](https://images.ctfassets.net/x/odometer.svg)Showing 549,752${BREAK}`,
+    `${BREAK}`,
+    `![Transmission](https://images.ctfassets.net/x/transmission.svg)Sports Automatic${BREAK}`,
+    `${BREAK}`,
+    `![FuelType](https://images.ctfassets.net/x/fuel_type.svg)Diesel${BREAK}`,
+    `${BREAK}`,
     `Current bid:${BREAK}`,
     `${BREAK}`,
     `**$${price}**`,
@@ -97,3 +103,12 @@ export const TRUNCATED_CARD_PAGE = page(card(CARD_LOTS[0]!, 1));
 export const CARD_PAGE_MISSING_A_CLOSE = page(
   ...CARD_LOTS.map((lot, index) => card(lot, index + 1, index === 1 ? '' : CARD_COUNTDOWN)),
 );
+
+/** The labelled facts a card carries, as Firecrawl writes them. */
+export const CARD_ATTRIBUTES = [
+  `![Odometer](https://images.ctfassets.net/x/odometer.svg)Showing 549,752${BREAK}`,
+  `${BREAK}`,
+  `![Transmission](https://images.ctfassets.net/x/transmission.svg)Sports Automatic${BREAK}`,
+  `${BREAK}`,
+  `![FuelType](https://images.ctfassets.net/x/fuel_type.svg)Diesel${BREAK}`,
+].join('\n');

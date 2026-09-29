@@ -42,6 +42,8 @@ export type ParsedLot = {
   closesAt?: string;
   location?: string;
   noReserve?: boolean;
+  /** Labelled facts from the card, such as odometer, transmission and fuel. */
+  attributes?: Record<string, string>;
   /**
    * Where the closing time came from. A countdown is relative to the fetch,
    * so it is only as exact as that, and S3 should prefer a listed time.
@@ -110,6 +112,7 @@ export function parseGraysCatalogue(markdown: string, fetchedAt?: string): Parse
       }
       if (fields.location) lot.location = fields.location;
       if (fields.noReserve) lot.noReserve = true;
+      if (fields.attributes) lot.attributes = fields.attributes;
     }
 
     lots.push(lot);

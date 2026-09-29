@@ -28,6 +28,18 @@ export type CardFields = {
   closesAt?: string;
   location?: string;
   noReserve?: boolean;
+  /**
+   * The labelled facts the card carries, such as odometer, transmission and
+   * fuel type.
+   *
+   * These were dropped at first, and the cost of that was not obvious until a
+   * valuation came back. A 2008 Landcruiser showing 549,752 kilometres was
+   * priced against ordinary ones at $40,000 to $56,000, and the match was
+   * called exact, because nothing downstream knew the odometer reading. On a
+   * vehicle it is the single largest thing separating two otherwise identical
+   * listings.
+   */
+  attributes?: Record<string, string>;
 };
 
 const BID = /Current bid:[\s\\]*\*\*\$([\d,]+(?:\.\d{2})?)\*\*/;
@@ -36,6 +48,19 @@ const TITLE = /\*\*([^*$][^*]*)\*\*/;
 // Markdown line breaks leave a trailing backslash or two, so the state has to
 // be allowed to end the line with those still attached.
 const LOCATION = /^\s*([A-Za-z][A-Za-z '-]+,\s*(?:NSW|VIC|QLD|WA|SA|TAS|NT|ACT))\s*\\*\s*$/m;
+
+// A labelled fact, written as an icon immediately followed by its value:
+//   ![Odometer](https://images.ctfassets.net/.../odometer.svg)Showing 171,033
+const ATTRIBUTE = /!\[([A-Za-z][A-Za-z ]*)\]\([^)]*\)([^\n\\]+)/g;
+
+/** Labels whose value is a picture count rather than a fact about the lot. */
+const NOT_A_FACT = new Set(['image']);
+
+/** Turns "Showing 171,033" into "171,033", and leaves everything else alone. */
+function tidyValue(label: string, value: string): string {
+  const trimmed = value.trim();
+  return label === 'odometer' ? trimmed.replace(/^Showing\s+/i, '') : trimmed;
+}
 
 /**
  * Reads what a card says about its lot.
@@ -70,6 +95,15 @@ export function readCardBody(body: string, fetchedAt?: string): CardFields {
   if (location?.[1]) fields.location = location[1].trim();
 
   if (/\bNo Reserve\b/.test(body)) fields.noReserve = true;
+
+  const attributes: Record<string, string> = {};
+  for (const match of body.matchAll(ATTRIBUTE)) {
+    const label = (match[1] ?? '').trim().toLowerCase().replace(/\s+/g, '');
+    const value = tidyValue(label, match[2] ?? '');
+    if (!label || NOT_A_FACT.has(label) || value.length === 0) continue;
+    attributes[label] = value;
+  }
+  if (Object.keys(attributes).length > 0) fields.attributes = attributes;
 
   return fields;
 }
