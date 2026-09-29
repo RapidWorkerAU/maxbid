@@ -35,6 +35,79 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_runs: {
+        Row: {
+          analysis_id: string | null
+          cost_usd: number
+          created_at: string
+          error: string | null
+          id: string
+          input_tokens: number
+          lot_id: string | null
+          model: string
+          ok: boolean
+          org_id: string | null
+          output_tokens: number
+          prompt_version: string
+          stage: string
+          updated_at: string
+        }
+        Insert: {
+          analysis_id?: string | null
+          cost_usd?: number
+          created_at?: string
+          error?: string | null
+          id?: string
+          input_tokens?: number
+          lot_id?: string | null
+          model: string
+          ok?: boolean
+          org_id?: string | null
+          output_tokens?: number
+          prompt_version: string
+          stage: string
+          updated_at?: string
+        }
+        Update: {
+          analysis_id?: string | null
+          cost_usd?: number
+          created_at?: string
+          error?: string | null
+          id?: string
+          input_tokens?: number
+          lot_id?: string | null
+          model?: string
+          ok?: boolean
+          org_id?: string | null
+          output_tokens?: number
+          prompt_version?: string
+          stage?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_runs_analysis_id_fkey"
+            columns: ["analysis_id"]
+            isOneToOne: false
+            referencedRelation: "analyses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_runs_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "lots"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_runs_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       analyses: {
         Row: {
           auction_id: string
@@ -322,6 +395,89 @@ export type Database = {
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lot_identifications: {
+        Row: {
+          ai_run_id: string | null
+          analysis_id: string
+          brand: string | null
+          condition_notes: string | null
+          confidence: number
+          confirmed_by: string | null
+          created_at: string
+          id: string
+          is_current: boolean
+          lot_id: string
+          model: string | null
+          specs: Json
+          stage: string
+          updated_at: string
+          year: number | null
+        }
+        Insert: {
+          ai_run_id?: string | null
+          analysis_id: string
+          brand?: string | null
+          condition_notes?: string | null
+          confidence: number
+          confirmed_by?: string | null
+          created_at?: string
+          id?: string
+          is_current?: boolean
+          lot_id: string
+          model?: string | null
+          specs?: Json
+          stage: string
+          updated_at?: string
+          year?: number | null
+        }
+        Update: {
+          ai_run_id?: string | null
+          analysis_id?: string
+          brand?: string | null
+          condition_notes?: string | null
+          confidence?: number
+          confirmed_by?: string | null
+          created_at?: string
+          id?: string
+          is_current?: boolean
+          lot_id?: string
+          model?: string | null
+          specs?: Json
+          stage?: string
+          updated_at?: string
+          year?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lot_identifications_ai_run_id_fkey"
+            columns: ["ai_run_id"]
+            isOneToOne: false
+            referencedRelation: "ai_runs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lot_identifications_analysis_id_fkey"
+            columns: ["analysis_id"]
+            isOneToOne: false
+            referencedRelation: "analyses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lot_identifications_confirmed_by_fkey"
+            columns: ["confirmed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lot_identifications_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "lots"
             referencedColumns: ["id"]
           },
         ]
@@ -693,6 +849,54 @@ export type Database = {
           version?: string
         }
         Relationships: []
+      }
+      usage_events: {
+        Row: {
+          analysis_id: string | null
+          cost_usd: number
+          created_at: string
+          id: string
+          org_id: string | null
+          provider: string
+          units: number
+          updated_at: string
+        }
+        Insert: {
+          analysis_id?: string | null
+          cost_usd?: number
+          created_at?: string
+          id?: string
+          org_id?: string | null
+          provider: string
+          units?: number
+          updated_at?: string
+        }
+        Update: {
+          analysis_id?: string | null
+          cost_usd?: number
+          created_at?: string
+          id?: string
+          org_id?: string | null
+          provider?: string
+          units?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "usage_events_analysis_id_fkey"
+            columns: ["analysis_id"]
+            isOneToOne: false
+            referencedRelation: "analyses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "usage_events_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_preferences: {
         Row: {
