@@ -290,6 +290,8 @@ export type Database = {
           premium_schedule: Json | null
           premium_source: string
           raw_terms: string | null
+          results_harvested_at: string | null
+          results_harvested_count: number
           source_url: string | null
           title: string | null
           updated_at: string
@@ -305,6 +307,8 @@ export type Database = {
           premium_schedule?: Json | null
           premium_source?: string
           raw_terms?: string | null
+          results_harvested_at?: string | null
+          results_harvested_count?: number
           source_url?: string | null
           title?: string | null
           updated_at?: string
@@ -320,6 +324,8 @@ export type Database = {
           premium_schedule?: Json | null
           premium_source?: string
           raw_terms?: string | null
+          results_harvested_at?: string | null
+          results_harvested_count?: number
           source_url?: string | null
           title?: string | null
           updated_at?: string
@@ -706,10 +712,12 @@ export type Database = {
       lots: {
         Row: {
           auction_id: string
+          bid_count: number | null
           closes_at: string | null
           created_at: string
           current_bid: number | null
           description: string | null
+          did_not_sell: boolean | null
           gst_on_hammer: boolean | null
           id: string
           lat: number | null
@@ -717,16 +725,20 @@ export type Database = {
           location_text: string | null
           lot_number: string
           raw: Json
+          sold_at: string | null
+          sold_price: number | null
           source_url: string | null
           title: string
           updated_at: string
         }
         Insert: {
           auction_id: string
+          bid_count?: number | null
           closes_at?: string | null
           created_at?: string
           current_bid?: number | null
           description?: string | null
+          did_not_sell?: boolean | null
           gst_on_hammer?: boolean | null
           id?: string
           lat?: number | null
@@ -734,16 +746,20 @@ export type Database = {
           location_text?: string | null
           lot_number: string
           raw?: Json
+          sold_at?: string | null
+          sold_price?: number | null
           source_url?: string | null
           title: string
           updated_at?: string
         }
         Update: {
           auction_id?: string
+          bid_count?: number | null
           closes_at?: string | null
           created_at?: string
           current_bid?: number | null
           description?: string | null
+          did_not_sell?: boolean | null
           gst_on_hammer?: boolean | null
           id?: string
           lat?: number | null
@@ -751,6 +767,8 @@ export type Database = {
           location_text?: string | null
           lot_number?: string
           raw?: Json
+          sold_at?: string | null
+          sold_price?: number | null
           source_url?: string | null
           title?: string
           updated_at?: string
