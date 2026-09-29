@@ -8,7 +8,7 @@
 // means something, and the prompt says plainly what low means.
 
 /** Changing the prompt changes the answers, so every run records which one. */
-export const IDENTIFY_PROMPT_VERSION = 'triage-identify-1';
+export const IDENTIFY_PROMPT_VERSION = 'triage-identify-2';
 
 /** What we know about a lot before anyone has looked at it. */
 export type LotForIdentification = {
@@ -51,8 +51,13 @@ export const SYSTEM_PROMPT = [
   '2. Put anything else the catalogue states into specs, such as fuel,',
   '   transmission, odometer, capacity or size. Use the words the catalogue',
   '   uses rather than tidying them.',
-  '3. conditionNotes carries only what the catalogue states about condition or',
-  '   damage, such as a written off vehicle marker. Leave it null otherwise.',
+  '3. conditionNotes carries anything the catalogue states about condition,',
+  '   damage, history or roadworthiness. Put it here and not in specs. This',
+  '   includes a written off vehicle marker such as WOVR, WOVR-INSPECTED,',
+  '   statutory write off or repairable write off, and wording such as',
+  '   damaged, non runner, incomplete, sold unregistered, no roadworthy,',
+  '   hail, flood or salvage. Copy the words the catalogue uses. Leave it',
+  '   null only when the catalogue says nothing about condition at all.',
   '4. confidence is 0 to 100, and it is your confidence that brand, model and',
   '   year are right. Use below 70 when the words are vague, when a photo',
   '   would settle it, or when the item could be one of several things.',

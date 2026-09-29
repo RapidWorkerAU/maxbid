@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  SYSTEM_PROMPT,
   IdentificationError,
   PHOTO_PASS_BELOW,
   needsPhotoPass,
@@ -129,5 +130,21 @@ describe('the words the model is given', () => {
     });
     expect(prompt).not.toContain('odometer');
     expect(prompt).not.toContain('Catalogue details');
+  });
+});
+
+describe('the condition rule, which a real catalogue caught', () => {
+  it('names the write off markers the model must not file as a spec', () => {
+    // The first live run put "WOVR-INSPECTED" into specs and left
+    // conditionNotes null. A written off vehicle is worth materially less, so
+    // that fact has to land in the field the valuation reads.
+    expect(SYSTEM_PROMPT).toMatch(/WOVR/);
+    expect(SYSTEM_PROMPT).toMatch(/statutory write off|repairable write off/);
+    expect(SYSTEM_PROMPT).toMatch(/Put it here and not in specs/);
+  });
+
+  it('asks for the catalogue own words rather than a tidied version', () => {
+    // WOVR-INSPECTED and WOVR-REPAIRABLE are not the same thing.
+    expect(SYSTEM_PROMPT).toMatch(/Copy the words the catalogue uses/);
   });
 });
