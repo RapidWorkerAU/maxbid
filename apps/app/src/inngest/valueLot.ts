@@ -4,7 +4,7 @@
 // comparables to the valuation maths in @maxbid/calc. No maths happens here:
 // rule 6 keeps it all in one place.
 
-import { valueComparables, type Comparable, type Valuation } from '@maxbid/calc';
+import { valueComparables, type Valuation } from '@maxbid/calc';
 import { ask } from '../ai/claude';
 import { TRIAGE_MODEL } from '../ai/pricing';
 import {
@@ -16,9 +16,11 @@ import {
   type ReadListing,
 } from '../ai/readListings';
 import { fetchPage } from '../extract/firecrawl';
+import { findAuctionResults, type AuctionResult } from '../search/auctionResults';
 import { brave, type SearchResult } from '../search/brave';
 import { queryFor, type QuerySubject } from '../search/query';
 import { MATERIAL_USAGE_GAP, readUsage, usageGap } from '../search/usage';
+import { allComparables, enoughOnTheirOwn } from './evidence';
 
 export const STAGE = 'S5';
 
@@ -45,10 +47,20 @@ export type ValuedComparable = ReadListing & {
 export type LotValuation = {
   query: string | null;
   results: number;
+  /** Past sales of the same thing. The evidence that actually carries weight. */
+  auctionResults: AuctionResult[];
   comparables: ValuedComparable[];
   valuation: Valuation | null;
   costUsd: number;
   pagesFetched: number;
+};
+
+const NOTHING: Omit<LotValuation, 'query' | 'results'> = {
+  auctionResults: [],
+  comparables: [],
+  valuation: null,
+  costUsd: 0,
+  pagesFetched: 0,
 };
 
 /** Reads a kilometre figure out of whatever the model wrote in usage. */
@@ -107,13 +119,41 @@ export type ValueLotInput = {
  */
 export async function valueLot(input: ValueLotInput): Promise<LotValuation> {
   const query = queryFor(input.subject);
-  if (!query) {
-    return { query: null, results: 0, comparables: [], valuation: null, costUsd: 0, pagesFetched: 0 };
+  if (!query) return { query: null, results: 0, ...NOTHING };
+
+  // Past sales first. Decision record 0020: a sold price is weighted 0.95
+  // against an asking price at 0.6, so three results are worth more than five
+  // listings and cost less to gather.
+  const past = await findAuctionResults(input.subject);
+  let pagesFetched = past.pagesFetched;
+
+  if (enoughOnTheirOwn(past.results)) {
+    // Enough sold evidence that a web search would spend a call, a read and
+    // often a fetch to add a comparable worth less than half as much.
+    const comparables = allComparables(past.results, [], input.lotKilometres);
+    return {
+      query,
+      results: 0,
+      auctionResults: past.results,
+      comparables: [],
+      valuation: valueComparables({ comparables }),
+      costUsd: 0,
+      pagesFetched,
+    };
   }
 
   const results = await brave.search(query, { count: RESULTS });
   if (results.length === 0) {
-    return { query, results: 0, comparables: [], valuation: null, costUsd: 0, pagesFetched: 0 };
+    const comparables = allComparables(past.results, [], input.lotKilometres);
+    return {
+      query,
+      results: 0,
+      auctionResults: past.results,
+      comparables: [],
+      valuation: comparables.length > 0 ? valueComparables({ comparables }) : null,
+      costUsd: 0,
+      pagesFetched,
+    };
   }
 
   const reply = await ask(
@@ -136,7 +176,6 @@ export async function valueLot(input: ValueLotInput): Promise<LotValuation> {
   const toFetch = new Set(worthFetching(listings).map((listing) => listing.index));
 
   const comparables: ValuedComparable[] = [];
-  let pagesFetched = 0;
 
   for (const listing of listings) {
     const result = results[listing.index]!;
@@ -164,19 +203,12 @@ export async function valueLot(input: ValueLotInput): Promise<LotValuation> {
     });
   }
 
-  const forMaths: Comparable[] = comparables.map((c) => ({
-    id: String(c.index),
-    price: c.price,
-    matchLevel: c.matchLevel,
-    evidenceType: c.advertised ? 'advertisedUsed' : 'marketplaceSold',
-    // Brave states no date, so nothing can be aged. recencyWeight treats this
-    // as current, which is right for a listing that is still advertised.
-    ageInDays: 0,
-  }));
+  const forMaths = allComparables(past.results, comparables, input.lotKilometres);
 
   return {
     query,
     results: results.length,
+    auctionResults: past.results,
     comparables,
     valuation: valueComparables({ comparables: forMaths }),
     costUsd: reply.costUsd,
