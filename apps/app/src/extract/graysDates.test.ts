@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseGraysClose } from './graysDates';
+import { parseGraysClose, parseGraysCountdown } from './graysDates';
 
 describe('reading a Grays closing time', () => {
   it('reads the format the page actually uses', () => {
@@ -48,5 +48,30 @@ describe('when the format is not what we expect', () => {
 
   it('returns nothing when the timezone is missing', () => {
     expect(parseGraysClose('25 Sep 26', '9.00 PM')).toBeNull();
+  });
+});
+
+describe('reading a countdown', () => {
+  const fetchedAt = '2026-09-29T04:38:09.000Z';
+
+  it('adds the countdown to the moment the page was fetched', () => {
+    expect(parseGraysCountdown('6h: 51m: 51s', fetchedAt)).toBe('2026-09-29T11:30:00.000Z');
+  });
+
+  it('reads a countdown that runs into days', () => {
+    expect(parseGraysCountdown('2d: 1h: 0m: 0s', fetchedAt)).toBe('2026-10-01T05:38:09.000Z');
+  });
+
+  it('reads a countdown that names only some units', () => {
+    expect(parseGraysCountdown('45m', fetchedAt)).toBe('2026-09-29T05:23:09.000Z');
+  });
+
+  it('refuses a countdown it cannot read, rather than closing the lot now', () => {
+    expect(parseGraysCountdown('soon', fetchedAt)).toBeNull();
+    expect(parseGraysCountdown('', fetchedAt)).toBeNull();
+  });
+
+  it('refuses to work from a fetch time it cannot read', () => {
+    expect(parseGraysCountdown('6h', 'not a date')).toBeNull();
   });
 });

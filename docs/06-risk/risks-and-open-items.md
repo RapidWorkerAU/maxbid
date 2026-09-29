@@ -52,3 +52,4 @@ Source: MaxBid Project Workbook, tab 25 Open Items.
 | O14 | Set founding member offer | Decide discount, duration and cap | Ashleigh and Jason | Phase 2 |
 | O15 | Choose AI citation tracking method | Manual monthly prompt checks or a monitoring tool | Ashleigh | Phase 2 |
 | O16 | Choose visual regression tool | Chromatic or Playwright screenshots, based on cost and workflow | Ashleigh | Phase 1 |
+| O17 | Detect a catalogue page that was cut short | A Grays card page states no lot total, so a page cut off after its last whole card reads as a smaller sale and the completeness check passes. Cards lost anywhere else are caught by the numbering Grays prints. Options: compare against the lot count the sale page states elsewhere, fetch a second page and compare, or compare a re-extraction against the previous run | Ashleigh | Phase 1 |
