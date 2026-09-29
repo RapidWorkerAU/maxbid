@@ -1,4 +1,4 @@
-import { redirectFor, type Visitor } from '@maxbid/db';
+import { canShowBidFigures, redirectFor, type Visitor } from '@maxbid/db';
 import { createServerSupabase } from '@maxbid/db/server';
 import { NextResponse, type NextRequest } from 'next/server';
 
@@ -44,23 +44,39 @@ async function describeVisitor(
     return { signedIn: false, hasOrganisation: false, termsAccepted: false };
   }
 
-  const [memberships, outstanding] = await Promise.all([
+  const [memberships, outstanding, profile] = await Promise.all([
     supabase.from('organisation_members').select('org_id').limit(1),
     // Every material version the user has not accepted. F66.
     supabase
       .from('terms_versions')
       .select('version, terms_acceptances(user_id)')
       .eq('is_material', true),
+    // Decision record 0022. A new organisation's profile is empty, and
+    // nothing can be calculated until the user fills it in.
+    supabase
+      .from('cost_profiles')
+      .select(
+        'profit_mode, target_profit_amount, target_return_pct, min_profit_amount, min_return_pct, completed_at',
+      )
+      .eq('is_default', true)
+      .limit(1)
+      .maybeSingle(),
   ]);
 
   const unaccepted = (outstanding.data ?? []).filter(
     (row) => (row.terms_acceptances ?? []).length === 0,
   );
 
+  const hasOrganisation = (memberships.data ?? []).length > 0;
+
   return {
     signedIn: true,
-    hasOrganisation: (memberships.data ?? []).length > 0,
+    hasOrganisation,
     termsAccepted: unaccepted.length === 0,
+    // Only asked once there is an organisation to answer for. Before that the
+    // profile does not exist yet, and undefined means not asked rather than
+    // not set up.
+    isSetUp: hasOrganisation ? canShowBidFigures(profile.data) : undefined,
   };
 }
 
