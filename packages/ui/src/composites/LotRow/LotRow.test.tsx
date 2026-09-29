@@ -111,3 +111,25 @@ describe('how long until it closes', () => {
     expect(closesIn('not a time', now)).toBe('');
   });
 });
+
+describe('what we think it is worth', () => {
+  it('shows the range as money', () => {
+    render(<LotRow lot={{ ...lot, resaleLow: 8500, resaleHigh: 22500 }} />);
+    expect(screen.getByText('$8,500')).toBeTruthy();
+    expect(screen.getByText('$22,500')).toBeTruthy();
+  });
+
+  it('says there is not enough evidence rather than leaving a blank', () => {
+    // A blank cell reads as a figure somebody forgot to fill in. Most lots
+    // have no range, so this is the common case and has to say so plainly.
+    render(<LotRow lot={lot} />);
+    expect(screen.getByText('Not enough evidence')).toBeTruthy();
+  });
+
+  it('needs both ends before it shows anything', () => {
+    // Half a range is not a range, and one figure on its own would be read
+    // as a single estimate.
+    render(<LotRow lot={{ ...lot, resaleLow: 8500 }} />);
+    expect(screen.getByText('Not enough evidence')).toBeTruthy();
+  });
+});

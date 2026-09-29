@@ -15,6 +15,13 @@ export type LotRecord = {
   raw?: unknown;
 };
 
+/** What triage worked out a lot is worth, for this organisation. */
+export type AnalysisLotRecord = {
+  lot_id: string;
+  triage_low: number | string | null;
+  triage_high: number | string | null;
+};
+
 export type IdentificationRecord = {
   lot_id: string;
   brand: string | null;
@@ -36,25 +43,39 @@ export function describeIdentification(row: IdentificationRecord): string | null
 }
 
 /** Joins the lots to their identifications for the table. */
+/** Postgres numerics arrive as strings, and Money needs a number. */
+function asNumber(value: number | string | null | undefined): number | null {
+  if (value === null || value === undefined) return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
 export function toRows(
   lots: LotRecord[],
   identifications: IdentificationRecord[],
+  ranges: AnalysisLotRecord[] = [],
 ): LotRowLot[] {
   const byLot = new Map(identifications.map((row) => [row.lot_id, row]));
+  const rangeByLot = new Map(ranges.map((row) => [row.lot_id, row]));
 
   return lots.map((lot) => {
     const found = byLot.get(lot.id);
-    const confidence = found?.confidence == null ? null : Number(found.confidence);
+    const range = rangeByLot.get(lot.id);
+    const confidence = asNumber(found?.confidence);
 
     return {
       id: lot.id,
       lotNumber: lot.lot_number,
       title: lot.title,
-      currentBid: lot.current_bid === null ? null : Number(lot.current_bid),
+      currentBid: asNumber(lot.current_bid),
       closesAt: lot.closes_at,
       identifiedAs: found ? describeIdentification(found) : null,
-      confidence: Number.isFinite(confidence) ? confidence : null,
+      confidence,
       conditionNote: found?.condition_notes ?? null,
+      // Both ends or neither. Half a range is not a range, and one figure on
+      // its own would be read as a single estimate.
+      resaleLow: asNumber(range?.triage_low),
+      resaleHigh: asNumber(range?.triage_high),
     };
   });
 }

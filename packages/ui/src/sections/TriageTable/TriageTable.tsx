@@ -56,6 +56,7 @@ function Headings() {
       <MonoLabel size="xs" tone="ink">Item</MonoLabel>
       <MonoLabel size="xs" tone="ink">Identified as</MonoLabel>
       <MonoLabel size="xs" tone="ink" className="text-right">Current bid</MonoLabel>
+      <MonoLabel size="xs" tone="ink" className="text-right">Worth about</MonoLabel>
       <MonoLabel size="xs" tone="ink" className="justify-self-end">Confidence</MonoLabel>
       <MonoLabel size="xs" tone="ink" className="text-right">Closes</MonoLabel>
     </div>
