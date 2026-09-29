@@ -3,7 +3,7 @@ import { assertComplete, parseGraysCatalogue } from '../extract/grays';
 import { fetchPage } from '../extract/firecrawl';
 import { extractRequested, inngest, triageRequested } from './client';
 import { openAnalysisLots, writeLots } from './lots';
-import { readAuctionTerms } from './normalise';
+import { closesAtFrom, readAuctionTerms } from './normalise';
 
 export { lotRows } from './lots';
 
@@ -92,8 +92,11 @@ export const extract = inngest.createFunction(
     // reads one lot to learn what the whole auction charges. F10, D25.
     const terms = await step.run('read-auction-terms', async () => {
       const first = lots[0];
-      if (!first?.lotUrl) return { premiumSource: 'platform_default', bands: 0, title: null };
-      return readAuctionTerms(auctionId, first.lotUrl);
+      const closesAt = closesAtFrom(lots);
+      if (!first?.lotUrl) {
+        return { premiumSource: 'platform_default', bands: 0, title: null, closesAt };
+      }
+      return readAuctionTerms(auctionId, first.lotUrl, closesAt);
     });
 
     await step.run('mark-extracted', async () => {
