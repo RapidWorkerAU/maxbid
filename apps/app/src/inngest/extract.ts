@@ -2,7 +2,7 @@ import type { Json } from '@maxbid/db';
 import { createServiceSupabase } from '@maxbid/db/server';
 import { assertComplete, parseGraysCatalogue, type ParsedLot } from '../extract/grays';
 import { fetchPage } from '../extract/firecrawl';
-import { extractRequested, inngest } from './client';
+import { extractRequested, inngest, triageRequested } from './client';
 import { readAuctionTerms } from './normalise';
 
 // S2 Extract and S3 Normalise. Source: docs/02-specs/pipeline.md.
@@ -121,6 +121,24 @@ export const extract = inngest.createFunction(
         .update({ status: 'triaging', progress_pct: 25 })
         .eq('id', analysisId);
       if (error) throw new Error(`Could not update the analysis: ${error.message}`);
+    });
+
+    // S4 identifies every lot. It needs the organisation, because what it
+    // spends is charged to them and ai_runs records it against them.
+    const orgId = await step.run('find-organisation', async () => {
+      const supabase = createServiceSupabase();
+      const { data, error } = await supabase
+        .from('analyses')
+        .select('org_id')
+        .eq('id', analysisId)
+        .single();
+      if (error) throw new Error(`Could not read the analysis: ${error.message}`);
+      return data.org_id;
+    });
+
+    await step.sendEvent('start-triage', {
+      name: triageRequested.name,
+      data: { analysisId, auctionId, orgId },
     });
 
     return { analysisId, auctionId, lots: lots.length, terms };

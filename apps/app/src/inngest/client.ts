@@ -27,4 +27,13 @@ export const extractRequested = eventType('analysis/extract.requested', {
   }>(),
 });
 
+/** S4. The lots are in the database and each needs identifying. */
+export const triageRequested = eventType('analysis/triage.requested', {
+  schema: staticSchema<{
+    analysisId: string;
+    auctionId: string;
+    orgId: string;
+  }>(),
+});
+
 export const inngest = new Inngest({ id: 'maxbid' });

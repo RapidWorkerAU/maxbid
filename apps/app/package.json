@@ -11,18 +11,20 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.128.0",
     "@maxbid/calc": "workspace:*",
     "@maxbid/content": "workspace:*",
     "@maxbid/db": "workspace:*",
     "@maxbid/tokens": "workspace:*",
     "@maxbid/ui": "workspace:*",
+    "@mendable/firecrawl-js": "^4.41.0",
+    "inngest": "^4.21.0",
     "next": "16.3.5",
     "react": "19.2.8",
-    "react-dom": "19.2.8",
-    "inngest": "^4.21.0",
-    "@mendable/firecrawl-js": "^4.41.0"
+    "react-dom": "19.2.8"
   },
   "devDependencies": {
+    "@maxbid/config": "workspace:*",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
@@ -31,7 +33,6 @@
     "eslint-config-next": "16.3.5",
     "tailwindcss": "^4",
     "typescript": "^5",
-    "@maxbid/config": "workspace:*",
     "vitest": "^4.1.11"
   },
   "packageManager": "pnpm@12.5.1"

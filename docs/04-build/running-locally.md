@@ -39,6 +39,12 @@ Its dashboard is at http://localhost:8288, and it shows every run step by step, 
 
 **Changes to `.env.local` need a restart** for anything read at startup. Next reloads most variables, but not all of them, and never the Inngest mode.
 
+**A stage fails the moment it starts, complaining about a table.** A
+migration was merged but never pushed. Merging puts it in the repository and
+in CI; only `pnpm db:push` puts it in the hosted database, and that is
+Ashleigh's to run. Run `node scripts/check-hosted-db.mjs` to see which tables
+the hosted project actually has.
+
 ## Checking what is really there
 
 | Command | What it tells you |
