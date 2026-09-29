@@ -13,7 +13,7 @@
 // model to read the results.
 
 /** Changing the prompt changes the answers, so every run records which one. */
-export const READ_LISTINGS_PROMPT_VERSION = 'triage-read-listings-1';
+export const READ_LISTINGS_PROMPT_VERSION = 'triage-read-listings-3';
 
 /** How well a listing matches the lot. These are the levels in @maxbid/calc. */
 export type ListingMatch =
@@ -34,6 +34,8 @@ export type ReadListing = {
   /** Plain English, shown to the user beside the figure. */
   reason: string;
   year: number | null;
+  /** The comparable's odometer or hours, where the snippet states one. */
+  usage: string | null;
 };
 
 export const SYSTEM_PROMPT = [
@@ -58,10 +60,23 @@ export const SYSTEM_PROMPT = [
   '   false only where the snippet says the item sold for that figure.',
   '5. matchLevel is one of exact, nearExact, higherSpec, lowerSpec,',
   '   similarAlternative, insufficient. Use exact only when the year, make,',
-  '   model and variant all agree.',
-  '6. reason is one sentence a person can check, naming what agrees and what',
+  '   model and variant all agree AND the usage is close.',
+  '6. Usage means kilometres on a vehicle or hours on a machine, and it is',
+  '   usually the largest thing separating two otherwise identical items.',
+  '   Put what the snippet states into the usage field, or null if it states',
+  '   nothing. Then:',
+  '   - If the comparable has done much less than the lot, it is worth more',
+  '     than the lot, so use higherSpec.',
+  '   - If it has done much more, use lowerSpec.',
+  '   - If the snippet does not state the usage, the best grade you may give',
+  '     is similarAlternative. This is a ceiling and not an instruction: a',
+  '     worse grade is still available and is often right. An unknown',
+  '     difference is not the same as no difference, and on a used vehicle or',
+  '     machine it is the difference that decides the price.',
+  '   Always name the usage difference in the reason.',
+  '7. reason is one sentence a person can check, naming what agrees and what',
   '   does not. Write plainly, and no dashes.',
-  '7. Return an empty list when nothing is usable. That is a real answer and a',
+  '8. Return an empty list when nothing is usable. That is a real answer and a',
   '   far better one than a price belonging to a different item.',
 ].join('\n');
 
@@ -77,6 +92,20 @@ export function userPromptFor(lot: string, results: ListingForReading[]): string
       (result, index) => `${index}. [${result.host}] ${result.title}\n   ${result.snippet}`,
     ),
   ].join('\n');
+}
+
+/**
+ * The best a comparable can be graded when nobody stated its usage.
+ *
+ * Enforced here as well as asked for in the prompt, because a model reads
+ * "at best" as permission. The first version of this rule said "use nearExact
+ * at best" and the model used nearExact on every row, which graded a
+ * 549,752 kilometre Landcruiser higher than leaving the odometer out
+ * altogether had. Decision record 0019.
+ */
+export function capForUnknownUsage(level: ListingMatch): ListingMatch {
+  const betterThanTheCap: ListingMatch[] = ['exact', 'nearExact', 'higherSpec', 'lowerSpec'];
+  return betterThanTheCap.includes(level) ? 'similarAlternative' : level;
 }
 
 const MATCH_LEVELS: ListingMatch[] = [
@@ -129,14 +158,20 @@ export function readListings(reply: string, resultCount: number): ReadListing[] 
     if (reason.length === 0) continue;
 
     const year = typeof row.year === 'number' && Number.isInteger(row.year) ? row.year : null;
+    const usage = typeof row.usage === 'string' && row.usage.trim().length > 0
+      ? row.usage.trim()
+      : null;
 
     out.push({
       index,
       price,
       advertised: row.advertised !== false,
-      matchLevel,
+      // Decision record 0019. A comparable whose usage nobody stated cannot be
+      // an exact match, because an unknown difference is not no difference.
+      matchLevel: usage === null ? capForUnknownUsage(matchLevel) : matchLevel,
       reason,
       year,
+      usage,
     });
   }
 

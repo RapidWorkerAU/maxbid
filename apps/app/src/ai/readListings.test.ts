@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { SYSTEM_PROMPT, readListings, userPromptFor } from './readListings';
+import { SYSTEM_PROMPT, capForUnknownUsage, readListings, userPromptFor } from './readListings';
 
 const one = (over: Record<string, unknown> = {}) =>
   JSON.stringify({
@@ -11,6 +11,7 @@ const one = (over: Record<string, unknown> = {}) =>
         matchLevel: 'nearExact',
         reason: 'Same year, same model and same fuel, with a similar odometer reading.',
         year: 2015,
+        usage: '150,000 km',
         ...over,
       },
     ],
@@ -26,6 +27,7 @@ describe('reading what the model found', () => {
         matchLevel: 'nearExact',
         reason: 'Same year, same model and same fuel, with a similar odometer reading.',
         year: 2015,
+        usage: '150,000 km',
       },
     ]);
   });
@@ -126,5 +128,57 @@ describe('the words the model is given', () => {
     expect(userPromptFor('2015 Invented Wagon Alpha Diesel', [])).toContain(
       'The lot: 2015 Invented Wagon Alpha Diesel',
     );
+  });
+});
+
+describe('usage, which a valuation showed we were ignoring', () => {
+  // A 2008 Landcruiser on 549,752 kilometres was graded an exact match for
+  // ordinary ones and valued at $46,341 against a bid of $11,300. Decision
+  // record 0019.
+  it('tells the model that usage is usually the largest difference', () => {
+    expect(SYSTEM_PROMPT).toMatch(/largest thing separating/);
+  });
+
+  it('tells it that less usage means worth more', () => {
+    expect(SYSTEM_PROMPT).toMatch(/done much less than the lot[\s\S]*higherSpec/);
+  });
+
+  it.each(['exact', 'nearExact', 'higherSpec', 'lowerSpec'])(
+    'caps a %s match at similarAlternative when the usage is not stated',
+    (matchLevel) => {
+      // An unknown difference is not the same as no difference, and on a used
+      // vehicle it is the difference that decides the price.
+      const [listing] = readListings(one({ matchLevel, usage: null }), 10);
+      expect(listing?.matchLevel).toBe('similarAlternative');
+    },
+  );
+
+  it('enforces the cap in code, not only in the prompt', () => {
+    // The first version of this rule lived only in the prompt and said "use
+    // nearExact at best". The model read that as permission and graded every
+    // row nearExact, which scored a 549,752 kilometre Landcruiser higher than
+    // leaving its odometer out altogether had.
+    expect(capForUnknownUsage('exact')).toBe('similarAlternative');
+    expect(capForUnknownUsage('nearExact')).toBe('similarAlternative');
+  });
+
+  it('leaves a grade that is already at or below the cap alone', () => {
+    expect(capForUnknownUsage('similarAlternative')).toBe('similarAlternative');
+    expect(capForUnknownUsage('insufficient')).toBe('insufficient');
+  });
+
+  it('keeps an exact match when the usage is stated', () => {
+    const [listing] = readListings(one({ matchLevel: 'exact', usage: '148,000 km' }), 10);
+    expect(listing?.matchLevel).toBe('exact');
+  });
+
+  it('keeps the usage as null when the model gave none', () => {
+    const [listing] = readListings(one({ usage: undefined }), 10);
+    expect(listing?.usage).toBeNull();
+  });
+
+  it('keeps what the snippet said about usage', () => {
+    const [listing] = readListings(one({ usage: '549,752 km' }), 10);
+    expect(listing?.usage).toBe('549,752 km');
   });
 });
