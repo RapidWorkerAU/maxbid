@@ -95,14 +95,36 @@ export const extract = inngest.createFunction(
       return parsed.lots;
     });
 
-    await step.run('write-lots', async () => {
+    const lotIdsByNumber = await step.run('write-lots', async () => {
       const supabase = createServiceSupabase();
       const rows = lotRows(auctionId, lots);
+      const ids: Record<string, string> = {};
+      for (let start = 0; start < rows.length; start += BATCH_SIZE) {
+        const { data, error } = await supabase
+          .from('lots')
+          .upsert(rows.slice(start, start + BATCH_SIZE), { onConflict: 'auction_id,lot_number' })
+          .select('id, lot_number');
+        if (error) throw new Error(`Could not write the lots: ${error.message}`);
+        for (const row of data ?? []) ids[row.lot_number] = row.id;
+      }
+      return ids;
+    });
+
+    // Every lot needs a row of its own for this analysis, because what a lot
+    // is worth to one organisation is theirs. Nothing created these before, so
+    // triage had nowhere to write a range to.
+    await step.run('open-analysis-lots', async () => {
+      const supabase = createServiceSupabase();
+      const rows = lots.map((lot) => ({
+        analysis_id: analysisId,
+        lot_id: lotIdsByNumber[lot.lotNumber]!,
+        status: 'triaged',
+      }));
       for (let start = 0; start < rows.length; start += BATCH_SIZE) {
         const { error } = await supabase
-          .from('lots')
-          .upsert(rows.slice(start, start + BATCH_SIZE), { onConflict: 'auction_id,lot_number' });
-        if (error) throw new Error(`Could not write the lots: ${error.message}`);
+          .from('analysis_lots')
+          .upsert(rows.slice(start, start + BATCH_SIZE), { onConflict: 'analysis_id,lot_id' });
+        if (error) throw new Error(`Could not open the analysis lots: ${error.message}`);
       }
     });
 
