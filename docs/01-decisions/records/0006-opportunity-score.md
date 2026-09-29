@@ -1,6 +1,6 @@
 # 0006 Opportunity score formula
 
-Status: Accepted
+Status: Accepted, amended by decision record 0023
 Date: 22 September 2026
 Decided by: Ashleigh Phillips
 
