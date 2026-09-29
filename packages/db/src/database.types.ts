@@ -445,6 +445,7 @@ export type Database = {
       }
       cost_profiles: {
         Row: {
+          completed_at: string | null
           created_at: string
           defaults: Json
           id: string
@@ -453,8 +454,8 @@ export type Database = {
           min_return_pct: number | null
           name: string
           org_id: string
-          profit_mode: string
-          repair_mode: string
+          profit_mode: string | null
+          repair_mode: string | null
           repair_value: number | null
           target_profit_amount: number | null
           target_return_pct: number | null
@@ -463,6 +464,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          completed_at?: string | null
           created_at?: string
           defaults?: Json
           id?: string
@@ -471,8 +473,8 @@ export type Database = {
           min_return_pct?: number | null
           name: string
           org_id: string
-          profit_mode?: string
-          repair_mode?: string
+          profit_mode?: string | null
+          repair_mode?: string | null
           repair_value?: number | null
           target_profit_amount?: number | null
           target_return_pct?: number | null
@@ -481,6 +483,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          completed_at?: string | null
           created_at?: string
           defaults?: Json
           id?: string
@@ -489,8 +492,8 @@ export type Database = {
           min_return_pct?: number | null
           name?: string
           org_id?: string
-          profit_mode?: string
-          repair_mode?: string
+          profit_mode?: string | null
+          repair_mode?: string | null
           repair_value?: number | null
           target_profit_amount?: number | null
           target_return_pct?: number | null
