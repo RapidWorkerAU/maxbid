@@ -14,13 +14,23 @@ import { existsSync, readFileSync } from 'node:fs';
 /** What each app cannot run without, and what it only needs for some features. */
 const APPS = {
   'apps/web': {
-    required: ['NEXT_PUBLIC_SUPABASE_URL', 'NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY', 'SUPABASE_SECRET_KEY'],
-    optional: ['NEXT_PUBLIC_SITE_URL', 'NEXT_PUBLIC_APP_URL'],
+    required: [
+      'NEXT_PUBLIC_SUPABASE_URL',
+      'NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY',
+      'SUPABASE_SECRET_KEY',
+      'NEXT_PUBLIC_SITE_URL',
+      'NEXT_PUBLIC_APP_URL',
+    ],
+    optional: [],
   },
   'apps/app': {
-    required: ['NEXT_PUBLIC_SUPABASE_URL', 'NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY', 'SUPABASE_SECRET_KEY'],
-    optional: [
+    required: [
+      'NEXT_PUBLIC_SUPABASE_URL',
+      'NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY',
+      'SUPABASE_SECRET_KEY',
       'NEXT_PUBLIC_APP_URL',
+    ],
+    optional: [
       'FIRECRAWL_API_KEY',
       'INNGEST_EVENT_KEY',
       'INNGEST_SIGNING_KEY',
@@ -52,6 +62,16 @@ function read(path) {
   return map;
 }
 
+/**
+ * Variables that must point at this machine, and not at a deployed site.
+ *
+ * This exists because both files held https://app.maxbid.com.au, so a magic
+ * link asked Supabase to send the user to a domain that is not running. The
+ * address was not in the Supabase allow list either, so Supabase quietly used
+ * the project Site URL instead and the link landed on the wrong app.
+ */
+const MUST_BE_LOCAL = ['NEXT_PUBLIC_SITE_URL', 'NEXT_PUBLIC_APP_URL'];
+
 let failures = 0;
 
 for (const [app, needs] of Object.entries(APPS)) {
@@ -66,11 +86,22 @@ for (const [app, needs] of Object.entries(APPS)) {
   }
 
   for (const name of needs.required) {
-    if (vars.get(name)) console.log(`  ok    ${name}`);
-    else {
+    const value = vars.get(name);
+    if (!value) {
       console.error(`  FAIL  ${name} is missing. Without it: ${REASONS[name] ?? 'unknown'}.`);
       failures += 1;
+      continue;
     }
+    if (MUST_BE_LOCAL.includes(name) && !value.includes('localhost')) {
+      console.error(
+        `  FAIL  ${name} is ${value}, which is not this machine. ` +
+          'Use http://localhost:3000 for the site and http://localhost:3001 for the app. ' +
+          'The deployed domains belong in Vercel, not here.',
+      );
+      failures += 1;
+      continue;
+    }
+    console.log(`  ok    ${name}`);
   }
 
   for (const name of needs.optional) {
@@ -81,7 +112,8 @@ for (const [app, needs] of Object.entries(APPS)) {
 
 console.log(
   failures === 0
-    ? '\nEvery required variable is set.'
-    : `\n${failures} required variables missing. The apps will fail when they use them.`,
+    ? '\nEvery required variable is set, and the URLs point at this machine.'
+    : `\n${failures} problem${failures === 1 ? '' : 's'} above. ` +
+        'Fix each one in the .env.local file named, then restart the dev server.',
 );
 process.exit(failures > 0 ? 1 : 0);
