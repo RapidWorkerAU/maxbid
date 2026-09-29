@@ -1,9 +1,11 @@
-import type { Json } from '@maxbid/db';
 import { createServiceSupabase } from '@maxbid/db/server';
-import { assertComplete, parseGraysCatalogue, type ParsedLot } from '../extract/grays';
+import { assertComplete, parseGraysCatalogue } from '../extract/grays';
 import { fetchPage } from '../extract/firecrawl';
 import { extractRequested, inngest, triageRequested } from './client';
+import { openAnalysisLots, writeLots } from './lots';
 import { readAuctionTerms } from './normalise';
+
+export { lotRows } from './lots';
 
 // S2 Extract and S3 Normalise. Source: docs/02-specs/pipeline.md.
 //
@@ -16,23 +18,6 @@ import { readAuctionTerms } from './normalise';
 // S3, which reads the premium schedule off a lot page. A stored page records
 // the version that read it, so a reprocess knows what it is replacing.
 export const EXTRACTOR_VERSION = 'grays-markdown-1.2.0';
-
-/** Lots are written in batches, so one huge catalogue is not one huge insert. */
-const BATCH_SIZE = 100;
-
-export function lotRows(auctionId: string, lots: ParsedLot[]) {
-  return lots.map((lot) => ({
-    auction_id: auctionId,
-    lot_number: lot.lotNumber,
-    title: lot.title,
-    source_url: lot.lotUrl,
-    closes_at: lot.closesAt ?? null,
-    current_bid: lot.currentBid ?? null,
-    // The slice of the payload that produced this lot. The whole page lives
-    // in raw_extract.
-    raw: { ...lot } as Json,
-  }));
-}
 
 export const extract = inngest.createFunction(
   {
@@ -95,16 +80,13 @@ export const extract = inngest.createFunction(
       return parsed.lots;
     });
 
-    await step.run('write-lots', async () => {
-      const supabase = createServiceSupabase();
-      const rows = lotRows(auctionId, lots);
-      for (let start = 0; start < rows.length; start += BATCH_SIZE) {
-        const { error } = await supabase
-          .from('lots')
-          .upsert(rows.slice(start, start + BATCH_SIZE), { onConflict: 'auction_id,lot_number' });
-        if (error) throw new Error(`Could not write the lots: ${error.message}`);
-      }
-    });
+    const lotIdsByNumber = await step.run('write-lots', async () => writeLots(auctionId, lots));
+
+    // What a lot is worth to one organisation is theirs, and these rows hold
+    // it. Nothing created them before, so triage had nowhere to write to.
+    await step.run('open-analysis-lots', async () =>
+      openAnalysisLots(analysisId, Object.values(lotIdsByNumber)),
+    );
 
     // S3. The premium lives on a lot page rather than the catalogue, so this
     // reads one lot to learn what the whole auction charges. F10, D25.

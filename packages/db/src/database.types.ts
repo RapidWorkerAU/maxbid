@@ -334,6 +334,109 @@ export type Database = {
           },
         ]
       }
+      comparable_snapshots: {
+        Row: {
+          checked_at: string
+          comparable_id: string
+          created_at: string
+          id: string
+          price: number
+          price_includes_gst: boolean | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          checked_at?: string
+          comparable_id: string
+          created_at?: string
+          id?: string
+          price: number
+          price_includes_gst?: boolean | null
+          status: string
+          updated_at?: string
+        }
+        Update: {
+          checked_at?: string
+          comparable_id?: string
+          created_at?: string
+          id?: string
+          price?: number
+          price_includes_gst?: boolean | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comparable_snapshots_comparable_id_fkey"
+            columns: ["comparable_id"]
+            isOneToOne: false
+            referencedRelation: "comparables"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      comparables: {
+        Row: {
+          condition: string | null
+          created_at: string
+          features: Json
+          first_seen_at: string
+          id: string
+          location_text: string | null
+          org_id: string | null
+          provenance: string
+          source_name: string
+          source_type: string
+          summary: string | null
+          title: string
+          updated_at: string
+          url: string | null
+          year: number | null
+        }
+        Insert: {
+          condition?: string | null
+          created_at?: string
+          features?: Json
+          first_seen_at?: string
+          id?: string
+          location_text?: string | null
+          org_id?: string | null
+          provenance: string
+          source_name: string
+          source_type: string
+          summary?: string | null
+          title: string
+          updated_at?: string
+          url?: string | null
+          year?: number | null
+        }
+        Update: {
+          condition?: string | null
+          created_at?: string
+          features?: Json
+          first_seen_at?: string
+          id?: string
+          location_text?: string | null
+          org_id?: string | null
+          provenance?: string
+          source_name?: string
+          source_type?: string
+          summary?: string | null
+          title?: string
+          updated_at?: string
+          url?: string | null
+          year?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comparables_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cost_profiles: {
         Row: {
           created_at: string
@@ -395,6 +498,89 @@ export type Database = {
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lot_comparables: {
+        Row: {
+          adjusted_price: number
+          adjustment_pct: number
+          comparable_id: string
+          created_at: string
+          differences: Json
+          excluded_by: string | null
+          excluded_by_user: boolean
+          exclusion_reason: string | null
+          id: string
+          identification_id: string
+          match_level: string
+          reason: string
+          snapshot_id: string
+          updated_at: string
+          weight: number
+        }
+        Insert: {
+          adjusted_price: number
+          adjustment_pct?: number
+          comparable_id: string
+          created_at?: string
+          differences?: Json
+          excluded_by?: string | null
+          excluded_by_user?: boolean
+          exclusion_reason?: string | null
+          id?: string
+          identification_id: string
+          match_level: string
+          reason: string
+          snapshot_id: string
+          updated_at?: string
+          weight: number
+        }
+        Update: {
+          adjusted_price?: number
+          adjustment_pct?: number
+          comparable_id?: string
+          created_at?: string
+          differences?: Json
+          excluded_by?: string | null
+          excluded_by_user?: boolean
+          exclusion_reason?: string | null
+          id?: string
+          identification_id?: string
+          match_level?: string
+          reason?: string
+          snapshot_id?: string
+          updated_at?: string
+          weight?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lot_comparables_comparable_id_fkey"
+            columns: ["comparable_id"]
+            isOneToOne: false
+            referencedRelation: "comparables"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lot_comparables_excluded_by_fkey"
+            columns: ["excluded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lot_comparables_identification_id_fkey"
+            columns: ["identification_id"]
+            isOneToOne: false
+            referencedRelation: "lot_identifications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lot_comparables_snapshot_id_fkey"
+            columns: ["snapshot_id"]
+            isOneToOne: false
+            referencedRelation: "comparable_snapshots"
             referencedColumns: ["id"]
           },
         ]
@@ -987,6 +1173,10 @@ export type Database = {
     }
     Functions: {
       can_edit_analysis: { Args: { target_analysis: string }; Returns: boolean }
+      can_edit_identification: {
+        Args: { target_identification: string }
+        Returns: boolean
+      }
       can_edit_org: { Args: { target_org: string }; Returns: boolean }
       create_organisation: { Args: { org_name: string }; Returns: string }
       is_org_admin: { Args: { target_org: string }; Returns: boolean }
@@ -994,6 +1184,10 @@ export type Database = {
       is_valid_premium_schedule: { Args: { schedule: Json }; Returns: boolean }
       org_role: { Args: { target_org: string }; Returns: string }
       owns_analysis: { Args: { target_analysis: string }; Returns: boolean }
+      owns_identification: {
+        Args: { target_identification: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
