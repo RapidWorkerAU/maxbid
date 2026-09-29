@@ -33,7 +33,24 @@ export type CallResult = {
   aiRunId: string | null;
 };
 
-/** Writes the cost row. Never throws: losing a run must not lose the work. */
+export class UnrecordedSpendError extends Error {
+  constructor(cause: string) {
+    super(
+      `A Claude call could not be recorded, so we stopped rather than spend money we cannot account for. The database said: ${cause}`,
+    );
+    this.name = 'UnrecordedSpendError';
+  }
+}
+
+/**
+ * Writes the cost row, and throws if it cannot.
+ *
+ * This used to swallow the failure, on the reasoning that losing a cost row
+ * should not lose the work. That was wrong. The spend ceiling is worked out
+ * from these very rows, so a call nothing recorded is a call nothing can cap,
+ * and the only trace of it would be the bill. Stopping on a database blip is
+ * the cheaper of the two mistakes.
+ */
 async function record(
   where: CallRecord,
   model: string,
@@ -42,7 +59,7 @@ async function record(
   error?: string,
 ): Promise<string | null> {
   try {
-    const { data } = await createServiceSupabase()
+    const { data, error: failed } = await createServiceSupabase()
       .from('ai_runs')
       .insert({
         org_id: where.orgId ?? null,
@@ -59,10 +76,11 @@ async function record(
       })
       .select('id')
       .single();
+    if (failed) throw new UnrecordedSpendError(failed.message);
     return data?.id ?? null;
   } catch (cause) {
-    console.error('Could not record an AI run:', cause);
-    return null;
+    if (cause instanceof UnrecordedSpendError) throw cause;
+    throw new UnrecordedSpendError(cause instanceof Error ? cause.message : String(cause));
   }
 }
 
@@ -111,7 +129,22 @@ export async function ask(options: AskOptions, where: CallRecord): Promise<CallR
     return { text, use, costUsd, aiRunId };
   } catch (cause) {
     const message = cause instanceof Error ? cause.message : String(cause);
-    await record(where, options.model, { inputTokens: 0, outputTokens: 0 }, 0, message);
+    // A failed call is recorded too. It may have spent tokens before it
+    // failed, and a stage that fails over and over is a cost even when it
+    // produces nothing. If that record cannot be written either, the
+    // unrecorded spend is the more serious of the two problems, so it is the
+    // one that surfaces, carrying the original failure in its message.
+    await record(
+      where,
+      options.model,
+      { inputTokens: 0, outputTokens: 0 },
+      0,
+      message,
+    ).catch((recordFailure: unknown) => {
+      throw new UnrecordedSpendError(
+        `${recordFailure instanceof Error ? recordFailure.message : String(recordFailure)}. The call itself failed with: ${message}`,
+      );
+    });
     throw cause;
   }
 }
