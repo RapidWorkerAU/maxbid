@@ -67,7 +67,7 @@ This register is the sign off record for every component in packages/ui. It is t
 | UI44 | PricingPlans | Section | Web | Not started |  |  |
 | UI45 | GuideLayout | Section | Web | Not started |  |  |
 | UI46 | MethodSteps | Section | Web | Not started |  |  |
-| UI47 | AppShell | Section | App | In review | 23 September 2026 | Sidebar on desktop, bottom tab bar on mobile, safe area aware |
+| UI47 | AppShell | Section | App | In review | 29 September 2026 | Sidebar on desktop, bottom tab bar on mobile, safe area aware. Now used by three pages |
 | UI48 | TriageTable | Section | App | Not started |  |  |
 | UI49 | LotDetail | Section | App | Not started |  |  |
 | UI50 | BidView | Section | App | Not started |  |  |
