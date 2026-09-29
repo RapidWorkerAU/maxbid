@@ -20,6 +20,8 @@
     "db:stop": "supabase stop",
     "db:reset": "supabase db reset",
     "db:types": "node scripts/gen-db-types.mjs",
+    "db:push": "supabase db push",
+    "db:link": "supabase link",
     "e2e": "playwright test",
     "check:tags": "node scripts/check-story-tags.mjs",
     "test:rls": "node scripts/run-rls-tests.mjs",
