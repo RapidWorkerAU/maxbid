@@ -103,3 +103,31 @@ describe('the completeness check on a card page', () => {
     expect(() => assertComplete(parsed)).toThrow(/closing times/);
   });
 });
+
+describe('the labelled facts on a card', () => {
+  const parsed = parseGraysCatalogue(CARD_PAGE, FETCHED_AT);
+
+  it('reads the odometer, transmission and fuel', () => {
+    expect(parsed.lots[0]!.attributes).toEqual({
+      odometer: '549,752',
+      transmission: 'Sports Automatic',
+      fueltype: 'Diesel',
+    });
+  });
+
+  it('drops the word Showing from an odometer reading', () => {
+    // "Showing 549,752" is how Grays writes it. The number is the fact.
+    expect(parsed.lots[0]!.attributes?.odometer).toBe('549,752');
+  });
+
+  it('leaves out the picture count, which is not a fact about the lot', () => {
+    expect(parsed.lots[0]!.attributes).not.toHaveProperty('image');
+  });
+
+  it('reads them for every lot, not only the first', () => {
+    // These went missing entirely at first, and the cost only showed up in a
+    // valuation: a Landcruiser showing 549,752 kilometres was priced against
+    // ordinary ones at $40,000 to $56,000, and the match was called exact.
+    expect(parsed.lots.every((lot) => lot.attributes?.odometer)).toBe(true);
+  });
+});

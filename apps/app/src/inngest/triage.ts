@@ -29,6 +29,18 @@ export function detailsFrom(raw: unknown): LotForIdentification['details'] {
   for (const key of keep) {
     if (row[key] !== undefined && row[key] !== null) details[key] = row[key];
   }
+
+  // The labelled facts the catalogue stated, such as the odometer reading.
+  // Leaving these out cost a valuation: a Landcruiser showing 549,752
+  // kilometres was priced against ordinary ones, because nothing downstream
+  // knew what it had done.
+  const attributes = row.attributes;
+  if (typeof attributes === 'object' && attributes !== null) {
+    for (const [key, value] of Object.entries(attributes)) {
+      if (value !== null && value !== undefined && value !== '') details[key] = value;
+    }
+  }
+
   return details;
 }
 

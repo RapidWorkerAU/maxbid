@@ -85,3 +85,23 @@ would produce a target bid that is simply wrong.
 Fetching fresh every time costs more credits. That is the right trade for a
 live auction. The setting is `SCRAPE_OPTIONS` in
 `apps/app/src/extract/firecrawl.ts`, and a test holds it to zero.
+
+## Past results are on the lot page, not the catalogue
+
+A Grays catalogue page for a closed sale shows "Bidding closed" and no price.
+Checked on sale 23502297: not one dollar figure on the whole page.
+
+The lot page states it plainly:
+
+> 25 September 2026 21:00 AEST
+> Sold for
+> $260
+> The auction has ended.
+
+So gathering results means one fetch per lot rather than one per sale. That is
+the cost decision record 0020 accepts, because the result is public
+information about a completed sale, is stored once and is read by every
+organisation and every later analysis after that.
+
+The same rules apply as to any other page here. robots.txt is read and obeyed,
+requests are rate limited per host, and we identify ourselves honestly.
