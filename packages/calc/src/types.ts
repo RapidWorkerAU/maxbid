@@ -1,12 +1,17 @@
 // Shared types for the bid engine. Source: docs/02-specs/bid-calculation.md.
 
+import type { PremiumSchedule } from './premium';
+
 /** Everything the bid maths needs to know about one lot. */
 export type BidInputs = {
   /** Resale price for the chosen scenario, usually the conservative resale. */
   resale: number;
   resaleIncludesGst: boolean;
-  /** Buyer's premium as a fraction, for example 0.165. */
-  premiumRate: number;
+  /**
+   * How this auction charges its buyer's premium. Use flatRate(0.165) for an
+   * auction that charges one percentage at every price. Decision record 0015.
+   */
+  premium: PremiumSchedule;
   gstOnHammer: boolean;
   gstOnPremium: boolean;
   /** Transport, repairs, fees and other costs added together, as the user entered them. */
@@ -19,8 +24,13 @@ export type BidInputs = {
 export type BidBasis = {
   netResale: number;
   effectiveOtherCosts: number;
-  /** Known as k in the spec. */
-  costPerHammerDollar: number;
+  /**
+   * What each dollar of hammer price costs before the premium. 1 for a GST
+   * registered buyer, 1.1 for an unregistered buyer paying GST on the hammer.
+   */
+  hammerFactor: number;
+  /** The same, applied to the premium rather than to the hammer price. */
+  premiumFactor: number;
 };
 
 /** The three bid figures, unrounded, with the basis they were worked out from. */

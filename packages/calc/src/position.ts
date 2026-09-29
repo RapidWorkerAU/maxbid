@@ -2,6 +2,7 @@
 // Formulas 2 to 5 of decision record 0004. Source: docs/02-specs/bid-calculation.md.
 
 import { GST_RATE, bidBasis } from './basis';
+import { premiumAt } from './premium';
 import type { BidInputs, Position } from './types';
 
 /**
@@ -13,7 +14,7 @@ import type { BidInputs, Position } from './types';
 export function cashNeeded(i: BidInputs, hammer: number): number {
   const g = GST_RATE;
   const onHammer = hammer * (1 + (i.gstOnHammer ? g : 0));
-  const onPremium = hammer * i.premiumRate * (1 + (i.gstOnPremium ? g : 0));
+  const onPremium = premiumAt(i.premium, hammer) * (1 + (i.gstOnPremium ? g : 0));
   return onHammer + onPremium + i.otherCosts;
 }
 
@@ -22,7 +23,7 @@ export function gstCredits(i: BidInputs, hammer: number): number {
   if (!i.gstRegistered) return 0;
   const g = GST_RATE;
   const onHammer = i.gstOnHammer ? hammer * g : 0;
-  const onPremium = i.gstOnPremium ? hammer * i.premiumRate * g : 0;
+  const onPremium = i.gstOnPremium ? premiumAt(i.premium, hammer) * g : 0;
   const onCosts = i.otherCostsIncludeGst ? i.otherCosts - i.otherCosts / (1 + g) : 0;
   return onHammer + onPremium + onCosts;
 }

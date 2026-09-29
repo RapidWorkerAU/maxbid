@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
+import { costPerHammerDollarAt } from './basis';
 import { bidForReturn, bidLimits, bidLimitsForReturn } from './bidLimits';
+import { NO_PREMIUM } from './premium';
 import { MIN_PROFIT, TARGET_PROFIT, registered, unregistered } from './examples';
 import { returnOnCost } from './position';
 
@@ -15,7 +17,7 @@ describe('bidLimits, worked example 1, GST registered', () => {
   it('works out the basis the spec describes', () => {
     expect(result.netResale).toBeCloseTo(16818.18, 2);
     expect(result.effectiveOtherCosts).toBeCloseTo(3572.73, 2);
-    expect(result.costPerHammerDollar).toBeCloseTo(1.165, 10);
+    expect(costPerHammerDollarAt(registered, 7936.01)).toBeCloseTo(1.165, 10);
   });
 
   it('puts the three figures in rising order, with the break even bid highest', () => {
@@ -36,7 +38,7 @@ describe('bidLimits, worked example 3, not GST registered', () => {
   it('carries the GST on the hammer and the premium as a real cost', () => {
     expect(result.netResale).toBe(18500);
     expect(result.effectiveOtherCosts).toBe(3930);
-    expect(result.costPerHammerDollar).toBeCloseTo(1.2815, 10);
+    expect(costPerHammerDollarAt(unregistered, 7936.01)).toBeCloseTo(1.2815, 10);
   });
 
   it('reaches the same break even bid as the registered buyer', () => {
@@ -76,8 +78,9 @@ describe('guards', () => {
   });
 
   it('handles an auction with no buyer premium', () => {
-    const result = bidLimits({ ...registered, premiumRate: 0 }, TARGET_PROFIT, MIN_PROFIT);
-    expect(result.costPerHammerDollar).toBe(1);
+    const noPremium = { ...registered, premium: NO_PREMIUM };
+    const result = bidLimits(noPremium, TARGET_PROFIT, MIN_PROFIT);
+    expect(costPerHammerDollarAt(noPremium, 1000)).toBe(1);
     expect(result.targetBid).toBeCloseTo(16818.18 - 3572.73 - 4000, 1);
   });
 });
