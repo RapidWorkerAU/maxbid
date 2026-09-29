@@ -70,3 +70,18 @@ Those are lot detail pages, auction listings, catalogues and their own buyer fac
 4. Public pages only. Never sign in, never bypass a paywall or a login.
 5. Store the payload in `raw_extract` so a retry does not mean a refetch.
 6. Recheck this page before public launch, and whenever a site changes its structure.
+
+## Never read a cached copy of an auction page
+
+Every fetch asks Firecrawl for the page as it is now, with `maxAge` set to
+zero. Firecrawl otherwise serves a copy it took up to two days ago.
+
+This was found in the first live run. The same catalogue came back with a
+byte identical countdown fourteen minutes apart, so the closing time worked
+out from it was fourteen minutes late. The current bids were as old as the
+copy. Bids are the figure the whole product reasons about, so a stale one
+would produce a target bid that is simply wrong.
+
+Fetching fresh every time costs more credits. That is the right trade for a
+live auction. The setting is `SCRAPE_OPTIONS` in
+`apps/app/src/extract/firecrawl.ts`, and a test holds it to zero.

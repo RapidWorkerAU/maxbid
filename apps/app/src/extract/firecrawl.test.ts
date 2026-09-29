@@ -1,5 +1,11 @@
 import { describe, expect, it, vi } from 'vitest';
-import { SiteAccessError, USER_AGENT, assertAllowed, robotsFor } from './firecrawl';
+import {
+  SCRAPE_OPTIONS,
+  SiteAccessError,
+  USER_AGENT,
+  assertAllowed,
+  robotsFor,
+} from './firecrawl';
 
 function fakeFetch(body: string) {
   return vi.fn(async () => ({
@@ -78,5 +84,19 @@ describe('when robots.txt cannot be read', () => {
       text: async () => '',
     })) as unknown as typeof fetch;
     await expect(assertAllowed(`${host()}/sale/1`, fetcher)).rejects.toThrow(/do not fetch/);
+  });
+});
+
+describe('how a page is fetched', () => {
+  it('never accepts a cached copy of an auction page', () => {
+    // A catalogue came back with an identical countdown fourteen minutes
+    // apart, so every closing time derived from it was fourteen minutes late,
+    // and the bids were as old as the copy. Bids are what the product exists
+    // to reason about, so the page has to be fetched now, every time.
+    expect(SCRAPE_OPTIONS.maxAge).toBe(0);
+  });
+
+  it('asks for markdown, which the extractors parse', () => {
+    expect(SCRAPE_OPTIONS.formats).toContain('markdown');
   });
 });
