@@ -3,6 +3,7 @@ import { createServiceSupabase } from '@maxbid/db/server';
 import { assertComplete, parseGraysCatalogue, type ParsedLot } from '../extract/grays';
 import { fetchPage } from '../extract/firecrawl';
 import { extractRequested, inngest } from './client';
+import { readAuctionTerms } from './normalise';
 
 // S2 Extract and S3 Normalise. Source: docs/02-specs/pipeline.md.
 //
@@ -11,9 +12,10 @@ import { extractRequested, inngest } from './client';
 // if parsing breaks, the pages can be reprocessed without fetching a site we
 // promised in D45 to treat carefully.
 
-// 1.1.0 added the card layout that the motor vehicle sales use. A stored page
-// records the version that read it, so a reprocess knows what it is replacing.
-export const EXTRACTOR_VERSION = 'grays-markdown-1.1.0';
+// 1.1.0 added the card layout that the motor vehicle sales use. 1.2.0 added
+// S3, which reads the premium schedule off a lot page. A stored page records
+// the version that read it, so a reprocess knows what it is replacing.
+export const EXTRACTOR_VERSION = 'grays-markdown-1.2.0';
 
 /** Lots are written in batches, so one huge catalogue is not one huge insert. */
 const BATCH_SIZE = 100;
@@ -104,6 +106,14 @@ export const extract = inngest.createFunction(
       }
     });
 
+    // S3. The premium lives on a lot page rather than the catalogue, so this
+    // reads one lot to learn what the whole auction charges. F10, D25.
+    const terms = await step.run('read-auction-terms', async () => {
+      const first = lots[0];
+      if (!first?.lotUrl) return { premiumSource: 'platform_default', bands: 0, title: null };
+      return readAuctionTerms(auctionId, first.lotUrl);
+    });
+
     await step.run('mark-extracted', async () => {
       const supabase = createServiceSupabase();
       const { error } = await supabase
@@ -113,6 +123,6 @@ export const extract = inngest.createFunction(
       if (error) throw new Error(`Could not update the analysis: ${error.message}`);
     });
 
-    return { analysisId, auctionId, lots: lots.length };
+    return { analysisId, auctionId, lots: lots.length, terms };
   },
 );

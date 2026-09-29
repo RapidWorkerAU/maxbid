@@ -29,6 +29,15 @@ export type PremiumBand = {
 export type PremiumSchedule = {
   /** In ascending order of hammer price. The last band must have upTo null. */
   bands: PremiumBand[];
+  /**
+   * True when the amounts above already include GST, so nothing is added.
+   *
+   * The Grays vehicle sale says "GST is included in the buyers premium", so
+   * its $495 is the whole charge. A GST registered buyer still claims the GST
+   * inside it, which is the amount less the amount divided by 1.1. Decision
+   * record 0016.
+   */
+  includesGst?: boolean;
 };
 
 /** A premium that is the same percentage at every price, as a fraction. */
@@ -112,6 +121,41 @@ export function premiumAt(schedule: PremiumSchedule, hammer: number): number {
   const band = schedule.bands.find((b) => b.upTo === null || hammer <= b.upTo);
   if (!band) return 0;
   return band.kind === 'fixed' ? band.amount : hammer * band.rate;
+}
+
+/**
+ * What the buyer actually hands over in premium.
+ *
+ * Either the schedule already includes GST, in which case the stated amount
+ * is the whole charge, or it does not and GST is added where it applies.
+ */
+export function premiumChargedAt(
+  schedule: PremiumSchedule,
+  hammer: number,
+  gstOnPremium: boolean,
+  gstRate: number,
+): number {
+  const amount = premiumAt(schedule, hammer);
+  if (schedule.includesGst) return amount;
+  return amount * (1 + (gstOnPremium ? gstRate : 0));
+}
+
+/**
+ * The GST inside that charge, which a registered buyer claims back.
+ *
+ * When the schedule includes GST the amount has to be worked backwards out of
+ * the charge. Multiplying by the rate would overstate it, because the GST is
+ * a tenth of the price before tax, not a tenth of the price after it.
+ */
+export function premiumGstAt(
+  schedule: PremiumSchedule,
+  hammer: number,
+  gstOnPremium: boolean,
+  gstRate: number,
+): number {
+  const amount = premiumAt(schedule, hammer);
+  if (schedule.includesGst) return amount - amount / (1 + gstRate);
+  return gstOnPremium ? amount * gstRate : 0;
 }
 
 /**

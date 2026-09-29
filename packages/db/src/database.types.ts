@@ -44,7 +44,7 @@ export type Database = {
           id: string
           org_id: string
           pdf_path: string | null
-          premium_override_pct: number | null
+          premium_override_schedule: Json | null
           progress_pct: number
           source_type: string
           status: string
@@ -58,7 +58,7 @@ export type Database = {
           id?: string
           org_id: string
           pdf_path?: string | null
-          premium_override_pct?: number | null
+          premium_override_schedule?: Json | null
           progress_pct?: number
           source_type: string
           status?: string
@@ -72,7 +72,7 @@ export type Database = {
           id?: string
           org_id?: string
           pdf_path?: string | null
-          premium_override_pct?: number | null
+          premium_override_schedule?: Json | null
           progress_pct?: number
           source_type?: string
           status?: string
@@ -170,7 +170,7 @@ export type Database = {
         Row: {
           created_at: string
           default_premium_gst: boolean
-          default_premium_pct: number | null
+          default_premium_schedule: Json | null
           extractor_version: string
           id: string
           is_active: boolean
@@ -182,7 +182,7 @@ export type Database = {
         Insert: {
           created_at?: string
           default_premium_gst?: boolean
-          default_premium_pct?: number | null
+          default_premium_schedule?: Json | null
           extractor_version?: string
           id?: string
           is_active?: boolean
@@ -194,7 +194,7 @@ export type Database = {
         Update: {
           created_at?: string
           default_premium_gst?: boolean
-          default_premium_pct?: number | null
+          default_premium_schedule?: Json | null
           extractor_version?: string
           id?: string
           is_active?: boolean
@@ -214,7 +214,7 @@ export type Database = {
           location_text: string | null
           platform_id: string
           premium_gst: boolean | null
-          premium_pct: number | null
+          premium_schedule: Json | null
           premium_source: string
           raw_terms: string | null
           source_url: string | null
@@ -229,7 +229,7 @@ export type Database = {
           location_text?: string | null
           platform_id: string
           premium_gst?: boolean | null
-          premium_pct?: number | null
+          premium_schedule?: Json | null
           premium_source?: string
           raw_terms?: string | null
           source_url?: string | null
@@ -244,7 +244,7 @@ export type Database = {
           location_text?: string | null
           platform_id?: string
           premium_gst?: boolean | null
-          premium_pct?: number | null
+          premium_schedule?: Json | null
           premium_source?: string
           raw_terms?: string | null
           source_url?: string | null
@@ -787,6 +787,7 @@ export type Database = {
       create_organisation: { Args: { org_name: string }; Returns: string }
       is_org_admin: { Args: { target_org: string }; Returns: boolean }
       is_org_member: { Args: { target_org: string }; Returns: boolean }
+      is_valid_premium_schedule: { Args: { schedule: Json }; Returns: boolean }
       org_role: { Args: { target_org: string }; Returns: string }
       owns_analysis: { Args: { target_analysis: string }; Returns: boolean }
     }
