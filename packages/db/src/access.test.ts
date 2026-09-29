@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import {
   ONBOARDING_PATH,
+  SETUP_PATH,
   SIGN_IN_PATH,
   TERMS_PATH,
   isPublicPath,
+  landingFor,
   redirectFor,
   type Visitor,
 } from './access';
@@ -98,5 +100,47 @@ describe('no gate ever loops', () => {
       // Following the redirect once must land somewhere that does not redirect.
       expect(redirectFor(visitor, first)).toBeNull();
     }
+  });
+});
+
+describe('the setup gate', () => {
+  const settled = { signedIn: true, hasOrganisation: true, termsAccepted: true };
+
+  it('sends a user who has not set up to setup', () => {
+    // Decision record 0022. A new organisation's cost profile is empty, and
+    // nothing can be calculated until the user fills it in.
+    expect(redirectFor({ ...settled, isSetUp: false }, '/')).toBe(SETUP_PATH);
+    expect(landingFor({ ...settled, isSetUp: false })).toBe(SETUP_PATH);
+  });
+
+  it('lets them stay on setup once they are there', () => {
+    expect(redirectFor({ ...settled, isSetUp: false }, SETUP_PATH)).toBeNull();
+  });
+
+  it('sends a user who has set up away from setup', () => {
+    expect(redirectFor({ ...settled, isSetUp: true }, SETUP_PATH)).toBe('/');
+  });
+
+  it('leaves a user alone when nobody asked', () => {
+    // Undefined means the caller did not look, which is not the same as not
+    // set up. Treating it as not set up would trap everybody in a loop the
+    // first time a caller forgot to ask.
+    expect(redirectFor(settled, '/')).toBeNull();
+    expect(landingFor(settled)).toBe('/');
+  });
+
+  it('comes after the terms, which are more serious', () => {
+    const noTerms = { ...settled, termsAccepted: false, isSetUp: false };
+    expect(redirectFor(noTerms, '/')).toBe(TERMS_PATH);
+  });
+
+  it('comes after having an organisation, because there is nothing to set up without one', () => {
+    const noOrg = { ...settled, hasOrganisation: false, isSetUp: false };
+    expect(redirectFor(noOrg, '/')).toBe(ONBOARDING_PATH);
+  });
+
+  it('never blocks the background jobs', () => {
+    // Inngest authenticates with its signing key, not a session cookie.
+    expect(redirectFor({ ...settled, isSetUp: false }, '/api/inngest')).toBeNull();
   });
 });

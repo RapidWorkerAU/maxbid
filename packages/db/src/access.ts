@@ -9,6 +9,7 @@
 export const SIGN_IN_PATH = '/sign-in';
 export const ONBOARDING_PATH = '/welcome';
 export const TERMS_PATH = '/terms';
+export const SETUP_PATH = '/setup';
 
 /**
  * Paths a signed out visitor may reach.
@@ -32,6 +33,15 @@ export type Visitor = {
   hasOrganisation: boolean;
   /** True when every material terms version has been accepted. */
   termsAccepted: boolean;
+  /**
+   * True once the organisation has told us what profit it aims for.
+   *
+   * Decision record 0022 gives a new organisation a cost profile with nothing
+   * in it, because a default profit target is a guess about somebody else's
+   * business. Nothing can be calculated until this is answered, so setup is a
+   * gate rather than a suggestion.
+   */
+  isSetUp?: boolean;
 };
 
 export function isPublicPath(pathname: string): boolean {
@@ -56,6 +66,9 @@ export function isPublicPath(pathname: string): boolean {
 export function landingFor(visitor: Visitor): string {
   if (!visitor.termsAccepted) return TERMS_PATH;
   if (!visitor.hasOrganisation) return ONBOARDING_PATH;
+  // Undefined means the caller did not ask, which is not the same as not set
+  // up. Only an explicit false sends somebody to setup.
+  if (visitor.isSetUp === false) return SETUP_PATH;
   return '/';
 }
 
@@ -82,7 +95,16 @@ export function redirectFor(visitor: Visitor, pathname: string): string | null {
     return pathname === ONBOARDING_PATH ? null : ONBOARDING_PATH;
   }
 
-  if (pathname === ONBOARDING_PATH) return '/';
+  if (pathname === ONBOARDING_PATH) return landingFor(visitor);
+
+  // Setup is the last gate, and the gentlest. Everything above it is about
+  // who the user is; this is about what they want, and they cannot be asked
+  // until they have an organisation to answer for.
+  if (visitor.isSetUp === false) {
+    return pathname === SETUP_PATH ? null : SETUP_PATH;
+  }
+
+  if (pathname === SETUP_PATH) return '/';
 
   return null;
 }
