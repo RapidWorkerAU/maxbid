@@ -53,7 +53,7 @@ This register is the sign off record for every component in packages/ui. It is t
 | UI30 | PlanPanel | Composite | Web | Not started |  |  |
 | UI31 | CostSummary | Composite | App | Not started |  |  |
 | UI32 | OverrideMarker | Composite | App | Not started |  |  |
-| UI33 | LotRow | Composite | App | In review | 29 September 2026 | Back to In review under rule 4: a resale range column was added after sign off. A card at 360px and a table row from medium up, one line per cell. Story tests measure the real geometry in a browser |
+| UI33 | LotRow | Composite | App | Approved | 29 September 2026 | A card at 360px and a table row from medium up, one line per cell, with the resale range. Story tests measure the real geometry in a browser, because two earlier versions passed every unit test with a broken render |
 | UI34 | StatusLine | Composite | Both | Not started |  |  |
 | UI35 | EmailCapture | Composite | Web | In review | 23 September 2026 | Waitlist and breakdown sign up. Light surface only, see the note in the file |
 | UI36 | SiteHeader | Section | Web | Not started |  |  |
@@ -68,7 +68,7 @@ This register is the sign off record for every component in packages/ui. It is t
 | UI45 | GuideLayout | Section | Web | Not started |  |  |
 | UI46 | MethodSteps | Section | Web | Not started |  |  |
 | UI47 | AppShell | Section | App | In review | 29 September 2026 | Sidebar on desktop, bottom tab bar on mobile, safe area aware. Now used by three pages |
-| UI48 | TriageTable | Section | App | In review | 29 September 2026 | Back to In review under rule 4: the resale range column was added after sign off. Still no opportunity score or maximum bid, which need S6 and a cost profile |
+| UI48 | TriageTable | Section | App | Approved | 29 September 2026 | SC05 with the resale range. Sticky header, C09 density switch. Still no opportunity score or maximum bid, which need S6 and a cost profile |
 | UI49 | LotDetail | Section | App | Not started |  |  |
 | UI50 | BidView | Section | App | Not started |  |  |
 | UI51 | ChangesSummary | Composite | App | Not started |  | Added for F54 |

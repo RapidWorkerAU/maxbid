@@ -7,7 +7,7 @@ import { LotRow } from './LotRow';
 const meta: Meta<typeof LotRow> = {
   title: 'Composites/LotRow',
   component: LotRow,
-  tags: ['in-review'],
+  tags: ['approved'],
   parameters: { layout: 'padded' },
   args: {
     lot: {
