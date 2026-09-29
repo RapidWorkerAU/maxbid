@@ -90,3 +90,14 @@ describe('what it refuses, and what it says', () => {
     expect('error' in result && result.error).not.toMatch(/[-–—]/);
   });
 });
+
+describe('the gap an existing organisation falls into', () => {
+  it('reads the same values whether a profile exists or not', () => {
+    // The action creates a profile where none exists. An organisation made
+    // before decision record 0022 has none, and an update matching no rows
+    // reports success, which would tell somebody their figures were saved
+    // when they were not. This file only reads the form, so the guard lives
+    // in setup.ts, and this test is here to point at it.
+    expect(readSetup(form(inDollars))).toMatchObject({ targetAmount: 4000 });
+  });
+});

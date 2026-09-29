@@ -38,18 +38,35 @@ export async function saveSetup(
     return { error: 'We could not save your GST setting. Please try again.' };
   }
 
-  const profile = await supabase
+  // An organisation created before decision record 0022 has no profile at
+  // all, so this has to write one rather than update nothing. An update that
+  // matches no rows reports success, which would tell the user their figures
+  // were saved when they were not.
+  const existing = await supabase
     .from('cost_profiles')
-    .update({
-      profit_mode: values.profitMode,
-      target_profit_amount: values.targetAmount,
-      min_profit_amount: values.minimumAmount,
-      target_return_pct: values.targetPct,
-      min_return_pct: values.minimumPct,
-      completed_at: new Date().toISOString(),
-    })
+    .select('id')
     .eq('org_id', membership.data.org_id)
-    .eq('is_default', true);
+    .eq('is_default', true)
+    .maybeSingle();
+
+  const figures = {
+    profit_mode: values.profitMode,
+    target_profit_amount: values.targetAmount,
+    min_profit_amount: values.minimumAmount,
+    target_return_pct: values.targetPct,
+    min_return_pct: values.minimumPct,
+    completed_at: new Date().toISOString(),
+  };
+
+  const profile = existing.data
+    ? await supabase.from('cost_profiles').update(figures).eq('id', existing.data.id)
+    : await supabase.from('cost_profiles').insert({
+        ...figures,
+        org_id: membership.data.org_id,
+        name: 'Default',
+        is_default: true,
+      });
+
   if (profile.error) {
     return { error: 'We could not save your profit target. Please try again.' };
   }
