@@ -30,7 +30,7 @@ Source: MaxBid Project Workbook, tab 02 Decisions.
 | D22 | Costs | Cost field display | Collapsed summary, expand to edit line items | Yes | Keeps the lot table readable. |
 | D23 | Costs | GST handling | GST registered setting on the user profile, then automatic calculation | Yes | Shows cash required and effective cost after credits. |
 | D24 | Costs | Selling fees | No automatic channel fees. User adds manually | No | A visible flag warns when selling fees are blank so the max bid is not silently inflated. |
-| D25 | Costs | Buyer's premium | Extracted from each auction's terms, platform default fallback, editable | Yes | Rates vary by auction and category. |
+| D25 | Costs | Buyer's premium | Extracted from each auction's terms as a schedule of bands, platform default fallback, editable | Yes | Rates vary by auction and category, and below $10,000 a real schedule charges a fixed amount rather than a rate. Amended by decision record 0015. |
 | D26 | Costs | Default assumptions | Multiple saved cost profiles | Yes | For example Machinery, Small tools, Vehicles. |
 | D27 | Costs | Transport | Distance estimate from user base to lot location, editable | Yes | Uses a routing API and a rate per km by size class from the cost profile. |
 | D28 | After analysis | Outcome tracking | Won or lost, final price and actual resale | Yes | Provides verified sold data and measures our accuracy. |
@@ -142,3 +142,4 @@ Each one has a decision record in docs/01-decisions/records.
 | D127 | Input | Pickles prohibits automated access | Remove Pickles from V1 and ask them for permission | 0012 | Their terms say except as expressly permitted by Pickles, so permission is the route, not a better extractor. |
 | D128 | Tech | Inngest or Trigger.dev | Inngest | 0013 | Closes O01. Trigger.dev caps concurrency at 5 on its free tier, which cannot run a 300 lot fan out. |
 | D129 | Tech | Firecrawl or Browserbase | Firecrawl | 0014 | Closes O02. Per page billing suits a per page budget, and we never sign in or fill a form. |
+| D130 | Costs | Buyer's premium is a rate or a schedule | A schedule of bands, each a fixed amount or a percentage | 0015 | The first real auction charges $495 below $2,000, which is 160 percent on a $309 lot. Across that sale the effective rate ran 7 to 160 percent, so no single rate fits, and D25 is amended. |

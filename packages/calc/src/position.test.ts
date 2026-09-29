@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { bidBasis } from './basis';
+import { bidBasis, costPerHammerDollarAt } from './basis';
 import { bidLimits } from './bidLimits';
 import { MIN_PROFIT, TARGET_PROFIT, registered, unregistered } from './examples';
 import { gstCredits, positionAt } from './position';
@@ -58,7 +58,7 @@ describe('the two routes to the same cost agree', () => {
   ])('reconciles for a buyer who is %s', (_name, inputs) => {
     const basis = bidBasis(inputs);
     for (const hammer of [0, 1000, 7936.01, 12500]) {
-      const throughK = hammer * basis.costPerHammerDollar + basis.effectiveOtherCosts;
+      const throughK = hammer * costPerHammerDollarAt(inputs, hammer) + basis.effectiveOtherCosts;
       expect(positionAt(inputs, hammer).costAfterGstCredits).toBeCloseTo(throughK, 8);
     }
   });
