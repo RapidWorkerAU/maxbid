@@ -103,3 +103,25 @@ Source: MaxBid Project Workbook, tab 21 Naming. Copied into this document by dec
 | LotLogic | Logic applied to each lot. | Suits the evidence first positioning |  |
 | Bidproof | Bids backed by proof. | Reflects the transparency principle |  |
 | Hammerline | The line you do not cross. | Links to the stop line feature |  |
+
+## State a fact about their figures, never a verdict on a lot
+
+MaxBid works out, from market research and the user's own profit margin, where
+a lot sits against their maximum bid, and it says so plainly. It does not tell
+anybody to bid or not to bid on a specific lot.
+
+The difference is the whole rule.
+
+| Write this | Not this |
+| --- | --- |
+| Below your target | Not worth bidding |
+| Approaching your maximum bid | Stop bidding |
+| Does not meet your $2,000 target | A bad buy |
+| Not worked out | No value |
+
+A figure, a range, and a comparison against a figure the user set themselves
+are all facts. A verdict on whether a lot is worth their money is advice, and
+DS01 already says this platform does not give advice.
+
+MaxBid also never hides a lot from a list because it scored badly. Sorting and
+filtering are the user's to choose.

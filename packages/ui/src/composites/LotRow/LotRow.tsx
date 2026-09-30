@@ -151,10 +151,24 @@ function Resale({ low, high }: { low?: number | null; high?: number | null }) {
   );
 }
 
-/** The figure the whole product exists to produce. Marker yellow, per B09. */
+/**
+ * The figure the whole product exists to produce. Marker yellow, per B09.
+ *
+ * A figure of nothing means the lot cannot carry the user's own profit target
+ * at any price, so it says that, as a fact about their target. It does not
+ * say the lot is not worth bidding on, which would be a recommendation about
+ * their money rather than a statement about their figures.
+ */
 function MaxBid({ amount }: { amount?: number | null }) {
   if (amount === null || amount === undefined) {
-    return <span className="font-sans text-xs text-ink-muted">Not yet</span>;
+    return <span className="font-sans text-xs text-ink-muted">Not worked out</span>;
+  }
+  if (amount <= 0) {
+    return (
+      <span className="whitespace-nowrap font-sans text-xs text-ink-muted">
+        Below your target
+      </span>
+    );
   }
   return (
     <span className="inline-block rounded-sm bg-marker px-1.5 py-0.5">

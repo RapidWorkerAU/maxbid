@@ -53,7 +53,7 @@ This register is the sign off record for every component in packages/ui. It is t
 | UI30 | PlanPanel | Composite | Web | Not started |  |  |
 | UI31 | CostSummary | Composite | App | Not started |  |  |
 | UI32 | OverrideMarker | Composite | App | Not started |  |  |
-| UI33 | LotRow | Composite | App | Approved | 29 September 2026 | A card at 360px and a table row from medium up, one line per cell, with the resale range. Story tests measure the real geometry in a browser, because two earlier versions passed every unit test with a broken render |
+| UI33 | LotRow | Composite | App | In review | 29 September 2026 | A card at 360px and a table row from medium up, one line per cell, with the resale range. Story tests measure the real geometry in a browser, because two earlier versions passed every unit test with a broken render |
 | UI34 | StatusLine | Composite | Both | Not started |  |  |
 | UI35 | EmailCapture | Composite | Web | In review | 23 September 2026 | Waitlist and breakdown sign up. Light surface only, see the note in the file |
 | UI36 | SiteHeader | Section | Web | Not started |  |  |

@@ -7,7 +7,7 @@ import { LotRow } from './LotRow';
 const meta: Meta<typeof LotRow> = {
   title: 'Composites/LotRow',
   component: LotRow,
-  tags: ['approved'],
+  tags: ['in-review'],
   parameters: { layout: 'padded' },
   args: {
     lot: {
@@ -259,5 +259,25 @@ export const FullyValued: Story = {
       score: 100,
     },
     onSelect: () => {},
+  },
+};
+
+export const BelowTheTarget: Story = {
+  // A $120 computer cannot carry a $2,000 profit target at any price. The row
+  // states that against their own figure rather than judging the lot.
+  args: {
+    lot: {
+      id: 'below',
+      lotNumber: '0007-23502471',
+      title: 'INVENTED DESKTOP TOWER 7070',
+      currentBid: 120,
+      closesAt: new Date(Date.now() + 3 * 3600_000).toISOString(),
+      identifiedAs: 'Invented, Desktop Tower 7070',
+      confidence: 85,
+      resaleLow: 160,
+      resaleHigh: 189,
+      maxBid: 0,
+      score: 0,
+    },
   },
 };
