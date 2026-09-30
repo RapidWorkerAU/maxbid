@@ -86,3 +86,4 @@ describe('refusing a stored lot that is not a result', () => {
     expect(asAuctionResult({ ...base, sold_at: null })).toBeNull();
   });
 });
+

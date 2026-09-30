@@ -84,7 +84,7 @@ export function asAuctionResult(lot: StoredLot, now?: Date): AuctionResult | nul
  */
 export async function fromOurArchive(
   subject: QuerySubject,
-  options: { limit?: number; now?: Date } = {},
+  options: { limit?: number; now?: Date; exceptLotId?: string } = {},
 ): Promise<AuctionResult[]> {
   const terms = termsFor(subject);
   if (terms.length === 0) return [];
@@ -96,6 +96,17 @@ export async function fromOurArchive(
     .not('sold_at', 'is', null)
     .order('sold_at', { ascending: false })
     .limit(options.limit ?? MOST_FROM_ARCHIVE);
+
+  // A lot is never evidence about itself.
+  //
+  // Checked against the real data: the Landcruiser's only archive comparable
+  // was its own $12,800 hammer price. Re-analysing that sale would have
+  // valued the lot against itself and reported it as strong, recent, same
+  // house evidence, which is the most confident wrong answer this can give.
+  //
+  // It cannot happen on a live sale, because a lot that has not closed has no
+  // sold price. It happens the moment anybody re-runs a closed one.
+  if (options.exceptLotId) query = query.neq('id', options.exceptLotId);
 
   // Every word has to appear, so a Landcruiser does not match a Land Rover.
   for (const term of terms) query = query.ilike('title', `%${term}%`);
