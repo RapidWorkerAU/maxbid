@@ -12,6 +12,7 @@
 import { fetchPage } from '../extract/firecrawl';
 import { ageInDays, parseGraysResult, type GraysResult } from '../extract/graysResult';
 import { brave, type SearchResult } from '../search/brave';
+import { fromOurArchive } from '../search/ourArchive';
 import { queryFor, type QuerySubject } from '../search/query';
 
 /** Where past results can be looked for, and how a lot page is recognised. */
@@ -63,8 +64,20 @@ export async function findAuctionResults(
   options: { limit?: number; now?: Date } = {},
 ): Promise<{ results: AuctionResult[]; pagesFetched: number }> {
   const limit = options.limit ?? MOST_RESULTS_PER_LOT;
-  const found: AuctionResult[] = [];
+
+  // Our own archive first. Decision record 0021: the harvester records what
+  // every lot we have read actually fetched, and reading it back costs one
+  // database query rather than a search and a page fetch each. It is also the
+  // better evidence, because we recorded it ourselves rather than finding it
+  // through whatever a search engine happened to crawl.
+  const found: AuctionResult[] = await fromOurArchive(subject, {
+    limit,
+    now: options.now,
+  }).catch(() => []);
   let pagesFetched = 0;
+
+  // Only what the archive could not supply is searched for.
+  if (found.length >= limit) return { results: found, pagesFetched };
 
   for (const site of RESULT_SITES) {
     if (found.length >= limit) break;
