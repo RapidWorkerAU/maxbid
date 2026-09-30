@@ -13,21 +13,43 @@ Updated at the end of every pull request. The current row is always the one to r
 | 3 | Add the quality gates that the rule book assumes | Merged | 22 Sep 2026 |
 | 4 | Complete the token set and fix two accessibility failures | Merged | 22 Sep 2026 |
 | 5 | This build plan | Merged | 22 Sep 2026 |
-| 6 | W1.1 Button, StopLine and Wordmark to In review | In review |  |
-| 7 | W1.2 Primitives A: Input, Toggle group, Money, MonoLabel, ProvenanceTag | In review |  |
-| 8 | W1.3 Primitives B: AiLabel, MatchBadge, ConfidenceBadge, ZoneLabel, InfoNote | In review |  |
-| 9 | W1.4 Primitives C: SheetFrame, TitleBlock, DetailLabel, LeaderLine, LineIcon | In review |  |
+| 6 | W1.1 Button, StopLine and Wordmark to In review | Merged | 22 Sep 2026 |
+| 7 | W1.2 Primitives A: Input, Toggle group, Money, MonoLabel, ProvenanceTag | Merged | 22 Sep 2026 |
+| 8 | W1.3 Primitives B: AiLabel, MatchBadge, ConfidenceBadge, ZoneLabel, InfoNote | Merged | 22 Sep 2026 |
+| 9 | W1.4 Primitives C: SheetFrame, TitleBlock, DetailLabel, LeaderLine, LineIcon | Merged | 22 Sep 2026 |
 | 10 | W1.5 First migration and row level security | Merged | 22 Sep 2026 |
-| 11 | All 18 primitives Approved, and W1.6 sign in, organisations, terms, AppShell | In review |  |
-| 12 | W1.7 Waitlist holding page | In review |  |
-| 13 | W2.3 Ingestion schema, auctions, lots and analyses | In review |  |
-| 14 | O05 site access findings and decision record 0012 | In review |  |
-| 15 | Diagnosable errors, the Grays card layout, and never reading a cached page | In review |  |
-| 16 | W2.6 Normalise stage S3, and the auction title | Next |  |
+| 11 | All 18 primitives Approved, and W1.6 sign in, organisations, terms, AppShell | Merged | 22 Sep 2026 |
+| 12 | W1.7 Waitlist holding page | Merged | 23 Sep 2026 |
+| 13 | W2.3 Ingestion schema, auctions, lots and analyses | Merged | 23 Sep 2026 |
+| 14 | O05 site access findings and decision record 0012 | Merged | 23 Sep 2026 |
+| 22 | Diagnosable errors, the Grays card layout, and never reading a cached page | Merged | 29 Sep 2026 |
+| 23 | The buyer's premium is a schedule, not a single rate | Merged | 29 Sep 2026 |
+| 24 | Store the premium as a schedule, and read it from the auction | Merged | 29 Sep 2026 |
+| 26 | Tables for triage, and for what every AI call costs | Merged | 29 Sep 2026 |
+| 27 | S4 identifies every lot, with a ceiling on what it may spend | Merged | 29 Sep 2026 |
+| 29 | The evidence tables, and a row per lot in every analysis | Merged | 29 Sep 2026 |
+| 31 | LotRow and TriageTable | Merged | 29 Sep 2026 |
+| 32 | Show the lots on the analysis page | Merged | 29 Sep 2026 |
+| 33 | S5 values a lot, and finds out what the evidence is really worth | Merged | 29 Sep 2026 |
+| 34 | Value against real auction results, and start our own archive | Merged | 29 Sep 2026 |
+| 35 | Run the harvest on its own, and give a sale a closing time | Merged | 29 Sep 2026 |
+| 36 | Show what each lot is worth, and make S5 a stage that runs | Merged | 29 Sep 2026 |
+| 37 | A new organisation starts with a cost profile and nothing in it | Merged | 29 Sep 2026 |
+| 38 | Stay inside what the extraction service allows per minute | Merged | 29 Sep 2026 |
+| 39 | Rank a catalogue on what a lot is worth, not on the current bid | Merged | 29 Sep 2026 |
+| 40 | Rank the list, and show the most you should bid | Merged | 29 Sep 2026 |
+| 41 | Value the lots worth valuing, not every lot | Merged | 30 Sep 2026 |
+| next | Make the valuations accurate enough to bid on | Next |  |
 
-**Where we are.** The whole path from a pasted catalogue link to lots in the database now works, run by a person rather than a test. A real Grays motor vehicle sale of 36 lots reads with every bid and every closing time, accurate to a quarter of a second against the time the lot pages state. Three defects came out of that first live run and are fixed: the parser knew only one of the two Grays layouts, Firecrawl was serving pages up to two days old, and the app had no way to report a missing environment variable. Next is S3, which is where an analysis currently stops.
+**Where we are.** The pipeline runs end to end on a real sale: a pasted Grays link becomes 36 identified lots with a premium schedule, resale ranges, bid figures and a ranking, all on screen. The archive holds what all 36 lots actually sold for, harvested after the sale closed, which is evidence nobody else has.
 
-**Blocked and waiting on Ashleigh.** O05 is closed. Grays and Lloyds are cleared, Pickles is prohibited and out of V1. Inngest and Firecrawl are chosen but need accounts. O03 blocks Week 3. O04 should be applied for now because approval takes time. O11 blocks promoting the waitlist page.
+**What that measurement said.** Twenty two lots were valued and every one of them sold, so the figures can be checked. The median maximum bid was 0.71 times what the lot fetched, which is the safe direction, and one lot came out at 3.93 times, which is not. The error is in the resale estimates rather than the bid maths: two lots were estimated at 2.8 and 3.5 times what they fetched at auction, and one at 0.7. **MaxBid is not yet accurate enough to bid on**, and saying so is more useful than the figures look.
+
+**Why, and what fixes it.** Almost every comparable is an advertised price weighted 0.6, where a sold price is weighted 0.95. The archive has one sale in it. Accuracy is a function of how many sales have been harvested, so it improves over weeks rather than in a sitting. Decision records 0020 and 0021 set that up deliberately.
+
+**Blocked and waiting on Ashleigh.** O03 is closed: search is Brave, by decision record 0018. O04, the eBay Marketplace Insights application, is still worth making because approval takes time and sold listings would strengthen the evidence. O11 blocks promoting the waitlist page. The app has never been deployed: there is no Vercel project for apps/app and maxbid.com.au still points at a placeholder.
+
+**Open items raised by building.** O17, a catalogue page cut short cannot be detected. O18, a premium band that combines a fixed amount with a percentage, or carries a minimum.
 
 ## How to read this
 
