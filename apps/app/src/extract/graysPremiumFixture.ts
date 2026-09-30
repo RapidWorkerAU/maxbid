@@ -47,3 +47,23 @@ export const LOT_PAGE = [
 /** The labelled row a lot page carries naming the sale it belongs to. */
 export const PART_OF_SALE_ROW =
   '| Part of Sale | [Invented Perth Motor Vehicle Auction](https://www.grays.com/sale/23502418/motor-vehicles-motor-cycles/invented-perth-motor-vehicle-auction) |';
+
+/** A sale charging the same premium at every price, written as one row. */
+export const FLAT_PREMIUM_TABLE = [
+  '| Buyers premium | | Final Bid Price | Buyers Premium |',
+  '| --- | --- |',
+  '| ANY | 20% |',
+].join('\n');
+
+/** A lot page from a sale with a flat premium. */
+export const FLAT_LOT_PAGE = [
+  '### Overview',
+  '',
+  FLAT_PREMIUM_TABLE,
+  '',
+  GST_NOTE,
+  '',
+  '### Description',
+  '',
+  'An invented desktop computer.',
+].join('\n');

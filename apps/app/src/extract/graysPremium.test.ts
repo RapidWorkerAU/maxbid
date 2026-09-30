@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { parseGraysPremium, parseGraysSaleTitle } from './graysPremium';
 import {
   DESCRIPTION_PREMIUM,
+  FLAT_LOT_PAGE,
   GST_NOTE,
   LOT_PAGE,
   PART_OF_SALE_ROW,
@@ -98,5 +99,35 @@ describe('reading the sale name from a lot page', () => {
 
   it('reads nothing when the row is not there', () => {
     expect(parseGraysSaleTitle(LOT_PAGE)).toBeNull();
+  });
+});
+
+describe('a sale that charges one premium at every price', () => {
+  // The Unreserved Mixed IT Equipment sales write it as a single row reading
+  // "ANY". Without this the premium could not be read at all, the platform
+  // default was used, and not one lot in a 40 lot sale got a bid figure.
+  it('reads it as a schedule of one band', () => {
+    const parsed = parseGraysPremium(FLAT_LOT_PAGE);
+    expect(parsed?.schedule.bands).toEqual([{ upTo: null, kind: 'rate', rate: 0.2 }]);
+  });
+
+  it('still notices whether GST is inside it', () => {
+    expect(parseGraysPremium(FLAT_LOT_PAGE)?.schedule.includesGst).toBe(true);
+  });
+
+  it('reads a flat premium given as a fixed amount', () => {
+    const page = FLAT_LOT_PAGE.replace('| ANY | 20% |', '| ANY | $99 |');
+    expect(parseGraysPremium(page)?.schedule.bands).toEqual([
+      { upTo: null, kind: 'fixed', amount: 99 },
+    ]);
+  });
+
+  it('keeps the row it read it from', () => {
+    expect(parseGraysPremium(FLAT_LOT_PAGE)?.sourceText).toContain('ANY');
+  });
+
+  it('still reads a banded table on a sale that has one', () => {
+    // The two must not interfere. A vehicle sale has bands and no ANY row.
+    expect(parseGraysPremium(LOT_PAGE)?.schedule.bands).toHaveLength(6);
   });
 });

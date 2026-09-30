@@ -30,6 +30,19 @@ import type { PremiumBand, PremiumSchedule } from '@maxbid/calc';
 const ROW =
   /^\|\s*\$([\d,]+)\s*(?:-\s*\$([\d,]+)|\+)\s*\|\s*(?:\$([\d,]+(?:\.\d+)?)|([\d.]+)\s*%)\s*\|/gm;
 
+/**
+ * A sale that charges the same premium at every price writes one row:
+ *
+ *   | Final Bid Price | Buyers Premium |
+ *   | ANY | 20% |
+ *
+ * The Unreserved Mixed IT Equipment sales do this. Without it the premium
+ * could not be read at all, the platform default was used, and no lot in the
+ * sale got a bid figure, because a premium we cannot read is not a premium of
+ * nothing.
+ */
+const FLAT_ROW = /^\|\s*ANY\s*\|\s*(?:\$([\d,]+(?:\.\d+)?)|([\d.]+)\s*%)\s*\|/gim;
+
 /** The note that says the figures already have GST in them. */
 const GST_INCLUDED = /GST is included in the buyers? premium/i;
 
@@ -48,6 +61,19 @@ type Row = { band: PremiumBand; from: number; line: string };
 function readRows(markdown: string): Row[][] {
   const tables: Row[][] = [];
   let current: Row[] = [];
+
+  // A flat premium is one row covering every price, so each match is a whole
+  // table on its own.
+  for (const match of markdown.matchAll(FLAT_ROW)) {
+    const [line, fixedText, rateText] = match;
+    const band: PremiumBand | null =
+      fixedText !== undefined
+        ? { upTo: null, kind: 'fixed', amount: money(fixedText) }
+        : rateText !== undefined
+          ? { upTo: null, kind: 'rate', rate: Number(rateText) / 100 }
+          : null;
+    if (band) tables.push([{ band, from: 0, line: (line ?? '').trim() }]);
+  }
 
   for (const match of markdown.matchAll(ROW)) {
     const [line, fromText, toText, fixedText, rateText] = match;
