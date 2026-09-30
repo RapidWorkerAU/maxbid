@@ -52,10 +52,21 @@ describe('regrading a comparable once its usage is known', () => {
   });
 
   it.each(['exact', 'nearExact', 'higherSpec', 'lowerSpec'] as const)(
-    'caps a %s match when the page never stated a reading',
+    'caps a %s match when the lot has a reading and the page never stated one',
     (given) => {
       // An unknown difference is not the same as no difference.
       expect(gradeForUsage(given, 549752, null)).toBe('similarAlternative');
+    },
+  );
+
+  it.each(['exact', 'nearExact'] as const)(
+    'leaves a %s match alone where usage is not a thing the lot has',
+    (given) => {
+      // A desktop computer has no odometer and never will, so an unknown
+      // reading on a comparable says nothing about it. Capping anyway held
+      // every comparable in a 40 lot IT sale at similarAlternative, nothing
+      // cleared the evidence threshold, and not one lot was valued.
+      expect(gradeForUsage(given, null, null)).toBe(given);
     },
   );
 
