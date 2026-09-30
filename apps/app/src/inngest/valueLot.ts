@@ -88,8 +88,15 @@ export function gradeForUsage(
   lotKilometres: number | null,
   comparableKilometres: number | null,
 ): ReadListing['matchLevel'] {
-  if (comparableKilometres === null) return capForUnknownUsage(given);
+  // Usage only matters where the lot has any. A desktop computer has no
+  // odometer and never will, so an unknown reading on a comparable says
+  // nothing about it.
+  //
+  // This order was the other way round, and it capped every comparable in a
+  // 40 lot IT sale at similarAlternative. Nothing cleared the evidence
+  // threshold and not one lot was valued, on a rule written for cars.
   if (lotKilometres === null) return given;
+  if (comparableKilometres === null) return capForUnknownUsage(given);
   if (usageGap(lotKilometres, comparableKilometres) < MATERIAL_USAGE_GAP) return given;
   return comparableKilometres < lotKilometres ? 'higherSpec' : 'lowerSpec';
 }
