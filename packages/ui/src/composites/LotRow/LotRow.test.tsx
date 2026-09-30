@@ -142,9 +142,24 @@ describe('the most you should bid', () => {
     expect(screen.getByText('$8,499')).toBeTruthy();
   });
 
-  it('says not yet rather than showing nothing', () => {
+  it('says it has not been worked out rather than showing nothing', () => {
     render(<LotRow lot={lot} />);
-    expect(screen.getByText('Not yet')).toBeTruthy();
+    expect(screen.getByText('Not worked out')).toBeTruthy();
+  });
+
+  it('says a lot is below the user target rather than judging it', () => {
+    // A figure of nothing means the lot cannot carry their own profit target
+    // at any price. That is a fact about their target. "Not worth bidding"
+    // would be a recommendation about their money, and MaxBid does not make
+    // those.
+    render(<LotRow lot={{ ...lot, maxBid: 0 }} />);
+    expect(screen.getByText('Below your target')).toBeTruthy();
+  });
+
+  it('never tells the user whether to bid', () => {
+    render(<LotRow lot={{ ...lot, maxBid: 0 }} />);
+    expect(screen.queryByText(/worth bidding/i)).toBeNull();
+    expect(screen.queryByText(/do not bid/i)).toBeNull();
   });
 
   it('shows the rank when the catalogue has been scored', () => {
