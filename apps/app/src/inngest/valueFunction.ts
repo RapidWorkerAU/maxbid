@@ -8,6 +8,7 @@ import { bandForScore, scoreCatalogue, type ScorableLot } from '@maxbid/calc';
 import { createServiceSupabase } from '@maxbid/db/server';
 import { SpendCeilingError } from '../ai/pricing';
 import { inngest, valueRequested } from './client';
+import { lotsWorthValuing } from './shortlist';
 import { assertBudgetLeft } from './triage';
 import { targetBidFor } from './targetBid';
 import { valueLot } from './valueLot';
@@ -18,6 +19,8 @@ const AT_A_TIME = 3;
 /** What we know about a lot before valuing it. */
 type LotToValue = {
   lot_id: string;
+  /** Only used to decide which lots are worth valuing, never to rank them. */
+  lots_current_bid?: number | string | null;
   brand: string | null;
   model: string | null;
   year: number | null;
@@ -183,6 +186,45 @@ export async function readContext(
   };
 }
 
+/**
+ * Every lot's identification, and which of them are worth valuing.
+ *
+ * Apart from the function so it stays inside the line limit, and so the choice
+ * of what to spend fetches on is visible in one place rather than buried in a
+ * step.
+ */
+export async function readLotsToValue(analysisId: string) {
+  const supabase = createServiceSupabase();
+  const { data, error } = await supabase
+    .from('lot_identifications')
+    .select('lot_id, brand, model, year, specs, lots(title, raw, current_bid)')
+    .eq('analysis_id', analysisId)
+    .eq('is_current', true);
+  if (error) throw new Error(`Could not read the identifications: ${error.message}`);
+
+  // Valuing a lot costs a search, a model call and up to four page fetches,
+  // and eight fetches a minute makes a 300 lot catalogue six hours. Every lot
+  // is still identified; only the ones worth bidding on are valued.
+  const all = (data ?? []) as unknown as (LotToValue & {
+    lots: { title: string; raw: unknown; current_bid: number | string | null } | null;
+  })[];
+
+  const worth = new Set(
+    lotsWorthValuing(
+      all.map((lot) => ({
+        lotId: lot.lot_id,
+        currentBid:
+          lot.lots?.current_bid === null || lot.lots?.current_bid === undefined
+            ? null
+            : Number(lot.lots.current_bid),
+        unidentified: !lot.brand && !lot.model,
+      })),
+    ).map((lot) => lot.lotId),
+  );
+
+  return { chosen: all.filter((lot) => worth.has(lot.lot_id)), considered: all.length };
+}
+
 export const valueLots = inngest.createFunction(
   {
     id: 'triage-value',
@@ -201,26 +243,20 @@ export const valueLots = inngest.createFunction(
   async ({ event, step }) => {
     const { analysisId, orgId } = event.data;
 
-    const lots = await step.run('read-identifications', async () => {
-      const supabase = createServiceSupabase();
-      const { data, error } = await supabase
-        .from('lot_identifications')
-        .select('lot_id, brand, model, year, specs, lots(title, raw)')
-        .eq('analysis_id', analysisId)
-        .eq('is_current', true);
-      if (error) throw new Error(`Could not read the identifications: ${error.message}`);
-      return (data ?? []) as unknown as LotToValue[];
-    });
+    const lots = await step.run('read-identifications', async () =>
+      readLotsToValue(analysisId),
+    );
 
     const context = await step.run('read-context', async () =>
       readContext(analysisId, orgId),
     );
 
+    const chosen = lots.chosen;
     let valued = 0;
     let withoutEvidence = 0;
     let stoppedForSpend = false;
 
-    for (let start = 0; start < lots.length; start += AT_A_TIME) {
+    for (let start = 0; start < chosen.length; start += AT_A_TIME) {
       if (stoppedForSpend) break;
 
       const roomLeft = await step.run(`budget-${start}`, async () => {
@@ -238,7 +274,7 @@ export const valueLots = inngest.createFunction(
       }
 
       const results = await Promise.all(
-        lots.slice(start, start + AT_A_TIME).map((lot) =>
+        chosen.slice(start, start + AT_A_TIME).map((lot) =>
           step
             .run(`value-${lot.lot_id}`, async () => ({
               valued: await valueAndStore(lot, { orgId, analysisId }, context),
@@ -269,6 +305,12 @@ export const valueLots = inngest.createFunction(
       if (error) throw new Error(`Could not update the analysis: ${error.message}`);
     });
 
-    return { analysisId, lots: lots.length, valued, withoutEvidence, stoppedForSpend };
+    return {
+      analysisId,
+      considered: lots.considered,
+      valued,
+      withoutEvidence,
+      stoppedForSpend,
+    };
   },
 );
