@@ -131,7 +131,7 @@ export async function valueLot(input: ValueLotInput): Promise<LotValuation> {
   // Past sales first. Decision record 0020: a sold price is weighted 0.95
   // against an asking price at 0.6, so three results are worth more than five
   // listings and cost less to gather.
-  const past = await findAuctionResults(input.subject);
+  const past = await findAuctionResults(input.subject, { exceptLotId: input.where.lotId });
   let pagesFetched = past.pagesFetched;
 
   if (enoughOnTheirOwn(past.results)) {

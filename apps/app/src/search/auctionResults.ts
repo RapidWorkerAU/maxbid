@@ -61,7 +61,7 @@ export function lotPagesAmong(results: SearchResult[], lotPath: RegExp): SearchR
  */
 export async function findAuctionResults(
   subject: QuerySubject,
-  options: { limit?: number; now?: Date } = {},
+  options: { limit?: number; now?: Date; exceptLotId?: string } = {},
 ): Promise<{ results: AuctionResult[]; pagesFetched: number }> {
   const limit = options.limit ?? MOST_RESULTS_PER_LOT;
 
@@ -73,6 +73,7 @@ export async function findAuctionResults(
   const found: AuctionResult[] = await fromOurArchive(subject, {
     limit,
     now: options.now,
+    exceptLotId: options.exceptLotId,
   }).catch(() => []);
   let pagesFetched = 0;
 
