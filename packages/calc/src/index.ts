@@ -9,3 +9,4 @@ export * from './percentile';
 export * from './valuation';
 export * from './confidence';
 export * from './opportunity';
+export * from './accuracy';
