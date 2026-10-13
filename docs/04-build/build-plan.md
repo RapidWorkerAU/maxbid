@@ -39,15 +39,26 @@ Updated at the end of every pull request. The current row is always the one to r
 | 39 | Rank a catalogue on what a lot is worth, not on the current bid | Merged | 29 Sep 2026 |
 | 40 | Rank the list, and show the most you should bid | Merged | 29 Sep 2026 |
 | 41 | Value the lots worth valuing, not every lot | Merged | 30 Sep 2026 |
-| next | Make the valuations accurate enough to bid on | Next |  |
+| 42 | Bring the progress log up to date, including what it got wrong | Merged | 30 Sep 2026 |
+| 43 | Read a premium that is the same at every price | Merged | 30 Sep 2026 |
+| 44 | Apply the usage rule only where usage is a thing the lot has | Merged | 30 Sep 2026 |
+| 45 | State a fact about the user's figures, not a verdict on a lot | Merged | 30 Sep 2026 |
+| 46 | Read our own archive before searching the web for it | Merged | 30 Sep 2026 |
+| 47 | Stop a lot being evidence about itself | Merged | 30 Sep 2026 |
+| 48 | Catalogues are ready before anybody asks for them, decision record 0024 | Merged | 13 Oct 2026 |
+| 49 | Put what a lot is and what it is worth where everybody can read them | Open | |
+| 50 | Record what actually happened, because nothing else can tell us | Open | |
+| next | Read the sitemaps nightly and queue the sales nobody has asked about | Next |  |
 
 **Where we are.** The pipeline runs end to end on a real sale: a pasted Grays link becomes 36 identified lots with a premium schedule, resale ranges, bid figures and a ranking, all on screen. The archive holds what all 36 lots actually sold for, harvested after the sale closed, which is evidence nobody else has.
 
-**What that measurement said.** Twenty two lots were valued and every one of them sold, so the figures can be checked. The median maximum bid was 0.71 times what the lot fetched, which is the safe direction, and one lot came out at 3.93 times, which is not. The error is in the resale estimates rather than the bid maths: two lots were estimated at 2.8 and 3.5 times what they fetched at auction, and one at 0.7. **MaxBid is not yet accurate enough to bid on**, and saying so is more useful than the figures look.
+**What the measurement said.** Twenty two lots were valued and every one of them sold, so the figures can be checked. The median maximum bid was 0.71 times what the lot fetched, which is the safe direction, and one lot came out at 3.93 times, which is not. The error is in the resale estimates rather than the bid maths: two lots were estimated at 2.8 and 3.5 times what they fetched at auction, and one at 0.7. **MaxBid is not yet accurate enough to bid on**, and saying so is more useful than the figures look.
 
-**Why, and what fixes it.** Almost every comparable is an advertised price weighted 0.6, where a sold price is weighted 0.95. The archive has one sale in it. Accuracy is a function of how many sales have been harvested, so it improves over weeks rather than in a sitting. Decision records 0020 and 0021 set that up deliberately.
+**Why, and what fixes it.** Almost every comparable is an advertised price weighted 0.6, where a sold price is weighted 0.95. The archive has one sale in it. Accuracy is a function of how many sales have been harvested, so it improves over weeks rather than in a sitting. Decision records 0020 and 0021 set that up deliberately, and decision record 0024 fills the archive faster by reading every live sale rather than only the ones somebody asked about.
 
-**Blocked and waiting on Ashleigh.** O03 is closed: search is Brave, by decision record 0018. O04, the eBay Marketplace Insights application, is still worth making because approval takes time and sold listings would strengthen the evidence. O11 blocks promoting the waitlist page. The app has never been deployed: there is no Vercel project for apps/app and maxbid.com.au still points at a placeholder.
+**What we are building now.** Decision record 0024. Analysing a catalogue takes forty minutes, almost all of it page fetches for the valuation, so a sale closing tonight cannot be analysed tonight. Most of that work does not depend on who is asking, so MaxBid crawls the sites it reads on a schedule and holds every live lot parsed, identified and valued before anybody asks. A pasted link becomes a lookup, a refresh of the current bids, and a sum. This is a mechanism, not a feature, and nothing in the interface mentions it. Pull request 49 is the shared layer it rests on.
+
+**Blocked and waiting on Ashleigh.** O04, the eBay Marketplace Insights application, is still worth making because approval takes time and sold listings would strengthen the evidence. O11 blocks promoting the waitlist page. The app has never been deployed: there is no Vercel project for apps/app and maxbid.com.au still points at a placeholder. LotRow is In review and needs a Storybook sign off before any further page uses it.
 
 **Open items raised by building.** O17, a catalogue page cut short cannot be detected. O18, a premium band that combines a fixed amount with a percentage, or carries a minimum.
 
