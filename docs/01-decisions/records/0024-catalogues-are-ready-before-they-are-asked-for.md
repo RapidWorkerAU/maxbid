@@ -1,6 +1,6 @@
 # 0024. Catalogues are ready before anybody asks for them
 
-Status: Proposed
+Status: Accepted
 
 Date: 13 October 2026
 
