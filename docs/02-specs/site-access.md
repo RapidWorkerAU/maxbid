@@ -129,3 +129,26 @@ Mercedes ML320 returned none, though Grays has certainly sold both.
 So past results can be read one at a time when a search engine knows about
 them, and there is no index of them to work from. That is the constraint any
 plan for auction evidence has to live inside.
+
+## Crawling on a schedule
+
+Decision record 0024 has MaxBid read every live sale on the sites it works
+with, nightly, rather than only the ones somebody asked about. That is a real
+increase in what we take from sites that owe us nothing, so the rules here
+bind the crawler exactly as they bind an extraction somebody asked for.
+
+1. The rate limit is shared across every stage. Nothing crawls faster because
+   it is a crawler.
+2. The crawl runs overnight in Australian hours, when the sites are quietest.
+3. robots.txt is read and obeyed on every host, every time. A host that will
+   not tell us its rules is still not fetched.
+4. We identify ourselves as MaxBidBot with a contact address, as rule 2 says.
+   Nothing about crawling ahead of time is hidden from the site.
+5. A sale is read once. The nightly job skips what it already holds, so what
+   we take is proportional to what is newly listed rather than to what is
+   live.
+
+The sitemap is how the list is found. Grays publishes one per category, listing
+every live lot and updated daily, so nothing has to be searched for or guessed
+at. Reading a sitemap a site publishes for crawlers is the most polite way
+there is to find out what it has.
