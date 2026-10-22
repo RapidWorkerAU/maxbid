@@ -44,4 +44,9 @@ export const valueRequested = eventType('analysis/value.requested', {
   }>(),
 });
 
+/** A sale somebody is looking at, whose bids are due a re-read. DR 0026. */
+export const bidRefreshRequested = eventType('auction/bids.refresh.requested', {
+  schema: staticSchema<{ auctionId: string }>(),
+});
+
 export const inngest = new Inngest({ id: 'maxbid' });
