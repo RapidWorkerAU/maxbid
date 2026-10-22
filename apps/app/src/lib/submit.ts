@@ -84,15 +84,20 @@ export async function submitAnalysis(
       name: analysisSubmitted.name,
       data: { analysisId: analysis.id, auctionId: auction.id, sourceType: 'url' as const },
     });
-  } catch {
+  } catch (cause) {
     // The analysis row stays. It is a real record of what was asked for, and
     // deleting it would lose the link between the user and the auction we
     // just created for them.
     await supabase.from('analyses').update({ status: 'failed' }).eq('id', analysis.id);
 
+    // The reason comes from the failure rather than from a guess about it.
+    // This used to name the one likely cause, which sends anybody hitting it
+    // for a different reason after the wrong thing.
+    console.error('Could not start the catalogue read', cause);
+    const why = cause instanceof Error ? cause.message : 'The reason was not given.';
+
     return {
-      error:
-        'We could not start the background jobs that read a catalogue, so nothing would have happened. In development, run pnpm dev:jobs and try again.',
+      error: `We could not start the background jobs that read a catalogue, so nothing would have happened. ${why}`,
     };
   }
 

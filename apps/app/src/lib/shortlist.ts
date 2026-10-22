@@ -87,11 +87,18 @@ export async function analyseShortlist(
       name: deepRequested.name,
       data: { analysisId, orgId: analysis.org_id, lotIds },
     });
-  } catch {
+  } catch (cause) {
     // The shortlist is saved either way, so nothing the user chose is lost.
+    //
+    // The reason comes from the failure rather than from a guess about it.
+    // The first version of this said to start the job runner, which was the
+    // likely cause and not the one it had been told, so anybody hitting it
+    // for a different reason would have been sent after the wrong thing.
+    console.error('Could not start the deep analysis', cause);
+    const why = cause instanceof Error ? cause.message : 'The reason was not given.';
+
     return {
-      error:
-        'We saved your shortlist but could not start the analysis. In development, run pnpm dev:jobs and try again.',
+      error: `We saved your shortlist but could not start the analysis. ${why}`,
     };
   }
 
