@@ -157,15 +157,39 @@ function Checkbox({ lot, selected, onSelect }: LotRowProps) {
   );
 }
 
+/**
+ * The longest a condition note can be and still read as a code.
+ *
+ * WOVR-INSPECTED is fourteen characters. A real catalogue put this in the
+ * same field: "HEADLIGHT LENSES HEAVILY YELLOWED AND HAZED. SCUFFS ON THE
+ * FRONT AND REAR BUMPERS..." and on, for a paragraph.
+ */
+const CONDITION_CODE_LENGTH = 24;
+
 function Condition({ note }: { note?: string | null }) {
   if (!note) return null;
+
   // A written off marker is a fact about the lot, not our judgement of it, so
   // it is a bordered tag rather than a zone colour. The zone colours mean go,
   // caution and stop on a bid figure, and one here would say we had decided
-  // something we have not. Space Mono, because it is a code, not a sentence.
+  // something we have not.
+  //
+  // It was written as though the field always held a code, with shrink-0 and
+  // whitespace-nowrap, which is right for one and ruinous for the other: a
+  // paragraph laid itself across the row and over every figure on it.
+  //
+  // A paragraph is not a tag, so it does not become one. The row says there
+  // is a note and the lot's own screen says what it is, which is where there
+  // is room to read it. The full text is on the tag either way, for anyone
+  // hovering.
+  const isCode = note.length <= CONDITION_CODE_LENGTH;
+
   return (
-    <span className="shrink-0 whitespace-nowrap rounded-sm border border-zone-amber px-1 py-px font-mono text-[0.625rem] uppercase leading-tight text-zone-amber">
-      {note}
+    <span
+      title={note}
+      className="min-w-0 max-w-32 shrink truncate rounded-sm border border-zone-amber px-1 py-px font-mono text-[0.625rem] uppercase leading-tight text-zone-amber"
+    >
+      {isCode ? note : 'Condition noted'}
     </span>
   );
 }
