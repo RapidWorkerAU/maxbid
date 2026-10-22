@@ -33,7 +33,18 @@ export type LotRowLot = {
   closesAt?: string | null;
   /** What triage decided the lot is. */
   identifiedAs?: string | null;
-  /** 0 to 100, from the identification. */
+  /**
+   * 0 to 100, in the figures on this row.
+   *
+   * The valuation's confidence, not the identification's. This column used to
+   * carry how sure we were that the lot was a 2008 Range Rover, sitting
+   * between a resale range and a bid figure, where it read as confidence in
+   * the money. On a row that says "Not enough evidence" it then said "High
+   * confidence" beside it, which is two opposite things on one line.
+   *
+   * How sure we are of what the lot is belongs with what the lot is, and the
+   * lot screen shows it there.
+   */
   confidence?: number | null;
   /** Anything the catalogue said about condition, such as a write off marker. */
   conditionNote?: string | null;

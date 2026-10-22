@@ -32,7 +32,32 @@ describe('joining a lot to what triage decided', () => {
     // Postgres numerics come back as strings, and Money needs a number.
     const [row] = toRows([lot], [identification]);
     expect(row?.currentBid).toBe(1609);
-    expect(row?.confidence).toBe(95);
+  });
+
+  it('carries confidence in the figures, not in what the lot is', () => {
+    // The identification's own confidence does not belong in a column that
+    // sits among the money. It read as confidence in the figures, and said
+    // "High confidence" beside "Not enough evidence" on eleven rows of a
+    // real catalogue.
+    const shared = { lot_id: 'lot-1', conservative: '8500.00', optimistic: '22500.00' };
+    const noOverride = {
+      lot_id: 'lot-1',
+      triage_low: null,
+      triage_high: null,
+      triage_max_bid: null,
+      opportunity_score: null,
+    };
+
+    const withRange = toRows(
+      [lot],
+      [identification],
+      [noOverride],
+      [{ ...shared, confidence: '62.00' }],
+    );
+    expect(withRange[0]?.confidence).toBe(62);
+
+    const withoutRange = toRows([lot], [identification]);
+    expect(withoutRange[0]?.confidence).toBeNull();
   });
 
   it('carries what triage decided', () => {

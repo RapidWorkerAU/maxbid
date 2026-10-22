@@ -40,7 +40,7 @@ export async function readCatalogue(
       .eq('analysis_id', analysisId),
     supabase
       .from('triage_valuations')
-      .select('lot_id, conservative, optimistic, lots!inner(auction_id)')
+      .select('lot_id, conservative, optimistic, confidence, lots!inner(auction_id)')
       .eq('lots.auction_id', auctionId)
       .eq('is_current', true),
     // Which lots we have already tried to value and could not. Without this a
