@@ -1,10 +1,15 @@
 // S4 Triage identify, as an Inngest function.
-// Source: docs/02-specs/pipeline.md. F13, decision record 0017.
+// Source: docs/02-specs/pipeline.md. F13, decision records 0017 and 0024.
+//
+// What a lot is does not depend on who is asking, so an identification is the
+// shared baseline every organisation reads, and a lot somebody has already
+// had identified is skipped rather than paid for again.
 
 import { createServiceSupabase } from '@maxbid/db/server';
 import { SpendCeilingError } from '../ai/pricing';
 import { inngest, triageRequested, valueRequested } from './client';
-import { assertBudgetLeft, identifyLot, storeIdentification } from './triage';
+import { alreadyIdentified, storeBaseline } from './sharedIdentification';
+import { assertBudgetLeft, identifyLot } from './triage';
 
 /** How many lots are identified at once. Kind to the API and to the database. */
 const AT_A_TIME = 5;
@@ -14,6 +19,35 @@ function photoFrom(raw: unknown): string | undefined {
   if (typeof raw !== 'object' || raw === null) return undefined;
   const url = (raw as Record<string, unknown>).imageUrl;
   return typeof url === 'string' && url.length > 0 ? url : undefined;
+}
+
+/**
+ * Every lot in the sale, and the ones we cannot already name.
+ *
+ * A lot somebody has already had identified costs nothing here, because what
+ * a lot is does not depend on who is asking. On a sale another organisation
+ * has looked at, or one read by the nightly crawl, `toRead` is empty and this
+ * stage spends nothing at all.
+ *
+ * Returns an array rather than a Set: a step result is serialised on its way
+ * back from Inngest and a Set does not survive that.
+ */
+async function readLots(auctionId: string) {
+  const supabase = createServiceSupabase();
+  const { data, error } = await supabase
+    .from('lots')
+    .select('id, lot_number, title, raw')
+    .eq('auction_id', auctionId)
+    .order('lot_number');
+  if (error) throw new Error(`Could not read the lots: ${error.message}`);
+
+  const all = data ?? [];
+  const known = await alreadyIdentified(all.map((lot) => lot.id));
+  return {
+    all,
+    known: [...known],
+    toRead: all.filter((lot) => !known.has(lot.id)),
+  };
 }
 
 export const triage = inngest.createFunction(
@@ -34,16 +68,8 @@ export const triage = inngest.createFunction(
   async ({ event, step }) => {
     const { analysisId, auctionId, orgId } = event.data;
 
-    const lots = await step.run('read-lots', async () => {
-      const supabase = createServiceSupabase();
-      const { data, error } = await supabase
-        .from('lots')
-        .select('id, lot_number, title, raw')
-        .eq('auction_id', auctionId)
-        .order('lot_number');
-      if (error) throw new Error(`Could not read the lots: ${error.message}`);
-      return data ?? [];
-    });
+    const read = await step.run('read-lots', async () => readLots(auctionId));
+    const lots = read.toRead;
 
     let identified = 0;
     let failed = 0;
@@ -76,7 +102,7 @@ export const triage = inngest.createFunction(
           step
             .run(`identify-${lot.lot_number}`, async () => {
               const result = await identifyLot(lot, { orgId, analysisId }, photoFrom(lot.raw));
-              await storeIdentification(analysisId, result);
+              await storeBaseline(result);
               return { ok: true as const, usedPhoto: result.usedPhoto };
             })
             // One lot that cannot be read must not stop the other 299. The
@@ -108,13 +134,27 @@ export const triage = inngest.createFunction(
 
     // S5 works out what each lot is worth. Not sent when triage stopped for
     // spend, because the ceiling is a limit on the analysis and not on a stage.
-    if (!stoppedForSpend && identified > 0) {
+    //
+    // The test is how many lots we can now name, not how many this run named.
+    // A sale where every lot was already identified names none and still has
+    // everything the valuation stage needs, and reading `identified` here
+    // would have left exactly that sale with no valuation at all.
+    const nameable = read.known.length + identified;
+    if (!stoppedForSpend && nameable > 0) {
       await step.sendEvent('start-valuation', {
         name: valueRequested.name,
         data: { analysisId, orgId },
       });
     }
 
-    return { analysisId, lots: lots.length, identified, failed, withPhoto, stoppedForSpend };
+    return {
+      analysisId,
+      lots: read.all.length,
+      identified,
+      alreadyKnown: read.known.length,
+      failed,
+      withPhoto,
+      stoppedForSpend,
+    };
   },
 );

@@ -15,6 +15,7 @@ import { bandForScore, scoreCatalogue, type ScorableLot } from '@maxbid/calc';
 import { createServiceSupabase } from '@maxbid/db/server';
 import { SpendCeilingError } from '../ai/pricing';
 import { inngest, valueRequested } from './client';
+import { identificationsFor } from './sharedIdentification';
 import { lotsWorthValuing } from './shortlist';
 import { storedRangesFor, VALUATION_METHOD_VERSION, type SharedRange } from './sharedValuation';
 import { assertBudgetLeft } from './triage';
@@ -118,14 +119,28 @@ export async function readContext(analysisId: string, orgId: string): Promise<Va
  */
 export async function readLotsToValue(analysisId: string) {
   const supabase = createServiceSupabase();
-  const { data, error } = await supabase
-    .from('lot_identifications')
-    .select('lot_id, brand, model, year, specs, confidence, stage, lots(title, raw, current_bid)')
-    .eq('analysis_id', analysisId)
-    .eq('is_current', true);
-  if (error) throw new Error(`Could not read the identifications: ${error.message}`);
 
-  const all = (data ?? []) as unknown as (LotToValue & {
+  // The identifications belong to the lots, not to this analysis, so the
+  // auction is what says which ones to read. Decision record 0024.
+  const { data: analysis, error: missing } = await supabase
+    .from('analyses')
+    .select('auction_id')
+    .eq('id', analysisId)
+    .single();
+  if (missing) throw new Error(`Could not read the analysis: ${missing.message}`);
+
+  const identifications = await identificationsFor(analysis.auction_id, analysisId);
+  const { data, error } = await supabase
+    .from('lots')
+    .select('id, title, raw, current_bid')
+    .eq('auction_id', analysis.auction_id);
+  if (error) throw new Error(`Could not read the lots: ${error.message}`);
+
+  const lotById = new Map((data ?? []).map((lot) => [lot.id, lot]));
+  const all = identifications.map((row) => ({
+    ...row,
+    lots: lotById.get(row.lot_id) ?? null,
+  })) as unknown as (LotToValue & {
     lots: { title: string; raw: unknown; current_bid: number | string | null } | null;
   })[];
 
