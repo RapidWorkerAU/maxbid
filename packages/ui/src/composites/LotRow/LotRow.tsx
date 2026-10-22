@@ -205,7 +205,11 @@ export function LotRow({
     <div
       // relative, because the link on the title stretches to cover the whole
       // row. See the link itself for why it is done that way.
-      className={`relative grid grid-cols-[auto_1fr] items-center gap-x-3 gap-y-1 border-b border-line/40 px-3 py-2.5 text-base last:border-b-0 hover:bg-surface-muted md:gap-y-0 md:py-0 md:text-[0.9375rem] ${LOT_COLUMNS} ${ROW_HEIGHT[density]} ${className}`}
+      //
+      // No hover tint. A background behind the row dropped the write off tag
+      // to 4.25 against 4.5, and the amber only passes on the page colour. The
+      // underlined title is the hover signal instead.
+      className={`relative grid grid-cols-[auto_1fr] items-center gap-x-3 gap-y-1 border-b border-line/40 px-3 py-2.5 text-base last:border-b-0 md:gap-y-0 md:py-0 md:text-[0.9375rem] ${LOT_COLUMNS} ${ROW_HEIGHT[density]} ${className}`}
     >
       <Checkbox lot={lot} selected={selected} onSelect={onSelect} />
 

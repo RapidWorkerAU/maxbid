@@ -90,7 +90,7 @@ describe('when we cannot say', () => {
         comparables={[]}
       />,
     );
-    expect(screen.getByText(/could not find enough comparable sales/)).toBeTruthy();
+    expect(screen.getByText(/could not find any sales of this item/)).toBeTruthy();
   });
 
   it('says a lot we could not identify has no range and no bid figure', () => {
@@ -137,5 +137,47 @@ describe('the product rules', () => {
   it('uses no dashes in its copy, as the writing rules require', () => {
     const { container } = render(<LotDetail {...base} />);
     expect(container.textContent).not.toMatch(/[–—]/);
+  });
+});
+
+describe('when we found sales but not enough of them', () => {
+  const noRange = {
+    ...base,
+    valuation: { conservative: null, expected: null, optimistic: null },
+  };
+
+  it('says how many it found rather than implying none', () => {
+    // A real run found four sales of a 1998 Landcruiser and showed "We have
+    // not found any comparable sales for this lot yet". A reader who owns one
+    // knows that is not true, and it reads as a broken product rather than a
+    // careful one.
+    render(<LotDetail {...noRange} />);
+    expect(screen.getByText(/We found 1 possible comparable sale,/)).toBeTruthy();
+    expect(screen.getByText(/not enough to put a resale figure/)).toBeTruthy();
+  });
+
+  it('counts in the plural when there is more than one', () => {
+    const three = {
+      ...noRange,
+      comparables: [...Array(3)].map((_, i) => ({ ...base.comparables[0]!, id: `c${i}` })),
+    };
+    render(<LotDetail {...three} />);
+    expect(screen.getByText(/We found 3 possible comparable sales/)).toBeTruthy();
+  });
+
+  it('still shows them, because they are the answer to why there is no figure', () => {
+    render(<LotDetail {...noRange} />);
+    expect(screen.getByText('$18,500')).toBeTruthy();
+  });
+
+  it('says plainly that it found nothing, where it found nothing', () => {
+    render(<LotDetail {...noRange} comparables={[]} />);
+    expect(screen.getByText(/could not find any sales of this item/)).toBeTruthy();
+  });
+
+  it('explains what a comparable is only where none were found', () => {
+    // Where they are listed below, the list is the explanation.
+    render(<LotDetail {...noRange} comparables={[]} />);
+    expect(screen.getByText(/A comparable is a sale of the same or a similar item/)).toBeTruthy();
   });
 });
