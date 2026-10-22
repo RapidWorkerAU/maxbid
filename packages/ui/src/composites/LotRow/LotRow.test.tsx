@@ -329,3 +329,43 @@ describe('what the confidence column is confidence in', () => {
     expect(container.textContent).not.toMatch(/confidence/i);
   });
 });
+
+describe('a condition note that is a paragraph, not a code', () => {
+  // A real catalogue put a whole paragraph in the field a WOVR marker uses.
+  // The tag was written with shrink-0 and whitespace-nowrap, so it laid
+  // itself across the row and over every figure on it.
+  const paragraph =
+    'HEADLIGHT LENSES HEAVILY YELLOWED AND HAZED. SCUFFS ON THE FRONT AND REAR BUMPERS. DRIVERS SIDE REAR DOOR EDGE IS SCRAPED.';
+
+  it('shows a short code as itself', () => {
+    render(<LotRow lot={{ ...lot, conditionNote: 'WOVR-INSPECTED' }} />);
+    expect(screen.getByText('WOVR-INSPECTED')).toBeTruthy();
+  });
+
+  it('says a paragraph is a note rather than printing it across the row', () => {
+    render(<LotRow lot={{ ...lot, conditionNote: paragraph }} />);
+    expect(screen.getByText('Condition noted')).toBeTruthy();
+    expect(screen.queryByText(paragraph)).toBeNull();
+  });
+
+  it('keeps the full text available on the tag', () => {
+    // The row says there is a note. The lot's own screen says what it is,
+    // which is where there is room to read it.
+    const { container } = render(<LotRow lot={{ ...lot, conditionNote: paragraph }} />);
+    expect(container.querySelector(`[title="${paragraph}"]`)).toBeTruthy();
+  });
+
+  it('never lets the tag push the row open', () => {
+    const { container } = render(<LotRow lot={{ ...lot, conditionNote: paragraph }} />);
+    const tag = container.querySelector(`[title="${paragraph}"]`)!;
+    expect(tag.className).toContain('truncate');
+    expect(tag.className).not.toContain('shrink-0');
+    expect(tag.className).not.toContain('whitespace-nowrap');
+  });
+
+  it('still renders the title beside it', () => {
+    // The paragraph used to cover the link, so the lot could not be opened.
+    render(<LotRow lot={{ ...lot, conditionNote: paragraph }} href="/analysis/a1/lot/l1" />);
+    expect(screen.getByRole('link').textContent).toBe('2015 Invented Wagon Alpha Diesel');
+  });
+});

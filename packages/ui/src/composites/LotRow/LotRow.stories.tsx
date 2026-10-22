@@ -339,3 +339,22 @@ export const StillBeingValued: Story = {
 export const LookedAndFoundTooLittle: Story = {
   args: { lot: { ...partway, pending: null } },
 };
+
+/**
+ * A real catalogue put a whole paragraph in the field a WOVR marker uses. The
+ * tag used to lay itself across the row and over every figure on it, and over
+ * the link, so the lot could not be opened. The row says there is a note; the
+ * lot's own screen says what it is.
+ */
+export const ConditionNoteIsAParagraph: Story = {
+  args: {
+    lot: {
+      ...partway,
+      resaleLow: 4100,
+      resaleHigh: 12420,
+      maxBid: 1583,
+      conditionNote:
+        'HEADLIGHT LENSES HEAVILY YELLOWED AND HAZED. SCUFFS ON THE FRONT AND REAR BUMPERS. DRIVERS SIDE REAR DOOR EDGE IS SCRAPED. PAINT CHIPS THROUGHOUT.',
+    },
+  },
+};
