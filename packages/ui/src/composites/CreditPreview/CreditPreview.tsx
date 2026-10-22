@@ -23,6 +23,18 @@ export type CreditPreviewProps = {
   /** Credits the organisation has left. */
   available: number;
   onConfirm?: () => void;
+  /** What the button says. The default promises a deep analysis. */
+  confirmLabel?: string;
+  /** What the button says while it is working. */
+  confirmingLabel?: string;
+  /**
+   * What confirming will actually do, where that is not what it sounds like.
+   *
+   * Deep analysis is Week 5 and is not built, so today the button saves a
+   * shortlist and spends nothing. A bar that said "Analyse these lots" and
+   * then did not would be worse than one that says what it can.
+   */
+  note?: string;
   /** True while the shortlist is being sent, so it cannot be sent twice. */
   confirming?: boolean;
   className?: string;
@@ -32,6 +44,9 @@ export function CreditPreview({
   selected,
   available,
   onConfirm,
+  confirmLabel,
+  confirmingLabel = 'Starting',
+  note,
   confirming = false,
   className = '',
 }: CreditPreviewProps) {
@@ -63,6 +78,7 @@ export function CreditPreview({
               ? `You have ${credits(cost.available)} and would have ${credits(cost.remaining)} left.`
               : `You have ${credits(cost.available)}, so you need ${credits(cost.shortfall)} more before you can analyse these.`}
           </p>
+          {note ? <p className="mt-1 font-sans text-sm text-ink-muted">{note}</p> : null}
         </div>
 
         <Button
@@ -70,7 +86,9 @@ export function CreditPreview({
           onClick={onConfirm}
           disabled={!cost.affordable || confirming || !onConfirm}
         >
-          {confirming ? 'Starting' : `Analyse ${cost.lots === 1 ? 'this lot' : 'these lots'}`}
+          {confirming
+            ? confirmingLabel
+            : (confirmLabel ?? `Analyse ${cost.lots === 1 ? 'this lot' : 'these lots'}`)}
         </Button>
       </div>
     </div>

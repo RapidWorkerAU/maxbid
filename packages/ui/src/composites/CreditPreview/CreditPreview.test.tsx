@@ -81,3 +81,44 @@ describe('confirming', () => {
     expect(screen.getByRole('button')).toHaveProperty('disabled', true);
   });
 });
+
+describe('saying what confirming will actually do', () => {
+  it('uses the label the caller gives it', () => {
+    // Deep analysis is not built, so today the button saves a shortlist. A
+    // bar that said "Analyse these lots" and then did not would be worse
+    // than one that says what it can.
+    render(
+      <CreditPreview
+        selected={3}
+        available={10}
+        onConfirm={() => {}}
+        confirmLabel="Save to your shortlist"
+      />,
+    );
+    expect(screen.getByRole('button').textContent).toBe('Save to your shortlist');
+  });
+
+  it('shows the note explaining what will and will not happen', () => {
+    render(
+      <CreditPreview
+        selected={3}
+        available={10}
+        onConfirm={() => {}}
+        note="It does not spend any credits."
+      />,
+    );
+    expect(screen.getByText('It does not spend any credits.')).toBeTruthy();
+  });
+
+  it('says what it is doing while it does it', () => {
+    render(
+      <CreditPreview selected={3} available={10} confirming confirmingLabel="Saving" />,
+    );
+    expect(screen.getByRole('button').textContent).toBe('Saving');
+  });
+
+  it('still promises an analysis when nobody says otherwise', () => {
+    render(<CreditPreview selected={3} available={10} onConfirm={() => {}} />);
+    expect(screen.getByRole('button').textContent).toBe('Analyse these lots');
+  });
+});
