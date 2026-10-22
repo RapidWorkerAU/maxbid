@@ -49,7 +49,8 @@ const REASONS = {
   INNGEST_SIGNING_KEY: 'hosted Inngest calling us back, not needed for the Dev Server',
   NEXT_PUBLIC_APP_URL: 'the link in a magic link email',
   NEXT_PUBLIC_SITE_URL: 'canonical URLs on the public site',
-  INNGEST_DEV: 'set to 1 locally, or the SDK rejects the Inngest Dev Server as unsigned',
+  INNGEST_DEV:
+    'set to 1 locally, or the SDK rejects the Inngest Dev Server as unsigned. 1 means the default port 8288, which is why pnpm dev:jobs pins that port rather than letting the CLI move to a free one',
 };
 
 function read(path) {

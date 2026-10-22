@@ -67,7 +67,18 @@ export type LotRowProps = {
  * catalogue title is the longest thing on the row.
  */
 export const LOT_COLUMNS =
-  'md:grid-cols-[1.75rem_3rem_7.5rem_minmax(0,1.8fr)_minmax(0,1fr)_6rem_9rem_7rem_7rem]';
+  'md:grid-cols-[1.75rem_3rem_7.5rem_minmax(0,1.8fr)_minmax(0,1fr)_6rem_9rem_7rem_7rem_8rem]';
+
+/**
+ * How many cells a row and the heading above it must each render.
+ *
+ * There were ten cells and nine columns, so the tenth wrapped onto a second
+ * implicit row: the Closes heading sat under Rank, and every lot's closing
+ * time sat on a line of its own under the row it belonged to. It looked like
+ * a styling problem and was a counting one, which is why a test counts them
+ * now rather than measuring them.
+ */
+export const LOT_CELL_COUNT = 10;
 
 const ROW_HEIGHT = {
   standard: 'md:h-row',
@@ -101,7 +112,9 @@ function Checkbox({ lot, selected, onSelect }: LotRowProps) {
       // The lot number alone would read as a string of digits, so the label
       // names what is being chosen.
       aria-label={`Shortlist lot ${lot.lotNumber}, ${lot.title}`}
-      className="size-4 shrink-0 rounded-sm accent-marker"
+      // Above the link stretched across the row, so shortlisting a lot does
+      // not open it instead.
+      className="relative z-10 size-4 shrink-0 rounded-sm accent-marker"
     />
   );
 }
@@ -190,7 +203,13 @@ export function LotRow({
 
   return (
     <div
-      className={`grid grid-cols-[auto_1fr] items-center gap-x-3 gap-y-1 border-b border-line/40 px-3 py-2.5 text-base last:border-b-0 md:gap-y-0 md:py-0 md:text-[0.9375rem] ${LOT_COLUMNS} ${ROW_HEIGHT[density]} ${className}`}
+      // relative, because the link on the title stretches to cover the whole
+      // row. See the link itself for why it is done that way.
+      //
+      // No hover tint. A background behind the row dropped the write off tag
+      // to 4.25 against 4.5, and the amber only passes on the page colour. The
+      // underlined title is the hover signal instead.
+      className={`relative grid grid-cols-[auto_1fr] items-center gap-x-3 gap-y-1 border-b border-line/40 px-3 py-2.5 text-base last:border-b-0 md:gap-y-0 md:py-0 md:text-[0.9375rem] ${LOT_COLUMNS} ${ROW_HEIGHT[density]} ${className}`}
     >
       <Checkbox lot={lot} selected={selected} onSelect={onSelect} />
 
@@ -208,15 +227,23 @@ export function LotRow({
       {/* Item. The longest thing on the row, so it gets the largest share and
           truncates rather than pushing everything else out of line.
 
-          The title is the link to the lot, where the evidence behind every
-          figure on this row is shown. It is the title rather than the whole
-          row so that the shortlist checkbox stays usable, and so a reader
-          dragging to select a figure does not navigate away. */}
+          The whole row opens the lot, which is what a reader expects of a list
+          like this. It is done with one real link on the title stretched over
+          the row by its own ::after, rather than by wrapping the row in a link
+          or giving it a click handler.
+
+          A link around the row would put a checkbox inside a link, which no
+          browser handles sensibly. A click handler would make the row a client
+          component for something a link already does, and would leave it
+          unreachable by keyboard. This way the row has exactly one thing in
+          the tab order and one thing a screen reader announces, and the
+          checkbox sits above the stretched area so it still takes its own
+          clicks. */}
       <div className="col-start-2 flex min-w-0 items-center gap-2 md:col-start-auto">
         {href ? (
           <a
             href={href}
-            className="truncate font-sans font-semibold text-link underline"
+            className="truncate font-sans font-semibold text-link underline after:absolute after:inset-0 after:content-['']"
             title={lot.title}
           >
             {lot.title}

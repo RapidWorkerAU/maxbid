@@ -137,9 +137,26 @@ export async function valueAndStore(
     confirmed: lot.stage === 'user',
   });
 
-  // Nothing worth storing. Record that we tried, so the next analysis and the
-  // nightly crawl do not pay for the same search, model call and page fetches
-  // to reach the same answer. O19.
+  // The evidence, whether or not it was enough.
+  //
+  // It used to be stored only when a range came out, so a lot that found four
+  // sales and fell short of the weight rule showed "We have not found any
+  // comparable sales for this lot yet", which was not true. We had found
+  // them. We had thrown them away.
+  //
+  // What we looked at is the answer to why there is no figure, and that is
+  // exactly when a reader most wants to see it. F59.
+  if (lot.id) {
+    try {
+      await storeEvidence(lot.id, result);
+    } catch {
+      // A valuation that cannot keep its working is still a valuation.
+    }
+  }
+
+  // Not enough to stand behind. Record that we tried, so the next analysis
+  // and the nightly crawl do not pay for the same search, model call and page
+  // fetches to reach the same answer. O19.
   if (!range) {
     await recordFailedAttempt(lot.lot_id, result.valuation);
     return null;
@@ -147,21 +164,6 @@ export async function valueAndStore(
 
   await storeRange(lot.lot_id, range);
   await applyRange(lot.lot_id, range, where, context);
-
-  // The evidence behind the figure, which is what makes it something the
-  // reader can check rather than take on trust. F59.
-  //
-  // After the range, and never in front of it. The range is what the user came
-  // for, and losing it because a comparable would not store would be the wrong
-  // way round. The screen says there are no comparable sales to show, which is
-  // true and is better than no figure at all.
-  if (lot.id) {
-    try {
-      await storeEvidence(lot.id, result);
-    } catch {
-      // Nothing to do about it here. The valuation stands.
-    }
-  }
 
   return range;
 }

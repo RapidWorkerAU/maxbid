@@ -14,7 +14,10 @@ import { supabaseServer } from './supabase';
 
 export type SubmitResult = { error: string } | null;
 
-export async function submitAnalysis(_previous: SubmitResult, form: FormData): Promise<SubmitResult> {
+export async function submitAnalysis(
+  _previous: SubmitResult,
+  form: FormData,
+): Promise<SubmitResult> {
   const rawUrl = String(form.get('url') ?? '').trim();
 
   const platform = detectPlatform(rawUrl);
@@ -72,10 +75,26 @@ export async function submitAnalysis(_previous: SubmitResult, form: FormData): P
     return { error: 'We could not start that analysis. Please try again.' };
   }
 
-  await inngest.send({
-    name: analysisSubmitted.name,
-    data: { analysisId: analysis.id, auctionId: auction.id, sourceType: 'url' as const },
-  });
+  // Everything slow happens in the background, so a job runner that cannot be
+  // reached means nothing will happen at all. Saying so beats a stack trace,
+  // and beats sending the user to an analysis page that will sit at nought per
+  // cent forever with no explanation.
+  try {
+    await inngest.send({
+      name: analysisSubmitted.name,
+      data: { analysisId: analysis.id, auctionId: auction.id, sourceType: 'url' as const },
+    });
+  } catch {
+    // The analysis row stays. It is a real record of what was asked for, and
+    // deleting it would lose the link between the user and the auction we
+    // just created for them.
+    await supabase.from('analyses').update({ status: 'failed' }).eq('id', analysis.id);
+
+    return {
+      error:
+        'We could not start the background jobs that read a catalogue, so nothing would have happened. In development, run pnpm dev:jobs and try again.',
+    };
+  }
 
   redirect(`/analysis/${analysis.id}`);
 }

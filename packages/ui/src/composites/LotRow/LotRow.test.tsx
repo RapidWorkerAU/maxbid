@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import { LotRow, closesIn, type LotRowLot } from './LotRow';
+import { LOT_CELL_COUNT, LOT_COLUMNS, LotRow, closesIn, type LotRowLot } from './LotRow';
 
 const lot: LotRowLot = {
   id: '1',
@@ -197,5 +197,59 @@ describe('linking to the lot', () => {
   it('keeps the title on one line even as a link', () => {
     render(<LotRow lot={lot} href="/analysis/a1/lot/l1" />);
     expect(screen.getByRole('link').className).toContain('truncate');
+  });
+});
+
+describe('the row and its heading line up', () => {
+  // There were ten cells and nine columns, so the tenth wrapped onto a second
+  // implicit row: the Closes heading sat under Rank, and every lot's closing
+  // time sat on a line of its own under the row it belonged to. Counting is
+  // what catches that, because every cell was styled correctly.
+  it('declares as many columns as a row has cells', () => {
+    const columns = LOT_COLUMNS.match(/\[(.+)\]/)![1]!.split('_').length;
+    expect(columns).toBe(LOT_CELL_COUNT);
+  });
+
+  it('renders exactly that many cells, shortlist or not', () => {
+    const { container } = render(<LotRow lot={lot} />);
+    const row = container.firstElementChild!;
+    expect(row.children).toHaveLength(LOT_CELL_COUNT);
+  });
+
+  it('renders the same number when the list shortlists', () => {
+    const { container } = render(<LotRow lot={lot} onSelect={() => {}} />);
+    expect(container.firstElementChild!.children).toHaveLength(LOT_CELL_COUNT);
+  });
+
+  it('keeps the count when a lot has no closing time or score', () => {
+    const bare = { id: '2', lotNumber: '0002-1', title: 'A lot' };
+    const { container } = render(<LotRow lot={bare} />);
+    expect(container.firstElementChild!.children).toHaveLength(LOT_CELL_COUNT);
+  });
+});
+
+describe('opening a lot from the row', () => {
+  it('stretches the title link across the whole row', () => {
+    // A reader expects to click anywhere on the row. One real link stretched
+    // by its own ::after does that without putting a checkbox inside a link
+    // and without a click handler the keyboard cannot reach.
+    render(<LotRow lot={lot} href="/analysis/a1/lot/l1" />);
+    expect(screen.getByRole('link').className).toContain('after:inset-0');
+  });
+
+  it('positions the row so the stretched link has something to cover', () => {
+    const { container } = render(<LotRow lot={lot} href="/analysis/a1/lot/l1" />);
+    expect(container.firstElementChild!.className).toContain('relative');
+  });
+
+  it('keeps one thing in the tab order, not ten', () => {
+    render(<LotRow lot={lot} href="/analysis/a1/lot/l1" />);
+    expect(screen.getAllByRole('link')).toHaveLength(1);
+  });
+
+  it('keeps the checkbox above the stretched link', () => {
+    // Otherwise shortlisting a lot would open it instead.
+    render(<LotRow lot={lot} href="/analysis/a1/lot/l1" onSelect={() => {}} />);
+    expect(screen.getByRole('checkbox').className).toContain('z-10');
   });
 });

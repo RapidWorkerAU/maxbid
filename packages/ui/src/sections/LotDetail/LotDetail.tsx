@@ -88,8 +88,26 @@ function Identification({ lot }: { lot: LotDetailLot }) {
   );
 }
 
+/**
+ * What there is to say when we have no range.
+ *
+ * "We could not find enough comparable sales" read as "we found nothing" on a
+ * lot where we had found four and they were below the weight the evidence
+ * rule asks for. Those are different statements, and a reader who owns a 1998
+ * Landcruiser knows perfectly well that sales of them exist. Saying how many
+ * we found, and that they were not enough rather than not there, is the
+ * difference between a limitation and a bug.
+ */
+function whyNoRange(found: number): string {
+  if (found === 0) {
+    return 'We could not find any sales of this item to compare it against, so we cannot say what it resells for. A comparable is a sale of the same or a similar item that we use as evidence.';
+  }
+  const sales = found === 1 ? '1 possible comparable sale' : `${found} possible comparable sales`;
+  return `We found ${sales}, which is not enough to put a resale figure on this lot. They are listed below with the weight each one carried. A sold price counts for more than an advertised one, a closer match counts for more than a rough one, and a recent price counts for more than an old one.`;
+}
+
 /** What we think it resells for, and how sure we are. */
-function Resale({ valuation }: { valuation: LotDetailValuation }) {
+function Resale({ valuation, found }: { valuation: LotDetailValuation; found: number }) {
   const hasRange = valuation.conservative !== null && valuation.optimistic !== null;
 
   return (
@@ -113,10 +131,7 @@ function Resale({ valuation }: { valuation: LotDetailValuation }) {
           ) : null}
         </>
       ) : (
-        <p className="font-sans text-sm text-ink-muted">
-          We could not find enough comparable sales to say what this lot resells for. A comparable
-          is a sale of the same or a similar item that we use as evidence.
-        </p>
+        <p className="font-sans text-sm text-ink-muted">{whyNoRange(found)}</p>
       )}
     </DetailCard>
   );
@@ -141,7 +156,7 @@ function Evidence({ comparables }: { comparables: Comparable[] }) {
         </>
       ) : (
         <p className="font-sans text-sm text-ink-muted">
-          We have not found any comparable sales for this lot yet.
+          We have not found any sales of this item to compare it against yet.
         </p>
       )}
     </DetailCard>
@@ -186,7 +201,7 @@ export function LotDetail({
         />
       </DetailCard>
 
-      <Resale valuation={valuation} />
+      <Resale valuation={valuation} found={comparables.length} />
       <Evidence comparables={comparables} />
 
       <DetailCard label="Your figures" heading="What this means for you">

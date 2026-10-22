@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { TriageTable } from './TriageTable';
-import type { LotRowLot } from '../../composites/LotRow';
+import { LOT_CELL_COUNT, LOT_COLUMNS, type LotRowLot } from '../../composites/LotRow';
 
 const lots: LotRowLot[] = [
   {
@@ -41,7 +41,9 @@ describe('the list of lots', () => {
 
   it('shows the name of the sale when it has one', () => {
     render(<TriageTable lots={lots} caption="Invented Perth Motor Vehicle Auction" />);
-    expect(screen.getByRole('heading', { name: 'Invented Perth Motor Vehicle Auction' })).toBeTruthy();
+    expect(
+      screen.getByRole('heading', { name: 'Invented Perth Motor Vehicle Auction' }),
+    ).toBeTruthy();
   });
 });
 
@@ -111,5 +113,35 @@ describe('an empty catalogue', () => {
   it('counts nothing, because there is nothing to count', () => {
     render(<TriageTable lots={[]} />);
     expect(screen.queryByText(/0 lots/)).toBeNull();
+  });
+});
+
+describe('the heading row lines up with the lots under it', () => {
+  it('renders one heading cell per column', () => {
+    // The Closes heading used to wrap onto a second line under Rank, because
+    // there were ten headings and nine columns. Every heading was styled
+    // correctly; there was simply one too many.
+    const { container } = render(<TriageTable lots={lots} />);
+    const headings = container.querySelector('.sticky')!;
+    expect(headings.children).toHaveLength(LOT_CELL_COUNT);
+  });
+
+  it('gives the heading row the same columns as the lots', () => {
+    const { container } = render(<TriageTable lots={lots} />);
+    expect(container.querySelector('.sticky')!.className).toContain(LOT_COLUMNS);
+  });
+});
+
+describe('linking each lot to its own screen', () => {
+  it('links every lot when told where they live', () => {
+    render(<TriageTable lots={lots} hrefFor={(id) => `/analysis/a1/lot/${id}`} />);
+    const links = screen.getAllByRole('link');
+    expect(links).toHaveLength(lots.length);
+    expect(links[0]!.getAttribute('href')).toBe('/analysis/a1/lot/1');
+  });
+
+  it('links nothing when there is nowhere to go', () => {
+    render(<TriageTable lots={lots} />);
+    expect(screen.queryAllByRole('link')).toHaveLength(0);
   });
 });
