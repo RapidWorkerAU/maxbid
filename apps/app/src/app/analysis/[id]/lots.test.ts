@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { bidsCheckedNoteFor, describeIdentification, pendingNoteFor, toRows } from './lots';
+import {
+  bidFreshnessNote,
+  bidsCheckedNoteFor,
+  describeIdentification,
+  pendingNoteFor,
+  toRows,
+} from './lots';
 
 const lot = {
   id: 'lot-1',
@@ -278,5 +284,59 @@ describe('saying when we last checked the bids', () => {
     for (const minutes of [0, 5, 90, 60 * 24 * 2]) {
       expect(bidsCheckedNoteFor([ago(minutes)], now)).not.toMatch(/[-–—]/);
     }
+  });
+});
+
+describe('a sale that has already closed', () => {
+  const now = new Date('2026-10-22T12:00:00.000Z');
+  const ago = (minutes: number) => new Date(now.getTime() - minutes * 60_000).toISOString();
+
+  it('says the bids are the last we read rather than dating them', () => {
+    // A closed sale's bids cannot move. Warning they may be out of date would
+    // mislead the other way: these are what the lots finished on.
+    const note = bidsCheckedNoteFor([ago(60 * 24 * 4)], now, true)!;
+    expect(note).toContain('This sale has closed');
+    expect(note).not.toContain('out of date');
+  });
+
+  it('still says nothing when we never read a bid', () => {
+    expect(bidsCheckedNoteFor([null], now, true)).toBeUndefined();
+  });
+
+  it('dates the bids while the sale is still running', () => {
+    expect(bidsCheckedNoteFor([ago(30)], now, false)).toContain('30 minutes ago');
+  });
+});
+
+describe('the freshness sentence the screen actually uses', () => {
+  const now = new Date('2026-10-22T12:00:00.000Z');
+  const at = (hours: number) => new Date(now.getTime() + hours * 3_600_000).toISOString();
+  const ago = (minutes: number) => new Date(now.getTime() - minutes * 60_000).toISOString();
+
+  it('treats the sale as closed only when every lot has closed', () => {
+    // One lot still running means the sale is still running, and the bids on
+    // every lot in it can still move.
+    const mixed = [
+      { closes_at: at(-1), bid_checked_at: ago(20) },
+      { closes_at: at(3), bid_checked_at: ago(20) },
+    ];
+    expect(bidFreshnessNote(mixed, now)).toContain('20 minutes ago');
+
+    const allClosed = [
+      { closes_at: at(-1), bid_checked_at: ago(20) },
+      { closes_at: at(-2), bid_checked_at: ago(20) },
+    ];
+    expect(bidFreshnessNote(allClosed, now)).toContain('This sale has closed');
+  });
+
+  it('treats an unknown closing time as still running', () => {
+    // We cannot say a sale has ended on the strength of not knowing when it
+    // ends, and claiming these were the final bids would be a guess.
+    const unknown = [{ closes_at: null, bid_checked_at: ago(20) }];
+    expect(bidFreshnessNote(unknown, now)).toContain('20 minutes ago');
+  });
+
+  it('says nothing for a catalogue with no lots', () => {
+    expect(bidFreshnessNote([], now)).toBeUndefined();
   });
 });

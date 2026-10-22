@@ -177,12 +177,20 @@ const JUST_NOW_SECONDS = 60;
 export function bidsCheckedNoteFor(
   checkedAt: (string | null)[],
   now: Date = new Date(),
+  hasClosed = false,
 ): string | undefined {
   const times = checkedAt
     .filter((value): value is string => Boolean(value))
     .map((value) => new Date(value).getTime())
     .filter((value) => Number.isFinite(value));
   if (times.length === 0) return undefined;
+
+  // A closed sale is a different statement. Its bids cannot move, so dating
+  // them and warning they may be out of date would be misleading the other
+  // way: these are what the lots finished on, not a figure going stale.
+  if (hasClosed) {
+    return 'This sale has closed, so these are the last bids we read before it ended.';
+  }
 
   // The oldest, not the newest. A list is only as current as its stalest row,
   // and quoting the newest would describe the best case as the whole picture.
@@ -205,4 +213,34 @@ export function bidsCheckedNoteFor(
 
   const days = Math.round(hours / 24);
   return `We checked the current bids ${days} ${days === 1 ? 'day' : 'days'} ago, so the figures below may be well out of date. Open the lot on the auction site to see what it is bid to now.`;
+}
+
+/**
+ * The bid freshness sentence for a list of lots.
+ *
+ * Wraps the two decisions the screen needs, which lot rows to date and whether
+ * the sale has ended, so the page states one fact and asks one question. It
+ * also keeps the clock out of the render: a component that reads the time is
+ * not a pure function of its inputs, and the React compiler rejects it.
+ *
+ * A sale has closed when every lot in it has. One lot still running means the
+ * sale is still running and the bids can still move.
+ */
+export function bidFreshnessNote(
+  lots: { closes_at: string | null; bid_checked_at: string | null }[],
+  now: Date = new Date(),
+): string | undefined {
+  const hasClosed =
+    lots.length > 0 &&
+    lots.every((lot) => {
+      if (!lot.closes_at) return false;
+      const closes = new Date(lot.closes_at).getTime();
+      return Number.isFinite(closes) && closes <= now.getTime();
+    });
+
+  return bidsCheckedNoteFor(
+    lots.map((lot) => lot.bid_checked_at),
+    now,
+    hasClosed,
+  );
 }

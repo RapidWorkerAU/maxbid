@@ -4,7 +4,16 @@
 import { extract } from './extract';
 import { ingest } from './ingest';
 import { harvestResults } from './harvestFunction';
+import { refreshBids, refreshOneSale } from './bidRefreshFunction';
 import { triage } from './triageFunction';
 import { valueLots } from './valueFunction';
 
-export const functions = [ingest, extract, triage, valueLots, harvestResults];
+export const functions = [
+  ingest,
+  extract,
+  triage,
+  valueLots,
+  harvestResults,
+  refreshBids,
+  refreshOneSale,
+];
