@@ -146,3 +146,77 @@ export async function storeRange(lotId: string, range: SharedRange) {
   });
   if (error) throw new Error(`Could not store the range: ${error.message}`);
 }
+
+/**
+ * How long before a lot we could not value is tried again. O19.
+ *
+ * Seven days, because a lot fails for want of comparables and comparables
+ * arrive when the archive grows. Decision record 0021 makes accuracy a
+ * function of how many sales we have harvested, and that grows over weeks
+ * rather than hours, so trying again tonight would spend the same fetches on
+ * the same answer.
+ *
+ * A changed method version overrides this and tries again at once, which is
+ * the same rule decision record 0025 uses for reusing a range: when we improve
+ * the method, every lot it failed on is worth another look.
+ */
+export const RETRY_A_FAILED_VALUATION_AFTER_DAYS = 7;
+
+/** Pure, so the cooling off rule is testable without a database. */
+export function tooSoonToTryAgain(attemptedAt: string | null, now: Date = new Date()): boolean {
+  if (!attemptedAt) return false;
+  const attempted = new Date(attemptedAt).getTime();
+  if (!Number.isFinite(attempted)) return false;
+
+  const days = (now.getTime() - attempted) / 86_400_000;
+  return days < RETRY_A_FAILED_VALUATION_AFTER_DAYS;
+}
+
+/**
+ * The lots we tried to value recently with this method and could not.
+ *
+ * Only this method's attempts are read, so improving the method makes every
+ * lot it failed on eligible again without anything having to clear the table.
+ */
+export async function recentlyFailedFor(
+  lotIds: string[],
+  now: Date = new Date(),
+): Promise<Set<string>> {
+  if (lotIds.length === 0) return new Set();
+
+  const { data, error } = await createServiceSupabase()
+    .from('valuation_attempts')
+    .select('lot_id, attempted_at')
+    .in('lot_id', lotIds)
+    .eq('method_version', VALUATION_METHOD_VERSION);
+  if (error) throw new Error(`Could not read the valuation attempts: ${error.message}`);
+
+  return new Set(
+    (data ?? []).filter((row) => tooSoonToTryAgain(row.attempted_at, now)).map((row) => row.lot_id),
+  );
+}
+
+/**
+ * Records that we tried to value a lot and found too little evidence.
+ *
+ * Replaces this method's earlier attempt rather than adding to it, because
+ * the only question asked of the table is when we last tried.
+ *
+ * What it found is kept so a lot that was close can be told from one that
+ * found nothing, which is what says whether the archive growing will help.
+ */
+export async function recordFailedAttempt(lotId: string, found: Valuation | null) {
+  const { error } = await createServiceSupabase()
+    .from('valuation_attempts')
+    .upsert(
+      {
+        lot_id: lotId,
+        method_version: VALUATION_METHOD_VERSION,
+        attempted_at: new Date().toISOString(),
+        comparable_count: found?.counted.length ?? 0,
+        combined_weight: found?.combinedWeight ?? 0,
+      },
+      { onConflict: 'lot_id,method_version' },
+    );
+  if (error) throw new Error(`Could not record the attempt: ${error.message}`);
+}

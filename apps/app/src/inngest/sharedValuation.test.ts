@@ -6,7 +6,12 @@
 
 import { describe, expect, it } from 'vitest';
 import { valueComparables, type Comparable } from '@maxbid/calc';
-import { rangeFrom, VALUATION_METHOD_VERSION } from './sharedValuation';
+import {
+  RETRY_A_FAILED_VALUATION_AFTER_DAYS,
+  rangeFrom,
+  tooSoonToTryAgain,
+  VALUATION_METHOD_VERSION,
+} from './sharedValuation';
 
 function comparable(over: Partial<Comparable> = {}): Comparable {
   return {
@@ -86,5 +91,41 @@ describe('the confidence stored with a range', () => {
 describe('the method version', () => {
   it('is set, because a stored range is only reused while it matches', () => {
     expect(VALUATION_METHOD_VERSION).toBeTruthy();
+  });
+});
+
+describe('when a lot we could not value is tried again', () => {
+  const now = new Date('2026-10-22T12:00:00.000Z');
+  const daysAgo = (days: number) => new Date(now.getTime() - days * 86_400_000).toISOString();
+
+  it('leaves it alone inside the cooling off period', () => {
+    // It fails for want of comparables, and comparables arrive as the archive
+    // grows over weeks. Trying again tonight spends the same fetches on the
+    // same answer.
+    expect(tooSoonToTryAgain(daysAgo(0), now)).toBe(true);
+    expect(tooSoonToTryAgain(daysAgo(6.9), now)).toBe(true);
+  });
+
+  it('tries again once the period has passed', () => {
+    expect(tooSoonToTryAgain(daysAgo(RETRY_A_FAILED_VALUATION_AFTER_DAYS), now)).toBe(false);
+    expect(tooSoonToTryAgain(daysAgo(30), now)).toBe(false);
+  });
+
+  it('tries a lot we have never attempted', () => {
+    // No attempt is not a recent attempt. A lot nothing has looked at must
+    // not be skipped on the strength of a record that does not exist.
+    expect(tooSoonToTryAgain(null, now)).toBe(false);
+  });
+
+  it('tries again when the stored attempt is not a date', () => {
+    // Better to spend a search than to skip a lot forever on a bad row.
+    expect(tooSoonToTryAgain('whenever', now)).toBe(false);
+  });
+
+  it('waits a period measured in days, not hours', () => {
+    // The rationale is that the archive grows over weeks. A period short
+    // enough to lapse overnight would put us back where O19 found us, with a
+    // nightly crawl retrying every failed lot every night.
+    expect(RETRY_A_FAILED_VALUATION_AFTER_DAYS).toBeGreaterThanOrEqual(1);
   });
 });

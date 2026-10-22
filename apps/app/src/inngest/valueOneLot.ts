@@ -6,7 +6,7 @@
 // read. Everything here is per lot. Nothing here knows about the catalogue.
 
 import { createServiceSupabase } from '@maxbid/db/server';
-import { rangeFrom, storeRange, type SharedRange } from './sharedValuation';
+import { rangeFrom, recordFailedAttempt, storeRange, type SharedRange } from './sharedValuation';
 import { targetBidFor } from './targetBid';
 import { valueLot } from './valueLot';
 
@@ -133,7 +133,14 @@ export async function valueAndStore(
       lot.confidence === null || lot.confidence === undefined ? null : Number(lot.confidence),
     confirmed: lot.stage === 'user',
   });
-  if (!range) return null;
+
+  // Nothing worth storing. Record that we tried, so the next analysis and the
+  // nightly crawl do not pay for the same search, model call and page fetches
+  // to reach the same answer. O19.
+  if (!range) {
+    await recordFailedAttempt(lot.lot_id, result.valuation);
+    return null;
+  }
 
   await storeRange(lot.lot_id, range);
   await applyRange(lot.lot_id, range, where, context);

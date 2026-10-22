@@ -170,3 +170,68 @@ describe('an identification has a baseline and a correction', () => {
     expect((data ?? []).length).toBe(2);
   });
 });
+
+describe('a record that we tried and could not', () => {
+  // O19. A lot that fails the evidence rule stores no range, so without this
+  // every analysis paid the search, the model call and the fetches again.
+
+  it('shows the attempt to every organisation', async () => {
+    const written = await serviceClient().from('valuation_attempts').insert({
+      lot_id: a.lotId,
+      method_version: 'triage-valuation-1',
+      comparable_count: 1,
+      combined_weight: 0.6,
+    });
+    expect(written.error).toBeNull();
+
+    for (const user of [t.ownerA, t.ownerB]) {
+      const seen = await user.client
+        .from('valuation_attempts')
+        .select('comparable_count')
+        .eq('lot_id', a.lotId);
+      expect(isEmpty(seen), 'that we looked and found too little is part of the working').toBe(
+        false,
+      );
+    }
+  });
+
+  it('lets nobody record one', async () => {
+    // A user saying we tried would not make it true.
+    const written = await t.ownerA.client.from('valuation_attempts').insert({
+      lot_id: a.lotId,
+      method_version: 'made-up',
+    });
+    expect(written.error).not.toBeNull();
+  });
+
+  it('lets nobody erase one', async () => {
+    // Erasing it would remove the reason their figures are blank.
+    const removed = await t.ownerA.client
+      .from('valuation_attempts')
+      .delete()
+      .eq('lot_id', a.lotId);
+    const after = await serviceClient()
+      .from('valuation_attempts')
+      .select('id')
+      .eq('lot_id', a.lotId);
+    expect(removed.error !== null || !isEmpty(after)).toBe(true);
+  });
+
+  it('keeps one attempt per lot per method, so a retry replaces it', async () => {
+    const again = await serviceClient().from('valuation_attempts').insert({
+      lot_id: a.lotId,
+      method_version: 'triage-valuation-1',
+    });
+    expect(again.error).not.toBeNull();
+  });
+
+  it('lets a different method try the same lot', async () => {
+    // Improving the method is a reason to look again, so its attempt is its
+    // own rather than clashing with the old one.
+    const other = await serviceClient().from('valuation_attempts').insert({
+      lot_id: a.lotId,
+      method_version: 'triage-valuation-2',
+    });
+    expect(other.error).toBeNull();
+  });
+});
