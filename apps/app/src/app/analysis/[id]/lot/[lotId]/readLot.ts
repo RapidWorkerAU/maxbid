@@ -7,6 +7,10 @@
 // because neither depends on who is buying. The bid figures come from the
 // organisation's own row. Decision record 0024.
 
+import type { PremiumSchedule } from '@maxbid/calc';
+import { canShowBidFigures } from '@maxbid/db';
+import { targetBidFor } from '../../../../../inngest/targetBid';
+import { bidFreshnessNote } from '../../lots';
 import { preferCorrection } from '../../../../../lib/identifications';
 import type { supabaseServer } from '../../../../../lib/supabase';
 import { asNumber } from './lot';
@@ -33,15 +37,14 @@ const NO_RANGE =
 const NO_IDENTIFICATION =
   'We could not work out what this lot is, so there is nothing to compare it against.';
 
-export async function readLot(supabase: Client, analysisId: string, lotId: string) {
-  const { data: lot } = await supabase
-    .from('lots')
-    .select('id, lot_number, title, current_bid, closes_at, auctions(title)')
-    .eq('id', lotId)
-    .maybeSingle();
-  if (!lot) return null;
+const NO_PROFILE =
+  'Tell us your costs and the profit you want, and we will work out the most you should bid.';
+const NO_PREMIUM =
+  'We could not read this auction’s buyer’s premium, so a bid worked out from it would be missing a real cost.';
 
-  const [identifications, valuation, own] = await Promise.all([
+/** Everything the screen reads, in as few round trips as the joins allow. */
+async function readRows(supabase: Client, analysisId: string, lotId: string) {
+  const [identifications, valuation, own, analysis] = await Promise.all([
     supabase
       .from('lot_identifications')
       .select('id, lot_id, brand, model, year, confidence, condition_notes, analysis_id')
@@ -60,7 +63,45 @@ export async function readLot(supabase: Client, analysisId: string, lotId: strin
       .eq('analysis_id', analysisId)
       .eq('lot_id', lotId)
       .maybeSingle(),
+    // The buyer's own figures, which is what makes the three bid limits
+    // theirs rather than ours.
+    supabase
+      .from('analyses')
+      .select('org_id, organisations(gst_registered)')
+      .eq('id', analysisId)
+      .maybeSingle(),
   ]);
+
+  // After the analysis, because it is what says which organisation to ask.
+  const profile = analysis.data?.org_id
+    ? await supabase
+        .from('cost_profiles')
+        .select(
+          'profit_mode, target_profit_amount, target_return_pct, min_profit_amount, min_return_pct, completed_at',
+        )
+        .eq('org_id', analysis.data.org_id)
+        .eq('is_default', true)
+        .maybeSingle()
+    : { data: null };
+
+  return { identifications, valuation, own, analysis, profile };
+}
+
+export async function readLot(supabase: Client, analysisId: string, lotId: string) {
+  const { data: lot } = await supabase
+    .from('lots')
+    .select(
+      'id, lot_number, title, current_bid, closes_at, bid_checked_at, auction_id, auctions(title, premium_schedule)',
+    )
+    .eq('id', lotId)
+    .maybeSingle();
+  if (!lot) return null;
+
+  const { identifications, valuation, own, analysis, profile } = await readRows(
+    supabase,
+    analysisId,
+    lotId,
+  );
 
   const found = preferCorrection((identifications.data ?? []) as IdentificationRow[])[0];
 
@@ -93,6 +134,35 @@ export async function readLot(supabase: Client, analysisId: string, lotId: strin
   const conservative = corrected ? ownLow : asNumber(valuation.data?.conservative);
   const optimistic = corrected ? ownHigh : asNumber(valuation.data?.optimistic);
 
+  const premium = (lot.auctions?.premium_schedule ?? null) as PremiumSchedule | null;
+  const limits =
+    conservative === null
+      ? null
+      : targetBidFor(
+          conservative,
+          {
+            gstRegistered: Boolean(analysis.data?.organisations?.gst_registered),
+            profile: profile.data ?? null,
+          },
+          // Grays states GST is not added to the final bid price on these
+          // sales, which is what S5 assumes too.
+          { premium, gstOnHammer: false },
+        );
+
+  // One reason, and the first one that applies. A reader with no cost profile
+  // and an unidentified lot has one thing to fix first, and listing both
+  // would not tell them which.
+  const whyNoBid =
+    limits !== null
+      ? undefined
+      : identifiedAs === null
+        ? NO_IDENTIFICATION
+        : conservative === null
+          ? NO_RANGE
+          : !canShowBidFigures(profile.data ?? null)
+            ? NO_PROFILE
+            : NO_PREMIUM;
+
   return {
     lot: {
       lotNumber: lot.lot_number,
@@ -103,6 +173,9 @@ export async function readLot(supabase: Client, analysisId: string, lotId: strin
       identifiedAs,
       identificationConfidence: asNumber(found?.confidence),
       conditionNote: found?.condition_notes ?? null,
+      // The same sentence the list carries, so a reader who clicks through
+      // does not lose the one fact that says how current the bid is.
+      bidNote: bidFreshnessNote([{ closes_at: lot.closes_at, bid_checked_at: lot.bid_checked_at }]),
     },
     valuation: {
       conservative,
@@ -113,17 +186,35 @@ export async function readLot(supabase: Client, analysisId: string, lotId: strin
       optimistic,
       confidence: corrected ? null : asNumber(valuation.data?.confidence),
     },
-    // Only the one figure is stored. The limit and break even bids are worked
-    // out alongside it and not kept, so they are left out rather than guessed
-    // at: the calculator panel recomputes all three. UI20.
-    bids: {
-      targetBid: asNumber(own.data?.triage_max_bid),
-      limitBid: null,
-      breakEvenBid: null,
-    },
-    missingBidReason:
-      identifiedAs === null ? NO_IDENTIFICATION : conservative === null ? NO_RANGE : undefined,
-    method: undefined as string | undefined,
+    // All three figures, worked out here rather than read back. Only the
+    // target bid is stored, because the ranking needs one number. The limit
+    // and break even bids come from the same resale and the same costs, so
+    // recomputing them is cheaper than keeping three copies that could drift
+    // apart.
+    bids: limits ?? { targetBid: null, limitBid: null, breakEvenBid: null },
+    missingBidReason: whyNoBid,
+    method: limits ? methodFor(conservative!) : undefined,
     evidence: evidence.data ?? [],
   };
+}
+
+/**
+ * How the bid figures were worked out, in words. F59.
+ *
+ * The steps bid-calculation.md lists, said as a sentence rather than as a
+ * formula, because the reader is checking whether we understood their
+ * situation rather than checking our arithmetic.
+ */
+export function methodFor(resale: number): string {
+  const amount = new Intl.NumberFormat('en-AU', {
+    style: 'currency',
+    currency: 'AUD',
+    maximumFractionDigits: 0,
+  }).format(resale);
+
+  return [
+    `We started from the cautious resale of ${amount}.`,
+    'We took off this auction’s buyer’s premium and the GST on it, then your costs, then the profit you said you want.',
+    'The figure left is the most you can bid and still reach that profit.',
+  ].join(' ');
 }

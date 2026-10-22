@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { ageInDays, heaviestFirst, toComparables, type EvidenceRecord } from './lot';
+import { methodFor } from './readLot';
 
 const NOW = new Date('2026-10-22T12:00:00.000Z');
-const daysBefore = (days: number) =>
-  new Date(NOW.getTime() - days * 86_400_000).toISOString();
+const daysBefore = (days: number) => new Date(NOW.getTime() - days * 86_400_000).toISOString();
 
 function record(over: Partial<EvidenceRecord> = {}): EvidenceRecord {
   return {
@@ -155,5 +155,25 @@ describe('reading the match level the database stores', () => {
       const [row] = toComparables([record({ match_level: stored })], NOW);
       expect(row!.matchLevel, `${stored} should read as ${shown}`).toBe(shown);
     }
+  });
+});
+
+describe('how the figures were worked out, in words', () => {
+  it('names the resale it started from', () => {
+    expect(methodFor(14000)).toContain('$14,000');
+  });
+
+  it('says what came off, in the order it came off', () => {
+    const words = methodFor(14000);
+    expect(words.indexOf('premium')).toBeLessThan(words.indexOf('your costs'));
+    expect(words.indexOf('your costs')).toBeLessThan(words.indexOf('profit'));
+  });
+
+  it('uses no dashes, as the writing rules require', () => {
+    expect(methodFor(14000)).not.toMatch(/[-–—]/);
+  });
+
+  it('says what the figure left over is', () => {
+    expect(methodFor(14000)).toContain('the most you can bid');
   });
 });
