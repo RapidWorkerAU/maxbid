@@ -21,6 +21,7 @@ import {
 import { DEEP_MODEL } from '../ai/pricing';
 import { deepRequested, inngest } from './client';
 import { NotEnoughCreditsError, refundCredits, reserveCredits } from './credits';
+import { markAnalysis, markLot, markLots } from './deepProgress';
 import { collectPhotos, photosFor } from './photos';
 import { storeBaseline } from './sharedIdentification';
 
@@ -109,9 +110,12 @@ export const deepIdentify = inngest.createFunction(
       // charge for work that never happened, which is the one thing a ledger
       // must never record.
       const { analysisId, orgId, lotIds } = event.data.event.data;
-      await step.run('refund-everything', async () =>
-        refundCredits(orgId, analysisId, lotIds.length),
-      );
+      await step.run('refund-everything', async () => {
+        await refundCredits(orgId, analysisId, lotIds.length);
+        // And put the screen back, or it would sit on reading forever.
+        await markLots(analysisId, lotIds, 'failed');
+        await markAnalysis(analysisId, 'triaged');
+      });
     },
   },
   async ({ event, step }) => {
@@ -139,16 +143,32 @@ export const deepIdentify = inngest.createFunction(
       return data ?? [];
     });
 
+    // The screen reads these. A run that says nothing for minutes cannot be
+    // told from one that failed.
+    await step.run('mark-running', async () => {
+      await markAnalysis(analysisId, 'deep_running');
+      await markLots(analysisId, lotIds, 'deep_running');
+    });
+
     let read = 0;
     for (let start = 0; start < lots.length; start += AT_A_TIME) {
       const batch = lots.slice(start, start + AT_A_TIME);
       const results = await Promise.all(
         batch.map((lot) =>
           step
-            .run(`identify-${lot.id}`, async () => identifyFromPhotos(lot, { orgId, analysisId }))
+            .run(`identify-${lot.id}`, async () => {
+              const done = await identifyFromPhotos(lot, { orgId, analysisId });
+              // Marked as each one lands rather than at the end, so the bar
+              // moves while somebody is watching it.
+              await markLot(analysisId, lot.id, done ? 'valued' : 'failed');
+              return done;
+            })
             // One lot that cannot be read must not stop the others, and it is
             // refunded below rather than charged for.
-            .catch(() => false),
+            .catch(async () => {
+              await markLot(analysisId, lot.id, 'failed');
+              return false;
+            }),
         ),
       );
       read += results.filter(Boolean).length;
@@ -157,6 +177,8 @@ export const deepIdentify = inngest.createFunction(
     const refunded = await step.run('refund-what-we-could-not-read', async () =>
       refundCredits(orgId, analysisId, lotIds.length - read),
     );
+
+    await step.run('mark-finished', async () => markAnalysis(analysisId, 'triaged'));
 
     return { analysisId, read, refunded, reserved };
   },
