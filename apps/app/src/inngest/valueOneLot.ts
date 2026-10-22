@@ -7,11 +7,14 @@
 
 import { createServiceSupabase } from '@maxbid/db/server';
 import { rangeFrom, recordFailedAttempt, storeRange, type SharedRange } from './sharedValuation';
+import { storeEvidence } from './storeEvidence';
 import { targetBidFor } from './targetBid';
 import { valueLot } from './valueLot';
 
 /** What we know about a lot before valuing it. */
 export type LotToValue = {
+  /** The identification row, which the evidence hangs off. F59. */
+  id?: string;
   lot_id: string;
   /** Only used to decide which lots are worth valuing, never to rank them. */
   lots_current_bid?: number | string | null;
@@ -144,5 +147,21 @@ export async function valueAndStore(
 
   await storeRange(lot.lot_id, range);
   await applyRange(lot.lot_id, range, where, context);
+
+  // The evidence behind the figure, which is what makes it something the
+  // reader can check rather than take on trust. F59.
+  //
+  // After the range, and never in front of it. The range is what the user came
+  // for, and losing it because a comparable would not store would be the wrong
+  // way round. The screen says there are no comparable sales to show, which is
+  // true and is better than no figure at all.
+  if (lot.id) {
+    try {
+      await storeEvidence(lot.id, result);
+    } catch {
+      // Nothing to do about it here. The valuation stands.
+    }
+  }
+
   return range;
 }

@@ -24,6 +24,8 @@ export type TriageTableProps = {
   /** The ids the user has shortlisted. */
   selected?: string[];
   onSelect?: (id: string, selected: boolean) => void;
+  /** Where each lot's own screen is. Omitted where there is nowhere to go. */
+  hrefFor?: (id: string) => string;
   /** Shown above the table, such as the name of the sale. */
   caption?: string;
   /** A sentence about what is not here yet. Leave it out once it all is. */
@@ -36,8 +38,8 @@ function Empty() {
     <div className="rounded-sm border border-line/60 px-4 py-10 text-center">
       <p className="font-sans font-semibold text-ink">No lots yet</p>
       <p className="mx-auto mt-1 max-w-sm font-sans text-sm text-ink-muted">
-        We have not read any lots from this catalogue. If the analysis is still
-        running, this page fills in as it goes.
+        We have not read any lots from this catalogue. If the analysis is still running, this page
+        fills in as it goes.
       </p>
     </div>
   );
@@ -52,21 +54,40 @@ function Headings() {
       {/* The empty cell above the checkbox column, so the headings sit over
           the right cells whether the list shortlists or not. */}
       <span aria-hidden />
-      <MonoLabel size="xs" tone="ink" className="text-right">Rank</MonoLabel>
-      <MonoLabel size="xs" tone="ink">Lot</MonoLabel>
-      <MonoLabel size="xs" tone="ink">Item</MonoLabel>
-      <MonoLabel size="xs" tone="ink">Identified as</MonoLabel>
-      <MonoLabel size="xs" tone="ink" className="text-right">Current bid</MonoLabel>
-      <MonoLabel size="xs" tone="ink" className="text-right">Worth about</MonoLabel>
-      <MonoLabel size="xs" tone="ink" className="text-right">Bid up to</MonoLabel>
-      <MonoLabel size="xs" tone="ink" className="justify-self-end">Confidence</MonoLabel>
-      <MonoLabel size="xs" tone="ink" className="text-right">Closes</MonoLabel>
+      <MonoLabel size="xs" tone="ink" className="text-right">
+        Rank
+      </MonoLabel>
+      <MonoLabel size="xs" tone="ink">
+        Lot
+      </MonoLabel>
+      <MonoLabel size="xs" tone="ink">
+        Item
+      </MonoLabel>
+      <MonoLabel size="xs" tone="ink">
+        Identified as
+      </MonoLabel>
+      <MonoLabel size="xs" tone="ink" className="text-right">
+        Current bid
+      </MonoLabel>
+      <MonoLabel size="xs" tone="ink" className="text-right">
+        Worth about
+      </MonoLabel>
+      <MonoLabel size="xs" tone="ink" className="text-right">
+        Bid up to
+      </MonoLabel>
+      <MonoLabel size="xs" tone="ink" className="justify-self-end">
+        Confidence
+      </MonoLabel>
+      <MonoLabel size="xs" tone="ink" className="text-right">
+        Closes
+      </MonoLabel>
     </div>
   );
 }
 
 export function TriageTable({
   lots,
+  hrefFor,
   density = 'standard',
   selected = [],
   onSelect,
@@ -92,9 +113,7 @@ export function TriageTable({
         banners. This is a caption row, not the top of the page.
       */}
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-        {caption ? (
-          <h2 className="font-sans text-lg font-bold text-ink">{caption}</h2>
-        ) : null}
+        {caption ? <h2 className="font-sans text-lg font-bold text-ink">{caption}</h2> : null}
         <p className="font-mono text-xs uppercase tracking-wide text-ink-muted tabular-nums">
           {lots.length} {lots.length === 1 ? 'lot' : 'lots'}
           {shortlisting && chosen.size > 0 ? ` · ${chosen.size} shortlisted` : ''}
@@ -110,6 +129,7 @@ export function TriageTable({
           <LotRow
             key={lot.id}
             lot={lot}
+            href={hrefFor?.(lot.id)}
             density={density}
             selected={chosen.has(lot.id)}
             onSelect={onSelect}

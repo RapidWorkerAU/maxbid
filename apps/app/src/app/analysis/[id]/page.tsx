@@ -82,6 +82,7 @@ export default async function AnalysisPage({ params }: { params: Promise<{ id: s
         <TriageTable
           className="mt-10"
           lots={rows}
+          hrefFor={(lotId) => `/analysis/${id}/lot/${lotId}`}
           caption="Lots in this catalogue"
           pendingNote={note || undefined}
         />
