@@ -68,9 +68,21 @@ export async function readCatalogue(
     .filter(Boolean)
     .join(' ');
 
+  // What the deep run is doing, for the bar. SC04.
+  const deep = (ranges.data ?? []).reduce(
+    (count, row) => {
+      if (row.status === 'deep_running') count.running += 1;
+      if (row.status === 'valued') count.done += 1;
+      if (row.status === 'failed') count.failed += 1;
+      return count;
+    },
+    { done: 0, running: 0, failed: 0 },
+  );
+
   return {
     rows,
     note,
+    deep: { ...deep, total: deep.done + deep.running + deep.failed },
     // Which lots are already shortlisted, so a reload keeps them ticked. A
     // tick box that forgets is not a shortlist.
     shortlisted: (ranges.data ?? [])

@@ -1,5 +1,6 @@
 import { AppShell } from '@maxbid/ui/sections/AppShell';
 import { notFound } from 'next/navigation';
+import { RunProgress } from '@maxbid/ui/composites/RunProgress';
 import { AnalysisProgress } from './AnalysisProgress';
 import { FilteredLots } from './FilteredLots';
 import { filtersFromParams } from '@maxbid/ui/composites/LotFilters';
@@ -43,7 +44,7 @@ export default async function AnalysisPage({
 
   if (!data) notFound();
 
-  const { rows, note, shortlisted } = await readCatalogue(
+  const { rows, note, shortlisted, deep } = await readCatalogue(
     supabase,
     id,
     data.auction_id,
@@ -75,6 +76,17 @@ export default async function AnalysisPage({
         sourceUrl={data.auctions?.source_url ?? null}
         lotCount={rows.length}
       />
+      {deep.total > 0 ? (
+        <RunProgress
+          className="mt-8"
+          label="Reading the lots you chose, from their photographs"
+          done={deep.done}
+          running={deep.running}
+          failed={deep.failed}
+          total={deep.total}
+          note="Each lot takes a minute or two, because we read its page and then look at every photograph on it. You can leave this page and come back."
+        />
+      ) : null}
       {rows.length > 0 ? (
         <FilteredLots
           lots={rows}
