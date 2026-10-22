@@ -3,7 +3,7 @@ import { assertComplete, parseGraysCatalogue } from '../extract/grays';
 import { fetchPage } from '../extract/firecrawl';
 import { extractRequested, inngest, triageRequested } from './client';
 import { openAnalysisLots, writeLots } from './lots';
-import { closesAtFrom, readAuctionTerms } from './normalise';
+import { closesAtFrom, premiumAlreadyRead, readAuctionTerms } from './normalise';
 
 export { lotRows } from './lots';
 
@@ -80,7 +80,9 @@ export const extract = inngest.createFunction(
       return parsed.lots;
     });
 
-    const lotIdsByNumber = await step.run('write-lots', async () => writeLots(auctionId, lots));
+    const lotIdsByNumber = await step.run('write-lots', async () =>
+      writeLots(auctionId, lots, page.fetchedAt),
+    );
 
     // What a lot is worth to one organisation is theirs, and these rows hold
     // it. Nothing created them before, so triage had nowhere to write to.
@@ -90,9 +92,17 @@ export const extract = inngest.createFunction(
 
     // S3. The premium lives on a lot page rather than the catalogue, so this
     // reads one lot to learn what the whole auction charges. F10, D25.
+    //
+    // Skipped when we already read it from this auction. A premium schedule is
+    // a term of the sale and does not change while the sale runs, so re-reading
+    // it spends a page fetch on an answer we hold. That matters at the rate of
+    // eight fetches a minute shared across every stage. Decision record 0024.
     const terms = await step.run('read-auction-terms', async () => {
       const first = lots[0];
       const closesAt = closesAtFrom(lots);
+      if (await premiumAlreadyRead(auctionId)) {
+        return { premiumSource: 'already_read', bands: 0, title: null, closesAt };
+      }
       if (!first?.lotUrl) {
         return { premiumSource: 'platform_default', bands: 0, title: null, closesAt };
       }

@@ -45,10 +45,7 @@ export type AuctionTerms = {
  * point of the fallback is DS12: a user must be told that the figure came from
  * a default rather than from this auction's own terms.
  */
-export function termsFrom(
-  page: string,
-  platformDefault: PremiumSchedule | null,
-): AuctionTerms {
+export function termsFrom(page: string, platformDefault: PremiumSchedule | null): AuctionTerms {
   const parsed = parseGraysPremium(page);
   const title = parseGraysSaleTitle(page);
 
@@ -111,4 +108,25 @@ export async function readAuctionTerms(
     title: terms.title,
     closesAt,
   };
+}
+
+/**
+ * Whether we have already read this auction's own premium schedule.
+ *
+ * A premium is a term of the sale and does not change while the sale runs, so
+ * reading it twice spends a page fetch on an answer we hold.
+ *
+ * False when the stored schedule came from a platform default rather than
+ * from the auction, because that is not an answer, it is a stand in for one,
+ * and the next run should try the page again.
+ */
+export async function premiumAlreadyRead(auctionId: string): Promise<boolean> {
+  const { data, error } = await createServiceSupabase()
+    .from('auctions')
+    .select('premium_source, premium_schedule')
+    .eq('id', auctionId)
+    .single();
+  if (error) throw new Error(`Could not read the auction: ${error.message}`);
+
+  return data.premium_source === 'extracted' && data.premium_schedule !== null;
 }

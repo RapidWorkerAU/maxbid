@@ -50,6 +50,7 @@ Updated at the end of every pull request. The current row is always the one to r
 | 50 | Record what actually happened, because nothing else can tell us | Open | |
 | 51 | Read what we already know before working it out again | Open | |
 | 52 | Identify a lot once, for everybody | Open | |
+| 53 | Say when we last checked the bids | Open | |
 | next | Read the sitemaps nightly and queue the sales nobody has asked about | Next |  |
 
 **Where we are.** The pipeline runs end to end on a real sale: a pasted Grays link becomes 36 identified lots with a premium schedule, resale ranges, bid figures and a ranking, all on screen. The archive holds what all 36 lots actually sold for, harvested after the sale closed, which is evidence nobody else has.

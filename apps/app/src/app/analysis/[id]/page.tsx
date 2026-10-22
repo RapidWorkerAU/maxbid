@@ -2,7 +2,7 @@ import { AppShell } from '@maxbid/ui/sections/AppShell';
 import { TriageTable } from '@maxbid/ui/sections/TriageTable';
 import { notFound } from 'next/navigation';
 import { AnalysisProgress } from './AnalysisProgress';
-import { pendingNoteFor, toRows } from './lots';
+import { bidsCheckedNoteFor, pendingNoteFor, toRows } from './lots';
 import { APP_LINKS } from '../../../lib/navigation';
 import { preferCorrection } from '../../../lib/identifications';
 import { supabaseServer } from '../../../lib/supabase';
@@ -27,7 +27,7 @@ export default async function AnalysisPage({ params }: { params: Promise<{ id: s
   const [lots, identifications, ranges, shared] = await Promise.all([
     supabase
       .from('lots')
-      .select('id, lot_number, title, current_bid, closes_at')
+      .select('id, lot_number, title, current_bid, closes_at, bid_checked_at')
       .eq('auction_id', data.auction_id)
       .order('lot_number'),
     supabase
@@ -56,6 +56,8 @@ export default async function AnalysisPage({ params }: { params: Promise<{ id: s
     shared.data ?? [],
   );
   const identified = rows.filter((row) => row.identifiedAs).length;
+  const checked = bidsCheckedNoteFor((lots.data ?? []).map((lot) => lot.bid_checked_at));
+  const note = [pendingNoteFor(identified, rows.length), checked].filter(Boolean).join(' ');
 
   return (
     <AppShell links={APP_LINKS} currentPath="/new">
@@ -71,7 +73,7 @@ export default async function AnalysisPage({ params }: { params: Promise<{ id: s
           className="mt-10"
           lots={rows}
           caption="Lots in this catalogue"
-          pendingNote={pendingNoteFor(identified, rows.length)}
+          pendingNote={note || undefined}
         />
       ) : null}
     </AppShell>

@@ -715,6 +715,7 @@ export type Database = {
       lots: {
         Row: {
           auction_id: string
+          bid_checked_at: string | null
           bid_count: number | null
           closes_at: string | null
           created_at: string
@@ -736,6 +737,7 @@ export type Database = {
         }
         Insert: {
           auction_id: string
+          bid_checked_at?: string | null
           bid_count?: number | null
           closes_at?: string | null
           created_at?: string
@@ -757,6 +759,7 @@ export type Database = {
         }
         Update: {
           auction_id?: string
+          bid_checked_at?: string | null
           bid_count?: number | null
           closes_at?: string | null
           created_at?: string

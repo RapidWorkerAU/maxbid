@@ -11,7 +11,15 @@ import type { ParsedLot } from '../extract/grays';
 /** Lots are written in batches, so one huge catalogue is not one huge insert. */
 export const BATCH_SIZE = 100;
 
-export function lotRows(auctionId: string, lots: ParsedLot[]) {
+/**
+ * Lot rows ready to write.
+ *
+ * `checkedAt` is when the page these lots came from was fetched, which is the
+ * only honest answer to when the bid was current. It is not now: a parse can
+ * run minutes after the fetch, and a replay from `raw_extract` can run days
+ * after it. Decision record 0024.
+ */
+export function lotRows(auctionId: string, lots: ParsedLot[], checkedAt: string) {
   return lots.map((lot) => ({
     auction_id: auctionId,
     lot_number: lot.lotNumber,
@@ -19,6 +27,9 @@ export function lotRows(auctionId: string, lots: ParsedLot[]) {
     source_url: lot.lotUrl,
     closes_at: lot.closesAt ?? null,
     current_bid: lot.currentBid ?? null,
+    // Null where the page did not state a bid. A lot nobody has bid on is a
+    // bid we read and found to be nothing, so the check still counts.
+    bid_checked_at: checkedAt,
     // The slice of the payload that produced this lot. The whole page lives
     // in raw_extract.
     raw: { ...lot } as Json,
@@ -32,9 +43,9 @@ export function lotRows(auctionId: string, lots: ParsedLot[]) {
  * at each lot, and looking them up again afterwards would be a second pass
  * over the same rows.
  */
-export async function writeLots(auctionId: string, lots: ParsedLot[]) {
+export async function writeLots(auctionId: string, lots: ParsedLot[], checkedAt: string) {
   const supabase = createServiceSupabase();
-  const rows = lotRows(auctionId, lots);
+  const rows = lotRows(auctionId, lots, checkedAt);
   const ids: Record<string, string> = {};
 
   for (let start = 0; start < rows.length; start += BATCH_SIZE) {
