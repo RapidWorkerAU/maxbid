@@ -4,7 +4,7 @@ import { LotFilters, NO_FILTERS } from './LotFilters';
 const meta: Meta<typeof LotFilters> = {
   title: 'Composites/LotFilters',
   component: LotFilters,
-  tags: ['in-review'],
+  tags: ['approved'],
   parameters: { layout: 'padded' },
   args: {
     filters: NO_FILTERS,

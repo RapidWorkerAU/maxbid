@@ -41,21 +41,21 @@ This register is the sign off record for every component in packages/ui. It is t
 | UI18 | Wordmark | Primitive | Both | Approved | 23 September 2026 | Three sizes, light and on navy |
 | UI19 | BidRail | Composite | Both | Not started |  |  |
 | UI20 | BidSlider | Composite | App | Not started |  |  |
-| UI21 | BidLimits | Composite | Both | In review | 22 October 2026 | The three figures rise in order, so break even is the biggest number on screen and the one to act on is the smallest. Only the target bid carries marker yellow, and the break even line says a bid above it loses money |
-| UI22 | EvidenceRow | Composite | App | In review | 22 October 2026 | One comparable sale with its price, match level, age and the weight it carried, so a resale range can be checked rather than taken on trust. F59 |
-| UI23 | PriceLine | Composite | Both | In review | 22 October 2026 | A named money figure on a leader line. Obeys the rounding rules, carries the sentence saying what the figure is, and states that a missing figure is not worked out rather than leaving a blank |
+| UI21 | BidLimits | Composite | Both | Approved | 22 October 2026 | The three figures rise in order, so break even is the biggest number on screen and the one to act on is the smallest. Only the target bid carries marker yellow, and the break even line says a bid above it loses money |
+| UI22 | EvidenceRow | Composite | App | Approved | 22 October 2026 | One comparable sale with its price, match level, age and the weight it carried, so a resale range can be checked rather than taken on trust. F59 |
+| UI23 | PriceLine | Composite | Both | Approved | 22 October 2026 | A named money figure on a leader line. Obeys the rounding rules, carries the sentence saying what the figure is, and states that a missing figure is not worked out rather than leaving a blank |
 | UI24 | SpecTable | Composite | Both | Not started |  |  |
 | UI25 | OptionChecklist | Composite | App | Not started |  |  |
-| UI26 | DetailCard | Composite | Both | In review | 22 October 2026 | A framed card with a label on its edge, the way a view on a drawing is labelled DETAIL A. Heading level is a prop, because a wrong one is an accessibility failure the axe gate does not catch |
+| UI26 | DetailCard | Composite | Both | Approved | 22 October 2026 | A framed card with a label on its edge, the way a view on a drawing is labelled DETAIL A. Heading level is a prop, because a wrong one is an accessibility failure the axe gate does not catch |
 | UI27 | TimeRemainingBar | Composite | Both | Not started |  |  |
 | UI28 | SplitBar | Composite | Web | Not started |  |  |
 | UI29 | PriceChart | Composite | Web | Not started |  |  |
 | UI30 | PlanPanel | Composite | Web | Not started |  |  |
 | UI31 | CostSummary | Composite | App | Not started |  |  |
 | UI32 | OverrideMarker | Composite | App | Not started |  |  |
-| UI33 | LotRow | Composite | App | In review | 29 September 2026 | A card at 360px and a table row from medium up, one line per cell, with the resale range. Story tests measure the real geometry in a browser, because two earlier versions passed every unit test with a broken render |
+| UI33 | LotRow | Composite | App | Approved | 22 October 2026 | A card at 360px and a table row from medium up, one line per cell, with the resale range. Story tests measure the real geometry in a browser, because two earlier versions passed every unit test with a broken render |
 | UI34 | StatusLine | Composite | Both | Not started |  |  |
-| UI35 | EmailCapture | Composite | Web | In review | 23 September 2026 | Waitlist and breakdown sign up. Light surface only, see the note in the file |
+| UI35 | EmailCapture | Composite | Web | Approved | 22 October 2026 | Waitlist and breakdown sign up. Light surface only, see the note in the file |
 | UI36 | SiteHeader | Section | Web | Not started |  |  |
 | UI37 | SiteFooter | Section | Web | Not started |  |  |
 | UI38 | SheetHero | Section | Web | Not started |  |  |
@@ -67,13 +67,13 @@ This register is the sign off record for every component in packages/ui. It is t
 | UI44 | PricingPlans | Section | Web | Not started |  |  |
 | UI45 | GuideLayout | Section | Web | Not started |  |  |
 | UI46 | MethodSteps | Section | Web | Not started |  |  |
-| UI47 | AppShell | Section | App | In review | 29 September 2026 | Sidebar on desktop, bottom tab bar on mobile, safe area aware. Now used by three pages |
+| UI47 | AppShell | Section | App | Approved | 22 October 2026 | Sidebar on desktop, bottom tab bar on mobile, safe area aware. Now used by three pages |
 | UI48 | TriageTable | Section | App | Approved | 29 September 2026 | SC05 with the resale range. Sticky header, C09 density switch. Still no opportunity score or maximum bid, which need S6 and a cost profile |
-| UI49 | LotDetail | Section | App | In review | 22 October 2026 | One lot and everything we know about it, in the order of the argument: what it is, what it is bid to, what it resells for, the evidence for that, then the bid figures that follow. A test asserts it never tells the reader whether to bid |
+| UI49 | LotDetail | Section | App | Approved | 22 October 2026 | One lot and everything we know about it, in the order of the argument: what it is, what it is bid to, what it resells for, the evidence for that, then the bid figures that follow. A test asserts it never tells the reader whether to bid |
 | UI50 | BidView | Section | App | Not started |  |  |
 | UI51 | ChangesSummary | Composite | App | Not started |  | Added for F54 |
 | UI52 | SearchedNotFoundPanel | Composite | App | Not started |  | Added for F57 |
 | UI53 | CannotVerifyPanel | Composite | App | Not started |  | Added for F58 |
 | UI54 | ReportProblem | Composite | App | Not started |  | Added for F64 |
-| UI55 | LotFilters | Composite | App | In review | 22 October 2026 | Narrows a catalogue on what a lot is worth bidding, where it is and when it closes. A lot we could not value stays in the list unless the reader hides it themselves, because we did not say it was unsuitable, we said we could not tell. Added for F16 |
-| UI56 | CreditPreview | Composite | App | In review | 22 October 2026 | What a shortlist costs before it is confirmed. Blocked when it exceeds the balance, per F17, and it states the cost without saying the shortlist is too big or suggesting which lots to drop. Added for F17 |
+| UI55 | LotFilters | Composite | App | Approved | 22 October 2026 | Narrows a catalogue on what a lot is worth bidding, where it is and when it closes. A lot we could not value stays in the list unless the reader hides it themselves, because we did not say it was unsuitable, we said we could not tell. Added for F16 |
+| UI56 | CreditPreview | Composite | App | Approved | 22 October 2026 | What a shortlist costs before it is confirmed. Blocked when it exceeds the balance, per F17, and it states the cost without saying the shortlist is too big or suggesting which lots to drop. Added for F17 |

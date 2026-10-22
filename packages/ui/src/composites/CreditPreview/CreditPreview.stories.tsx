@@ -4,7 +4,7 @@ import { CreditPreview } from './CreditPreview';
 const meta: Meta<typeof CreditPreview> = {
   title: 'Composites/CreditPreview',
   component: CreditPreview,
-  tags: ['in-review'],
+  tags: ['approved'],
   parameters: { layout: 'padded' },
   args: { selected: 4, available: 10, onConfirm: () => {} },
 };

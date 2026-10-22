@@ -16,7 +16,7 @@ const base = {
 const meta: Meta<typeof EmailCapture> = {
   title: 'Composites/EmailCapture',
   component: EmailCapture,
-  tags: ['in-review'],
+  tags: ['approved'],
   parameters: { layout: 'padded' },
   args: { ...base, state: { status: 'idle' } },
   decorators: [

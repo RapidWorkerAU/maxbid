@@ -10,7 +10,7 @@ const links = [
 const meta: Meta<typeof AppShell> = {
   title: 'Sections/AppShell',
   component: AppShell,
-  tags: ['in-review'],
+  tags: ['approved'],
   parameters: { layout: 'fullscreen' },
   args: {
     links,
