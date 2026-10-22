@@ -17,13 +17,9 @@ beforeAll(async () => {
   t = await createTenants();
   a = await createAuction(t);
 
-  const row = await serviceClient()
-    .from('analysis_lots')
-    .insert({ analysis_id: a.analysisId, lot_id: a.lotId, status: 'triaged' })
-    .select('id')
-    .single();
-  if (row.error) throw row.error;
-  analysisLotId = row.data.id;
+  // The fixture already joins that analysis to that lot, and only one row may
+  // do so, so this reads it rather than making a second one.
+  analysisLotId = a.analysisLotId;
 }, 60_000);
 
 describe('the user records what happened', () => {
@@ -70,16 +66,38 @@ describe('the user records what happened', () => {
 });
 
 describe('what the record refuses to hold', () => {
+  /**
+   * Tries to record an outcome against a lot that has none yet.
+   *
+   * Every refusal needs its own lot. One outcome per analysis lot, and only
+   * one analysis lot per analysis and lot pair, so reusing either would make
+   * the insert fail on the uniqueness rule instead of on the rule being
+   * tested, and the test would pass whether or not that rule existed.
+   *
+   * It throws rather than falling back when the setup fails, for the same
+   * reason: a refusal test that silently tests nothing is worse than no test.
+   */
   async function record(values: Record<string, unknown>) {
     const admin = serviceClient();
     const lot = await admin
-      .from('analysis_lots')
-      .insert({ analysis_id: a.analysisId, lot_id: a.lotId, status: 'triaged' })
+      .from('lots')
+      .insert({
+        auction_id: a.auctionId,
+        lot_number: `LOT-${crypto.randomUUID().slice(0, 8)}`,
+        title: 'Another edgebander',
+      })
       .select('id')
       .single();
-    // One outcome per lot per analysis, so a second lot is needed each time.
-    const id = lot.data?.id ?? analysisLotId;
-    return admin.from('outcomes').insert({ analysis_lot_id: id, ...values });
+    if (lot.error) throw lot.error;
+
+    const analysisLot = await admin
+      .from('analysis_lots')
+      .insert({ analysis_id: a.analysisId, lot_id: lot.data.id, status: 'triaged' })
+      .select('id')
+      .single();
+    if (analysisLot.error) throw analysisLot.error;
+
+    return admin.from('outcomes').insert({ analysis_lot_id: analysisLot.data.id, ...values });
   }
 
   it('refuses a result it does not recognise', async () => {

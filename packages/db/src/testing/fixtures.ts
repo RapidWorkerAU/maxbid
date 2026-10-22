@@ -47,6 +47,8 @@ export type AuctionFixture = {
   auctionId: string;
   lotId: string;
   analysisId: string;
+  /** The row joining that analysis to that lot. One per pair, by unique key. */
+  analysisLotId: string;
 };
 
 /** A shared auction with one lot, plus an analysis of it owned by orgA. */
@@ -95,8 +97,15 @@ export async function createAuction(tenants: Tenants): Promise<AuctionFixture> {
 
   const analysisLot = await admin
     .from('analysis_lots')
-    .insert({ analysis_id: analysis.data.id, lot_id: lot.data.id, opportunity_score: 74 });
+    .insert({ analysis_id: analysis.data.id, lot_id: lot.data.id, opportunity_score: 74 })
+    .select('id')
+    .single();
   if (analysisLot.error) throw analysisLot.error;
 
-  return { auctionId: auction.data.id, lotId: lot.data.id, analysisId: analysis.data.id };
+  return {
+    auctionId: auction.data.id,
+    lotId: lot.data.id,
+    analysisId: analysis.data.id,
+    analysisLotId: analysisLot.data.id,
+  };
 }
