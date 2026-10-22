@@ -24,8 +24,22 @@ import { allComparables, enoughOnTheirOwn } from './evidence';
 
 export const STAGE = 'S5';
 
-/** How many results to ask for. More costs the same and reads the same. */
-const RESULTS = 10;
+/**
+ * How many search results to ask for.
+ *
+ * Twenty rather than ten. On the Grays sale of 22 October 2026 every lot
+ * valued found three or four comparables and a combined weight of 1.06 to
+ * 1.28, against the 1.5 the evidence rule asks for, so no lot got a range.
+ * The count was never the problem: the weight was, and the only honest way to
+ * raise it is more genuine comparables.
+ *
+ * It costs one search call either way, the same as ten, and no extra page
+ * fetches: what gets fetched is decided by worthFetching and capped by
+ * MOST_PAGES_PER_LOT below, neither of which changes here. The model reads a
+ * longer list, which is a few hundred more tokens on a call that costs a
+ * fraction of a cent.
+ */
+const RESULTS = 20;
 
 /**
  * How many listing pages we will fetch for one lot.
@@ -168,7 +182,10 @@ export async function valueLot(input: ValueLotInput): Promise<LotValuation> {
       model: TRIAGE_MODEL,
       system: SYSTEM_PROMPT,
       prompt: userPromptFor(input.describedAs, results),
-      maxTokens: 1500,
+      // Twenty listings rather than ten, so the reply has twice as many rows
+      // to write. A truncated reply loses listings silently, which is the one
+      // failure that would undo the point of asking for more.
+      maxTokens: 2500,
     },
     {
       stage: STAGE,

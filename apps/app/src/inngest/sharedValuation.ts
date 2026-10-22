@@ -24,7 +24,7 @@ import { createServiceSupabase } from '@maxbid/db/server';
  * only reused while this matches, so forgetting to bump it is how a stale
  * figure survives a fix.
  */
-export const VALUATION_METHOD_VERSION = 'triage-valuation-1';
+export const VALUATION_METHOD_VERSION = 'triage-valuation-2';
 
 /** A resale range we already hold, or have just worked out. */
 export type SharedRange = {
