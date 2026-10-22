@@ -181,3 +181,76 @@ describe('when we found sales but not enough of them', () => {
     expect(screen.getByText(/A comparable is a sale of the same or a similar item/)).toBeTruthy();
   });
 });
+
+describe('what it takes to win one, kept apart from what it resells for', () => {
+  const withAuction = {
+    ...base,
+    valuation: {
+      ...base.valuation,
+      auctionMarket: { low: 11000, typical: 13000, high: 15000, results: 3 },
+    },
+  };
+
+  it('shows the auction figure beside the current bid, not in the resale', () => {
+    render(<LotDetail {...withAuction} />);
+    expect(screen.getByText('What these usually fetch at auction')).toBeTruthy();
+    expect(screen.getByText('$13,000')).toBeTruthy();
+  });
+
+  it('says plainly that it is not the resale figure', () => {
+    // A hammer price is what a reseller paid to buy. A resale price is what
+    // the public paid to own. Averaging the two removed the margin, which is
+    // the thing the product exists to find.
+    render(<LotDetail {...withAuction} />);
+    expect(screen.getByText(/not the same as what it resells for/)).toBeTruthy();
+  });
+
+  it('says how many past sales it rests on, and their spread', () => {
+    render(<LotDetail {...withAuction} />);
+    expect(screen.getByText(/From 3 past sales/)).toBeTruthy();
+    expect(screen.getByText(/\$11,000 and \$15,000/)).toBeTruthy();
+  });
+
+  it('uses the singular for one past sale', () => {
+    render(
+      <LotDetail
+        {...withAuction}
+        valuation={{
+          ...withAuction.valuation,
+          auctionMarket: { low: 13000, typical: 13000, high: 13000, results: 1 },
+        }}
+      />,
+    );
+    expect(screen.getByText(/From 1 past sale /)).toBeTruthy();
+  });
+
+  it('shows nothing where we have no past results', () => {
+    render(<LotDetail {...base} />);
+    expect(screen.queryByText('What these usually fetch at auction')).toBeNull();
+  });
+
+  it('shows it even when there is no resale range', () => {
+    // It is often all we have, and it is worth knowing on its own.
+    render(
+      <LotDetail
+        {...withAuction}
+        valuation={{
+          conservative: null,
+          expected: null,
+          optimistic: null,
+          auctionMarket: { low: 11000, typical: 13000, high: 15000, results: 3 },
+        }}
+      />,
+    );
+    expect(screen.getByText('What these usually fetch at auction')).toBeTruthy();
+  });
+
+  it('never marks the auction figure in marker yellow', () => {
+    // B09 reserves it for the main action and the most you should bid. This
+    // is neither: it is what other people paid.
+    const { container } = render(<LotDetail {...withAuction} />);
+    const marked = container.querySelectorAll('.bg-accent');
+    expect(marked).toHaveLength(1);
+    expect(marked[0]!.textContent).toBe('$7,936');
+  });
+});

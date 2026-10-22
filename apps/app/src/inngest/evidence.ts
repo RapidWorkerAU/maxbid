@@ -14,20 +14,12 @@ import type { Comparable } from '@maxbid/calc';
 import type { AuctionResult } from '../search/auctionResults';
 import { gradeForUsage, type ValuedComparable } from './valueLot';
 
-/** Enough sold results that looking further is spending for nothing. */
-export const ENOUGH_RESULTS = 4;
-
-/**
- * True when the auction results alone are worth valuing on.
- *
- * Below this we still search the web, because a lot with one past sale needs
- * whatever else can be found. Above it we stop, because each web listing
- * costs a search, a read and often a page fetch to add a comparable worth
- * well under half as much.
- */
-export function enoughOnTheirOwn(results: AuctionResult[]): boolean {
-  return results.length >= ENOUGH_RESULTS;
-}
+// enoughOnTheirOwn used to stop the web search once there were four or more
+// auction results, on the grounds that they were enough to value on. They are
+// not, and cannot be: a hammer price is what a reseller paid to buy and a
+// resale price is what the public paid to own, so no number of auction results
+// builds a resale range. It is gone rather than retuned, because there is no
+// number of them that would make it right.
 
 /**
  * Turns a past auction result into a comparable.

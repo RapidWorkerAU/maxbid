@@ -6,7 +6,11 @@ import { ConfidenceBadge } from '../../primitives/ConfidenceBadge';
 import { InfoNote } from '../../primitives/InfoNote';
 import { MonoLabel } from '../../primitives/MonoLabel';
 import { SheetFrame } from '../../primitives/SheetFrame';
+import { formatMoney } from '../../primitives/Money';
 import { TitleBlock } from '../../primitives/TitleBlock';
+
+/** A figure inside a sentence, formatted the way every other figure is. */
+const money = (amount: number) => formatMoney({ amount });
 
 /**
  * UI49. One lot, and everything we know about it. SC06.
@@ -44,6 +48,15 @@ export type LotDetailLot = {
 };
 
 export type LotDetailValuation = {
+  /**
+   * What one of these usually fetches at auction, where we know.
+   *
+   * Never the resale figure. A hammer price is what a reseller paid to buy
+   * and a resale price is what the public paid to own, and the gap between
+   * them is the margin. It is shown because what it takes to win is a
+   * question a bidder genuinely has, and we have the evidence for it.
+   */
+  auctionMarket?: { low: number; typical: number; high: number; results: number } | null;
   /** The cautious end, which the bid figures are worked out from. */
   conservative: number | null;
   expected: number | null;
@@ -199,6 +212,19 @@ export function LotDetail({
           emptyText="No bids yet"
           note={lot.bidNote}
         />
+        {valuation.auctionMarket ? (
+          <div className="mt-5 border-t border-border pt-4">
+            <PriceLine
+              label="What these usually fetch at auction"
+              amount={valuation.auctionMarket.typical}
+              note={`From ${valuation.auctionMarket.results} past ${
+                valuation.auctionMarket.results === 1 ? 'sale' : 'sales'
+              } of the same kind of item, between ${money(valuation.auctionMarket.low)} and ${money(
+                valuation.auctionMarket.high,
+              )}. This is what other buyers have paid to win one, which is not the same as what it resells for.`}
+            />
+          </div>
+        ) : null}
       </DetailCard>
 
       <Resale valuation={valuation} found={comparables.length} />

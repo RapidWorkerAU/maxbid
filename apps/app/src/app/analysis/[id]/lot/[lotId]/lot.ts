@@ -130,3 +130,25 @@ export function toComparables(rows: EvidenceRecord[], now: Date = new Date()): C
 export function heaviestFirst(comparables: Comparable[]): Comparable[] {
   return [...comparables].sort((a, b) => b.weight - a.weight);
 }
+
+/**
+ * What these fetch at auction, from a stored valuation row.
+ *
+ * All three ends or none. Two ends and no middle is not a range, and a figure
+ * we cannot state fully is one we must not state at all.
+ */
+export function auctionMarketIn(
+  row: {
+    auction_low: number | string | null;
+    auction_typical: number | string | null;
+    auction_high: number | string | null;
+    auction_results: number | null;
+  } | null,
+): { low: number; typical: number; high: number; results: number } | null {
+  if (!row) return null;
+  const low = asNumber(row.auction_low);
+  const typical = asNumber(row.auction_typical);
+  const high = asNumber(row.auction_high);
+  if (low === null || typical === null || high === null) return null;
+  return { low, typical, high, results: row.auction_results ?? 0 };
+}

@@ -20,7 +20,7 @@ import { findAuctionResults, type AuctionResult } from '../search/auctionResults
 import { brave, type SearchResult } from '../search/brave';
 import { queryFor, type QuerySubject } from '../search/query';
 import { MATERIAL_USAGE_GAP, readUsage, usageGap } from '../search/usage';
-import { allComparables, enoughOnTheirOwn } from './evidence';
+import { allComparables } from './evidence';
 
 export const STAGE = 'S5';
 
@@ -142,26 +142,18 @@ export async function valueLot(input: ValueLotInput): Promise<LotValuation> {
   const query = queryFor(input.subject);
   if (!query) return { query: null, results: 0, ...NOTHING };
 
-  // Past sales first. Decision record 0020: a sold price is weighted 0.95
-  // against an asking price at 0.6, so three results are worth more than five
-  // listings and cost less to gather.
+  // Past sales first. They tell us what it takes to win one of these, which
+  // is the question the archive is best at, and they set the floor under a
+  // resale estimate.
+  //
+  // They used to stop the search when there were four or more of them, on the
+  // grounds that they were enough to value on. They are not, and cannot be: a
+  // hammer price is what a reseller paid to buy and a resale price is what the
+  // public paid to own, so no number of auction results builds a resale range.
+  // Stopping here would have guaranteed the one thing we need and do not have.
+  // The search always runs.
   const past = await findAuctionResults(input.subject, { exceptLotId: input.where.lotId });
   let pagesFetched = past.pagesFetched;
-
-  if (enoughOnTheirOwn(past.results)) {
-    // Enough sold evidence that a web search would spend a call, a read and
-    // often a fetch to add a comparable worth less than half as much.
-    const comparables = allComparables(past.results, [], input.lotKilometres);
-    return {
-      query,
-      results: 0,
-      auctionResults: past.results,
-      comparables: [],
-      valuation: valueComparables({ comparables }),
-      costUsd: 0,
-      pagesFetched,
-    };
-  }
 
   const results = await brave.search(query, { count: RESULTS });
   if (results.length === 0) {

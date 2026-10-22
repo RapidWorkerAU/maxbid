@@ -59,3 +59,34 @@ export const DEFAULT_ASKING_DISCOUNT = 0.1;
 /** At least three comparables carrying this much weight before a range is shown. */
 export const MINIMUM_COMPARABLES = 3;
 export const MINIMUM_COMBINED_WEIGHT = 1.5;
+
+/**
+ * Evidence that is a resale price, so the resale range is built from it.
+ *
+ * matching-and-valuation.md gives every evidence type a "Used for" column,
+ * and only these say Resale. An auction result says "Resale floor and auction
+ * market", which is a different job and is listed separately below.
+ */
+export const RESALE_EVIDENCE: EvidenceType[] = [
+  'verifiedOutcome',
+  'marketplaceSold',
+  'pooledOutcome',
+  'advertisedUsed',
+  'userSupplied',
+];
+
+/**
+ * Evidence of what an item fetches at auction, which is not what it resells
+ * for.
+ *
+ * A hammer price is what a reseller paid to buy. A resale price is what the
+ * public paid to own. The gap between them is the margin the whole product
+ * exists to find, so treating one as the other removes the thing being
+ * measured: a bid worked out from auction prices lands below what the item
+ * demonstrably fetches in the same room, and reads as though the item is
+ * worth less than it is.
+ *
+ * It is still the best evidence we have for what it will take to win, and it
+ * still says a resale cannot sensibly be below it, which is the floor.
+ */
+export const AUCTION_MARKET_EVIDENCE: EvidenceType[] = ['auctionResult'];
