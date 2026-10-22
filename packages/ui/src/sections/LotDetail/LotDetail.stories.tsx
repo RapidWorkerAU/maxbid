@@ -41,7 +41,7 @@ const comparables = [
 const meta: Meta<typeof LotDetail> = {
   title: 'Sections/LotDetail',
   component: LotDetail,
-  tags: ['in-review'],
+  tags: ['approved'],
   parameters: { layout: 'padded' },
   args: {
     lot: {

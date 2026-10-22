@@ -6,7 +6,7 @@ import { BidLimits } from './BidLimits';
 const meta: Meta<typeof BidLimits> = {
   title: 'Composites/BidLimits',
   component: BidLimits,
-  tags: ['in-review'],
+  tags: ['approved'],
   parameters: { layout: 'padded' },
   args: { targetBid: 7936, limitBid: 10081, breakEvenBid: 11369 },
 };

@@ -6,7 +6,7 @@ import { EvidenceRow } from './EvidenceRow';
 const meta: Meta<typeof EvidenceRow> = {
   title: 'Composites/EvidenceRow',
   component: EvidenceRow,
-  tags: ['in-review'],
+  tags: ['approved'],
   parameters: { layout: 'padded' },
   args: {
     comparable: {

@@ -4,7 +4,7 @@ import { PriceLine } from './PriceLine';
 const meta: Meta<typeof PriceLine> = {
   title: 'Composites/PriceLine',
   component: PriceLine,
-  tags: ['in-review'],
+  tags: ['approved'],
   parameters: { layout: 'padded' },
   args: { label: 'Transport', amount: 450 },
 };

@@ -5,7 +5,7 @@ import { PriceLine } from '../PriceLine';
 const meta: Meta<typeof DetailCard> = {
   title: 'Composites/DetailCard',
   component: DetailCard,
-  tags: ['in-review'],
+  tags: ['approved'],
   parameters: { layout: 'padded' },
   args: {
     label: 'Identification',
