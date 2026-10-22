@@ -43,7 +43,12 @@ export default async function AnalysisPage({
 
   if (!data) notFound();
 
-  const { rows, note } = await readCatalogue(supabase, id, data.auction_id, data.status);
+  const { rows, note, shortlisted } = await readCatalogue(
+    supabase,
+    id,
+    data.auction_id,
+    data.status,
+  );
 
   // What this organisation has left to spend on deep analysis. F17 shows it
   // before a shortlist is confirmed, because a charge somebody did not see
@@ -76,6 +81,7 @@ export default async function AnalysisPage({
           initialFilters={filtersFromParams(onlyStrings(query))}
           credits={credits ?? 0}
           analysisId={id}
+          alreadyShortlisted={shortlisted}
           caption="Lots in this catalogue"
           pendingNote={note || undefined}
         />

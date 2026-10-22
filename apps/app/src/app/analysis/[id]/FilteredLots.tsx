@@ -11,6 +11,7 @@ import {
 } from '@maxbid/ui/composites/LotFilters';
 import type { LotRowLot } from '@maxbid/ui/composites/LotRow';
 import { usePathname, useRouter } from 'next/navigation';
+import { saveShortlist } from '../../../lib/shortlist';
 import { useMemo, useState } from 'react';
 
 /**
@@ -43,6 +44,8 @@ export type FilteredLotsProps = {
    * something that would not work.
    */
   analysisId: string;
+  /** The lots already on this analysis's shortlist, so a reload keeps them. */
+  alreadyShortlisted: string[];
   caption?: string;
   pendingNote?: string;
 };
@@ -52,11 +55,14 @@ export function FilteredLots({
   initialFilters,
   credits,
   analysisId,
+  alreadyShortlisted,
   caption,
   pendingNote,
 }: FilteredLotsProps) {
   const [filters, setFilters] = useState(initialFilters);
-  const [shortlisted, setShortlisted] = useState<string[]>([]);
+  const [shortlisted, setShortlisted] = useState<string[]>(alreadyShortlisted);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState<string | null>(null);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -66,6 +72,25 @@ export function FilteredLots({
     // replace rather than push, so the back button leaves the catalogue
     // rather than walking back through every filter the reader tried.
     router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+  };
+
+  const save = async () => {
+    setSaving(true);
+    setSaved(null);
+    const result = await saveShortlist(analysisId, shortlisted);
+    setSaving(false);
+
+    if ('error' in result) {
+      setSaved(result.error);
+      return;
+    }
+    // An emptied shortlist is a saved choice too. Saying nothing would leave
+    // the reader unsure whether unticking everything had worked.
+    setSaved(
+      result.saved === 0
+        ? 'Your shortlist is empty. Nothing is saved against this catalogue.'
+        : `Saved. ${result.saved} ${result.saved === 1 ? 'lot is' : 'lots are'} on your shortlist for this catalogue.`,
+    );
   };
 
   const locations = useMemo(() => locationsIn(lots), [lots]);
@@ -87,14 +112,26 @@ export function FilteredLots({
         caption={caption}
         pendingNote={pendingNote}
         selected={shortlisted}
-        onSelect={(id, on) =>
-          setShortlisted((chosen) => (on ? [...chosen, id] : chosen.filter((each) => each !== id)))
-        }
+        onSelect={(id, on) => {
+          setSaved(null);
+          setShortlisted((chosen) => (on ? [...chosen, id] : chosen.filter((each) => each !== id)));
+        }}
       />
       {/* A lot the filters are hiding stays ticked. Narrowing the list is not
           changing your mind about a lot, and quietly unticking one would be
           us doing that for them. */}
-      <CreditPreview selected={shortlisted.length} available={credits} />
+      <CreditPreview
+        selected={shortlisted.length}
+        available={credits}
+        onConfirm={save}
+        confirming={saving}
+        confirmLabel="Save to your shortlist"
+        confirmingLabel="Saving"
+        note={
+          saved ??
+          'This saves which lots you want analysed in full. It does not spend any credits: the full analysis of each lot is still being built, and credits are only taken when it runs.'
+        }
+      />
     </>
   );
 }

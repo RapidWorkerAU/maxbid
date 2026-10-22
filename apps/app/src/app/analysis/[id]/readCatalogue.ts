@@ -36,7 +36,7 @@ export async function readCatalogue(
       .or(`analysis_id.is.null,analysis_id.eq.${analysisId}`),
     supabase
       .from('analysis_lots')
-      .select('lot_id, triage_low, triage_high, triage_max_bid, opportunity_score')
+      .select('lot_id, triage_low, triage_high, triage_max_bid, opportunity_score, status')
       .eq('analysis_id', analysisId),
     supabase
       .from('triage_valuations')
@@ -68,5 +68,13 @@ export async function readCatalogue(
     .filter(Boolean)
     .join(' ');
 
-  return { rows, note };
+  return {
+    rows,
+    note,
+    // Which lots are already shortlisted, so a reload keeps them ticked. A
+    // tick box that forgets is not a shortlist.
+    shortlisted: (ranges.data ?? [])
+      .filter((row) => row.status === 'shortlisted')
+      .map((row) => row.lot_id),
+  };
 }
