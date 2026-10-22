@@ -27,6 +27,10 @@ export function lotRows(auctionId: string, lots: ParsedLot[], checkedAt: string)
     source_url: lot.lotUrl,
     closes_at: lot.closesAt ?? null,
     current_bid: lot.currentBid ?? null,
+    // Parsed since the card reader was written and only ever kept inside raw.
+    // It is a column because a reader filtering on where a lot is should not
+    // need us to dig through a payload to answer.
+    location_text: lot.location ?? null,
     // Null where the page did not state a bid. A lot nobody has bid on is a
     // bid we read and found to be nothing, so the check still counts.
     bid_checked_at: checkedAt,

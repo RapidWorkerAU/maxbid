@@ -1,16 +1,38 @@
 import { AppShell } from '@maxbid/ui/sections/AppShell';
-import { TriageTable } from '@maxbid/ui/sections/TriageTable';
 import { notFound } from 'next/navigation';
 import { AnalysisProgress } from './AnalysisProgress';
+import { FilteredLots } from './FilteredLots';
+import { filtersFromParams } from '@maxbid/ui/composites/LotFilters';
 import { readCatalogue } from './readCatalogue';
 import { APP_LINKS } from '../../../lib/navigation';
 import { askForFreshBids } from '../../../lib/askForFreshBids';
 import { supabaseServer } from '../../../lib/supabase';
 
+/**
+ * A repeated query parameter arrives as an array, and a filter reads one
+ * value. The first is what a browser would have sent on its own.
+ */
+function onlyStrings(
+  query: Record<string, string | string[] | undefined>,
+): Record<string, string | undefined> {
+  const flat: Record<string, string | undefined> = {};
+  for (const [key, value] of Object.entries(query)) {
+    flat[key] = Array.isArray(value) ? value[0] : value;
+  }
+  return flat;
+}
+
 // SC04 and SC05. Progress while the pipeline runs, then the lots themselves.
 // ux-standards.md asks for stage names and a notice that the user may leave.
-export default async function AnalysisPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function AnalysisPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const { id } = await params;
+  const query = await searchParams;
   const supabase = await supabaseServer();
 
   const { data } = await supabase
@@ -42,9 +64,9 @@ export default async function AnalysisPage({ params }: { params: Promise<{ id: s
         lotCount={rows.length}
       />
       {rows.length > 0 ? (
-        <TriageTable
-          className="mt-10"
+        <FilteredLots
           lots={rows}
+          initialFilters={filtersFromParams(onlyStrings(query))}
           hrefFor={(lotId) => `/analysis/${id}/lot/${lotId}`}
           caption="Lots in this catalogue"
           pendingNote={note || undefined}

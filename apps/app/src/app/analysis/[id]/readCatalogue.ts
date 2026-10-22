@@ -23,7 +23,7 @@ export async function readCatalogue(
   const [lots, identifications, ranges, shared, tried] = await Promise.all([
     supabase
       .from('lots')
-      .select('id, lot_number, title, current_bid, closes_at, bid_checked_at')
+      .select('id, lot_number, title, current_bid, closes_at, bid_checked_at, location_text')
       .eq('auction_id', auctionId)
       .order('lot_number'),
     supabase
