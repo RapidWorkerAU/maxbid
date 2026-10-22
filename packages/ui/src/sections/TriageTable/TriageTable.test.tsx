@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { TriageTable } from './TriageTable';
-import { LOT_CELL_COUNT, LOT_COLUMNS, type LotRowLot } from '../../composites/LotRow';
+import { LOT_COLUMNS_NO_SHORTLIST, cellCountFor, type LotRowLot } from '../../composites/LotRow';
 
 const lots: LotRowLot[] = [
   {
@@ -122,13 +122,20 @@ describe('the heading row lines up with the lots under it', () => {
     // there were ten headings and nine columns. Every heading was styled
     // correctly; there was simply one too many.
     const { container } = render(<TriageTable lots={lots} />);
-    const headings = container.querySelector('.sticky')!;
-    expect(headings.children).toHaveLength(LOT_CELL_COUNT);
+    expect(container.querySelector('.sticky')!.children).toHaveLength(cellCountFor(false));
+  });
+
+  it('renders one more when the list shortlists', () => {
+    const { container } = render(<TriageTable lots={lots} onSelect={() => {}} />);
+    expect(container.querySelector('.sticky')!.children).toHaveLength(cellCountFor(true));
   });
 
   it('gives the heading row the same columns as the lots', () => {
     const { container } = render(<TriageTable lots={lots} />);
-    expect(container.querySelector('.sticky')!.className).toContain(LOT_COLUMNS);
+    const headings = container.querySelector('.sticky')!.className;
+    const row = container.querySelectorAll('.relative')[0]!.className;
+    expect(headings).toContain(LOT_COLUMNS_NO_SHORTLIST);
+    expect(row).toContain(LOT_COLUMNS_NO_SHORTLIST);
   });
 });
 

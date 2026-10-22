@@ -1,4 +1,4 @@
-import { LOT_COLUMNS, LotRow, type LotRowLot } from '../../composites/LotRow';
+import { columnsFor, LotRow, type LotRowLot } from '../../composites/LotRow';
 import { InfoNote } from '../../primitives/InfoNote';
 import { MonoLabel } from '../../primitives/MonoLabel';
 
@@ -46,14 +46,15 @@ function Empty() {
 }
 
 /** The column headings. Hidden on a phone, where each row is a card. */
-function Headings() {
+function Headings({ shortlisting }: { shortlisting: boolean }) {
   return (
     <div
-      className={`sticky top-0 z-10 hidden h-row items-center border-b border-line bg-surface-muted px-3 md:grid md:gap-x-3 ${LOT_COLUMNS}`}
+      className={`sticky top-0 z-10 hidden h-row items-center border-b border-line bg-surface-muted px-3 md:grid md:gap-x-3 ${columnsFor(shortlisting)}`}
     >
-      {/* The empty cell above the checkbox column, so the headings sit over
-          the right cells whether the list shortlists or not. */}
-      <span aria-hidden />
+      {/* The cell above the shortlist column, which only exists when the list
+          shortlists. Without it the headings would sit one column left of the
+          cells they name. */}
+      {shortlisting ? <span aria-hidden /> : null}
       <MonoLabel size="xs" tone="ink" className="text-right">
         Rank
       </MonoLabel>
@@ -124,7 +125,7 @@ export function TriageTable({
 
       {/* A hairline frame with 2px corners, per B08. No shadow. */}
       <div className="mt-3 overflow-hidden rounded-sm border border-line/60">
-        <Headings />
+        <Headings shortlisting={Boolean(onSelect)} />
         {lots.map((lot) => (
           <LotRow
             key={lot.id}
