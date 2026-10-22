@@ -1256,6 +1256,44 @@ export type Database = {
           },
         ]
       }
+      valuation_attempts: {
+        Row: {
+          attempted_at: string
+          combined_weight: number
+          comparable_count: number
+          created_at: string
+          id: string
+          lot_id: string
+          method_version: string
+        }
+        Insert: {
+          attempted_at?: string
+          combined_weight?: number
+          comparable_count?: number
+          created_at?: string
+          id?: string
+          lot_id: string
+          method_version: string
+        }
+        Update: {
+          attempted_at?: string
+          combined_weight?: number
+          comparable_count?: number
+          created_at?: string
+          id?: string
+          lot_id?: string
+          method_version?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "valuation_attempts_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "lots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       waitlist_signups: {
         Row: {
           converted_org_id: string | null

@@ -17,7 +17,12 @@ import { SpendCeilingError } from '../ai/pricing';
 import { inngest, valueRequested } from './client';
 import { identificationsFor } from './sharedIdentification';
 import { lotsWorthValuing } from './shortlist';
-import { storedRangesFor, VALUATION_METHOD_VERSION, type SharedRange } from './sharedValuation';
+import {
+  recentlyFailedFor,
+  storedRangesFor,
+  VALUATION_METHOD_VERSION,
+  type SharedRange,
+} from './sharedValuation';
 import { assertBudgetLeft } from './triage';
 import { applyRange, valueAndStore, type LotToValue, type ValuingContext } from './valueOneLot';
 
@@ -160,7 +165,13 @@ export async function readLotsToValue(analysisId: string) {
   })[];
 
   const ranges = await storedRangesFor(all.map((lot) => lot.lot_id));
-  const unknown = all.filter((lot) => !ranges.has(lot.lot_id));
+
+  // A lot this method tried recently and could not value is left alone. It
+  // fails for want of comparables, and comparables arrive as the archive
+  // grows over weeks, so trying again tonight spends the same fetches on the
+  // same answer. O19.
+  const failed = await recentlyFailedFor(all.map((lot) => lot.lot_id));
+  const unknown = all.filter((lot) => !ranges.has(lot.lot_id) && !failed.has(lot.lot_id));
 
   // A plain list, not the map. Every step result crosses a JSON boundary on
   // its way back from Inngest, and a Map does not survive that: it arrives as
@@ -185,6 +196,9 @@ export async function readLotsToValue(analysisId: string) {
   return {
     chosen: unknown.filter((lot) => worth.has(lot.lot_id)),
     held,
+    // Reported so a run that valued nothing says why: a sale where every lot
+    // failed recently is a different thing from one with nothing to value.
+    skippedAfterFailing: failed.size,
     considered: all.length,
   };
 }
@@ -292,6 +306,7 @@ export const valueLots = inngest.createFunction(
       reused: reused.applied,
       reuseRefused: reused.refused,
       withoutEvidence,
+      skippedAfterFailing: lots.skippedAfterFailing,
       stoppedForSpend,
       methodVersion: VALUATION_METHOD_VERSION,
     };

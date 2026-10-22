@@ -52,6 +52,7 @@ Updated at the end of every pull request. The current row is always the one to r
 | 52 | Identify a lot once, for everybody | Open | |
 | 53 | Say when we last checked the bids | Open | |
 | 55 | Re-read a current bid as often as it needs it | Open | |
+| 56 | Remember a lot we could not value | Open | |
 | next | Read the sitemaps nightly and queue the sales nobody has asked about | Next |  |
 
 **Where we are.** The pipeline runs end to end on a real sale: a pasted Grays link becomes 36 identified lots with a premium schedule, resale ranges, bid figures and a ranking, all on screen. The archive holds what all 36 lots actually sold for, harvested after the sale closed, which is evidence nobody else has.
@@ -64,7 +65,7 @@ Updated at the end of every pull request. The current row is always the one to r
 
 **Blocked and waiting on Ashleigh.** O04, the eBay Marketplace Insights application, is still worth making because approval takes time and sold listings would strengthen the evidence. O11 blocks promoting the waitlist page. The app has never been deployed: there is no Vercel project for apps/app and maxbid.com.au still points at a placeholder. LotRow is In review and needs a Storybook sign off before any further page uses it.
 
-**Open items raised by building.** O17, a catalogue page cut short cannot be detected. O18, a premium band that combines a fixed amount with a percentage, or carries a minimum. O19, a lot with too little evidence stores no range, so it is valued again on every analysis. O20, the per page cost of re-reading bids against the extraction plan's limits.
+**Open items raised by building.** O17, a catalogue page cut short cannot be detected. O18, a premium band that combines a fixed amount with a percentage, or carries a minimum. O20, the per page cost of re-reading bids against the extraction plan's limits. O19 is closed by decision record 0027.
 
 **A rule that has to be kept by hand.** Decision record 0025 reuses a stored resale range while `VALUATION_METHOD_VERSION` matches. **Bump that string whenever the valuation method changes what the answer would be.** Nothing detects a forgotten bump, and the consequence is that an accuracy fix does not reach any lot already valued.
 
