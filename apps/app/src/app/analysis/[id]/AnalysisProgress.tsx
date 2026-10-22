@@ -3,6 +3,7 @@
 import { InfoNote } from '@maxbid/ui/primitives/InfoNote';
 import { MonoLabel } from '@maxbid/ui/primitives/MonoLabel';
 import { StopLine } from '@maxbid/ui/primitives/StopLine';
+import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { STAGES, stageFor, type AnalysisStatus } from '../../../lib/stages';
 
@@ -25,11 +26,18 @@ export function AnalysisProgress({
 
   // Refresh while there is work happening. A background job has no way to push
   // to this page yet, so the page asks. Web push arrives with F93.
+  //
+  // router.refresh rather than reloading the browser. A reload threw away the
+  // reader's scroll position every five seconds, so anybody looking at a lot
+  // halfway down a long catalogue was dragged back to the top while they read.
+  // This re-fetches the page on the server and updates it in place: the
+  // figures change and nothing else moves.
+  const router = useRouter();
   useEffect(() => {
     if (stage.settled) return;
-    const timer = setInterval(() => window.location.reload(), 5000);
+    const timer = setInterval(() => router.refresh(), 5000);
     return () => clearInterval(timer);
-  }, [stage.settled]);
+  }, [stage.settled, router]);
 
   return (
     <div className="max-w-2xl">
@@ -41,9 +49,7 @@ export function AnalysisProgress({
         things at once.
       */}
       <h1 className="font-sans text-2xl font-bold">{title ?? 'Catalogue analysis'}</h1>
-      {sourceUrl ? (
-        <p className="mt-1 truncate text-sm text-ink-muted">{sourceUrl}</p>
-      ) : null}
+      {sourceUrl ? <p className="mt-1 truncate text-sm text-ink-muted">{sourceUrl}</p> : null}
 
       <div className="mt-6" aria-live="polite">
         <p className="font-sans font-semibold">{stage.label}</p>

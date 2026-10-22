@@ -125,7 +125,12 @@ export const triage = inngest.createFunction(
         .update({
           // Stopping for spend is not a finished triage, and saying it was
           // would hide the reason the later stages have nothing to work with.
-          status: stoppedForSpend ? 'failed' : 'triaged',
+          //
+          // valuing, not triaged. S5 runs for another twenty minutes after
+          // this, and triaged is what the screen reads as finished: it said
+          // every lot was ranked while none had been valued, and stopped
+          // refreshing itself because there was nothing left to wait for.
+          status: stoppedForSpend ? 'failed' : 'valuing',
           progress_pct: stoppedForSpend ? 25 : 50,
         })
         .eq('id', analysisId);

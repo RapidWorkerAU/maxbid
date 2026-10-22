@@ -122,10 +122,39 @@ export const ASaleOfThem: Story = {
   render: () => (
     <div className="border-t border-line">
       {[
-        { id: 'a', lotNumber: '0001-23502418', title: '2015 Invented Wagon Alpha Diesel', currentBid: 1609, confidence: 95, identifiedAs: 'Invented Wagon, Alpha, 2015', conditionNote: 'WOVR-INSPECTED' },
-        { id: 'b', lotNumber: '0002-23502418', title: '2014 Invented Hatch Beta Petrol', currentBid: 809, confidence: 95, identifiedAs: 'Invented Hatch, Beta, 2014' },
-        { id: 'c', lotNumber: '0005-23502418', title: '2008 Invented Cruiser Gamma Diesel', currentBid: 11200, confidence: 90, identifiedAs: 'Invented Cruiser, Gamma, 2008' },
-        { id: 'd', lotNumber: '0022-23502418', title: '2007 Invented Coupe', currentBid: 909, confidence: 42, identifiedAs: 'Invented Coupe, 2007' },
+        {
+          id: 'a',
+          lotNumber: '0001-23502418',
+          title: '2015 Invented Wagon Alpha Diesel',
+          currentBid: 1609,
+          confidence: 95,
+          identifiedAs: 'Invented Wagon, Alpha, 2015',
+          conditionNote: 'WOVR-INSPECTED',
+        },
+        {
+          id: 'b',
+          lotNumber: '0002-23502418',
+          title: '2014 Invented Hatch Beta Petrol',
+          currentBid: 809,
+          confidence: 95,
+          identifiedAs: 'Invented Hatch, Beta, 2014',
+        },
+        {
+          id: 'c',
+          lotNumber: '0005-23502418',
+          title: '2008 Invented Cruiser Gamma Diesel',
+          currentBid: 11200,
+          confidence: 90,
+          identifiedAs: 'Invented Cruiser, Gamma, 2008',
+        },
+        {
+          id: 'd',
+          lotNumber: '0022-23502418',
+          title: '2007 Invented Coupe',
+          currentBid: 909,
+          confidence: 42,
+          identifiedAs: 'Invented Coupe, 2007',
+        },
       ].map((lot) => (
         <LotRow
           key={lot.id}
@@ -171,7 +200,9 @@ export const FitsInOneRow: Story = {
     // something wrapped.
     const height = row.getBoundingClientRect().height;
     if (height > 40) {
-      throw new Error(`The row is ${Math.round(height)}px tall, so something wrapped into a second line.`);
+      throw new Error(
+        `The row is ${Math.round(height)}px tall, so something wrapped into a second line.`,
+      );
     }
 
     // Nothing may spill sideways out of the row.
@@ -280,4 +311,31 @@ export const BelowTheTarget: Story = {
       score: 0,
     },
   },
+};
+
+// A lot part way through the pipeline. The three below are the same lot at
+// three points, and the difference between the last two is the whole point:
+// one is a wait and the other is an answer.
+const partway = {
+  id: '9',
+  lotNumber: '0009-23502418',
+  title: '2007 Invented Saloon Beta Petrol',
+  currentBid: 109,
+  identifiedAs: 'Invented Saloon, Beta, 2007',
+  confidence: 92,
+};
+
+/** Identification has not reached this lot yet. Not the same as having failed. */
+export const StillBeingIdentified: Story = {
+  args: { lot: { ...partway, identifiedAs: null, confidence: null, pending: 'identification' } },
+};
+
+/** Identified, and the valuation stage has not reached it yet. */
+export const StillBeingValued: Story = {
+  args: { lot: { ...partway, pending: 'valuation' } },
+};
+
+/** The same lot once the stage has run and found too little. */
+export const LookedAndFoundTooLittle: Story = {
+  args: { lot: { ...partway, pending: null } },
 };

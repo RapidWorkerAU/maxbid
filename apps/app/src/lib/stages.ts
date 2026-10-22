@@ -7,6 +7,7 @@ export type AnalysisStatus =
   | 'queued'
   | 'extracting'
   | 'triaging'
+  | 'valuing'
   | 'triaged'
   | 'deep_running'
   | 'complete'
@@ -24,6 +25,7 @@ export const STAGES: AnalysisStatus[] = [
   'queued',
   'extracting',
   'triaging',
+  'valuing',
   'triaged',
   'deep_running',
   'complete',
@@ -45,6 +47,12 @@ const DESCRIPTIONS: Record<AnalysisStatus, Omit<Stage, 'number'>> = {
     detail: 'We are working out a rough value for each lot so we can rank them.',
     settled: false,
   },
+  valuing: {
+    label: 'Working out what each lot is worth',
+    detail:
+      'We have worked out what every lot is. We are now finding comparable sales for the lots worth valuing, which takes a while because we read them one at a time. The list fills in as we go and you can leave this page.',
+    settled: false,
+  },
   triaged: {
     label: 'Ready for you',
     detail: 'Every lot is ranked. Choose the ones worth a detailed analysis.',
@@ -52,7 +60,8 @@ const DESCRIPTIONS: Record<AnalysisStatus, Omit<Stage, 'number'>> = {
   },
   deep_running: {
     label: 'Analysing the lots you chose',
-    detail: 'We are identifying each item, finding comparable sales and working out your bid limits.',
+    detail:
+      'We are identifying each item, finding comparable sales and working out your bid limits.',
     settled: false,
   },
   complete: {

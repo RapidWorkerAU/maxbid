@@ -253,3 +253,38 @@ describe('opening a lot from the row', () => {
     expect(screen.getByRole('checkbox').className).toContain('z-10');
   });
 });
+
+describe('a cell that is still being worked out', () => {
+  // "Not enough evidence" on a lot the valuation stage has not reached is a
+  // claim about work we have not done. These are different statements and the
+  // row has to tell them apart.
+  it('says it is working rather than that there is no evidence', () => {
+    render(<LotRow lot={{ ...lot, pending: 'valuation' }} />);
+    expect(screen.getAllByText('Working it out').length).toBeGreaterThan(0);
+    expect(screen.queryByText('Not enough evidence')).toBeNull();
+    expect(screen.queryByText('Not worked out')).toBeNull();
+  });
+
+  it('says there is no evidence once the stage has run', () => {
+    render(<LotRow lot={{ ...lot, pending: null }} />);
+    expect(screen.getByText('Not enough evidence')).toBeTruthy();
+    expect(screen.queryByText('Working it out')).toBeNull();
+  });
+
+  it('says it is working on the name while the identification runs', () => {
+    render(<LotRow lot={{ ...lot, identifiedAs: null, pending: 'identification' }} />);
+    expect(screen.getAllByText('Working it out').length).toBeGreaterThan(0);
+  });
+
+  it('never covers a figure it already has', () => {
+    // A lot part way through still shows what we know. Hiding a real figure
+    // behind a wait would be worse than the wait.
+    render(<LotRow lot={{ ...lot, resaleLow: 14000, resaleHigh: 21000, pending: 'valuation' }} />);
+    expect(screen.getByText(/\$14,000/)).toBeTruthy();
+  });
+
+  it('never marks a pending cell in marker yellow', () => {
+    const { container } = render(<LotRow lot={{ ...lot, pending: 'valuation' }} />);
+    expect(container.querySelectorAll('.bg-marker')).toHaveLength(0);
+  });
+});
