@@ -129,6 +129,19 @@ export async function readLotsToValue(analysisId: string) {
     .single();
   if (missing) throw new Error(`Could not read the analysis: ${missing.message}`);
 
+  // Which lots this analysis actually covers. S2 opened a row for every lot it
+  // read, and `lots` holds every lot ever seen on the auction, so the two are
+  // not the same set: a catalogue that lost a lot between two runs, or a sale
+  // read in full by a crawl and in part by a person, leaves identifications
+  // and ranges for lots this analysis has no row for. Those lots are not ours
+  // to write a bid figure against.
+  const { data: covered, error: notCovered } = await supabase
+    .from('analysis_lots')
+    .select('lot_id')
+    .eq('analysis_id', analysisId);
+  if (notCovered) throw new Error(`Could not read the analysis lots: ${notCovered.message}`);
+  const ours = new Set((covered ?? []).map((row) => row.lot_id));
+
   const identifications = await identificationsFor(analysis.auction_id, analysisId);
   const { data, error } = await supabase
     .from('lots')
@@ -137,10 +150,12 @@ export async function readLotsToValue(analysisId: string) {
   if (error) throw new Error(`Could not read the lots: ${error.message}`);
 
   const lotById = new Map((data ?? []).map((lot) => [lot.id, lot]));
-  const all = identifications.map((row) => ({
-    ...row,
-    lots: lotById.get(row.lot_id) ?? null,
-  })) as unknown as (LotToValue & {
+  const all = identifications
+    .filter((row) => ours.has(row.lot_id))
+    .map((row) => ({
+      ...row,
+      lots: lotById.get(row.lot_id) ?? null,
+    })) as unknown as (LotToValue & {
     lots: { title: string; raw: unknown; current_bid: number | string | null } | null;
   })[];
 
@@ -197,11 +212,23 @@ export const valueLots = inngest.createFunction(
 
     // Everything we already hold, before anything is spent. Arithmetic only,
     // so those rows fill in at once rather than over forty minutes.
+    //
+    // One lot that cannot be written must not stop the rest, the same way the
+    // valuing path below tolerates one lot failing. Throwing here would fail
+    // the step, and with retries that fails the whole analysis over a single
+    // row.
     const reused = await step.run('apply-stored-ranges', async () => {
+      let applied = 0;
+      let refused = 0;
       for (const entry of lots.held) {
-        await applyRange(entry.lotId, entry.range, { analysisId }, context);
+        try {
+          await applyRange(entry.lotId, entry.range, { analysisId }, context);
+          applied += 1;
+        } catch {
+          refused += 1;
+        }
       }
-      return lots.held.length;
+      return { applied, refused };
     });
 
     const chosen = lots.chosen;
@@ -262,7 +289,8 @@ export const valueLots = inngest.createFunction(
       analysisId,
       considered: lots.considered,
       valued,
-      reused,
+      reused: reused.applied,
+      reuseRefused: reused.refused,
       withoutEvidence,
       stoppedForSpend,
       methodVersion: VALUATION_METHOD_VERSION,
