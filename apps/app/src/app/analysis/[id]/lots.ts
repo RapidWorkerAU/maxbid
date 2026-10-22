@@ -36,6 +36,8 @@ export type SharedRangeRecord = {
   lot_id: string;
   conservative: number | string | null;
   optimistic: number | string | null;
+  /** 0 to 100, in the range itself. What the table's confidence column shows. */
+  confidence?: number | string | null;
 };
 
 export type IdentificationRecord = {
@@ -105,8 +107,16 @@ export function toRows(
   const rows = lots.map((lot) => {
     const found = byLot.get(lot.id);
     const range = rangeByLot.get(lot.id);
-    const resale = resaleRangeFor(range, sharedByLot.get(lot.id));
-    const confidence = asNumber(found?.confidence);
+    const shared = sharedByLot.get(lot.id);
+    const resale = resaleRangeFor(range, shared);
+
+    // The confidence in the figures on this row, not in what the lot is. The
+    // two are different questions and this column sits among the money.
+    //
+    // Null where the organisation corrected the range themselves: our
+    // confidence was in our figure, and theirs has replaced it.
+    const confidence =
+      resale.low === null || range?.triage_low != null ? null : asNumber(shared?.confidence);
 
     return {
       id: lot.id,

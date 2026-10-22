@@ -76,8 +76,10 @@ function Headings({ shortlisting }: { shortlisting: boolean }) {
       <MonoLabel size="xs" tone="ink" className="text-right">
         Bid up to
       </MonoLabel>
+      {/* Confidence in the figures to its left, not in what the lot is. The
+          two are different questions, and this column sits among the money. */}
       <MonoLabel size="xs" tone="ink" className="justify-self-end">
-        Confidence
+        Figures
       </MonoLabel>
       <MonoLabel size="xs" tone="ink" className="text-right">
         Closes

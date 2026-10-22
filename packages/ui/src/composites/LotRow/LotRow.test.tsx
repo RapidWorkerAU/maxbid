@@ -306,3 +306,26 @@ describe('a cell that is still being worked out', () => {
     expect(container.querySelectorAll('.bg-marker')).toHaveLength(0);
   });
 });
+
+describe('what the confidence column is confidence in', () => {
+  // It used to carry how sure we were that the lot was a 2008 Range Rover,
+  // sitting between a resale range and a bid figure, where it reads as
+  // confidence in the money. On a row saying "Not enough evidence" it then
+  // said "High confidence" beside it, which is two opposite things on one
+  // line.
+  it('shows nothing where there are no figures to be confident in', () => {
+    render(<LotRow lot={{ ...lot, confidence: null }} />);
+    expect(screen.queryByText(/confidence/i)).toBeNull();
+  });
+
+  it('shows a band where there is a range behind it', () => {
+    render(<LotRow lot={{ ...lot, resaleLow: 14000, resaleHigh: 21000, confidence: 62 }} />);
+    expect(screen.getByText(/confidence/i)).toBeTruthy();
+  });
+
+  it('never sits beside a row that says there is not enough evidence', () => {
+    const { container } = render(<LotRow lot={{ ...lot, confidence: null, pending: null }} />);
+    expect(container.textContent).toContain('Not enough evidence');
+    expect(container.textContent).not.toMatch(/confidence/i);
+  });
+});
