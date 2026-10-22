@@ -48,6 +48,7 @@ Updated at the end of every pull request. The current row is always the one to r
 | 48 | Catalogues are ready before anybody asks for them, decision record 0024 | Merged | 13 Oct 2026 |
 | 49 | Put what a lot is and what it is worth where everybody can read them | Open | |
 | 50 | Record what actually happened, because nothing else can tell us | Open | |
+| 51 | Read what we already know before working it out again | Open | |
 | next | Read the sitemaps nightly and queue the sales nobody has asked about | Next |  |
 
 **Where we are.** The pipeline runs end to end on a real sale: a pasted Grays link becomes 36 identified lots with a premium schedule, resale ranges, bid figures and a ranking, all on screen. The archive holds what all 36 lots actually sold for, harvested after the sale closed, which is evidence nobody else has.
@@ -60,7 +61,9 @@ Updated at the end of every pull request. The current row is always the one to r
 
 **Blocked and waiting on Ashleigh.** O04, the eBay Marketplace Insights application, is still worth making because approval takes time and sold listings would strengthen the evidence. O11 blocks promoting the waitlist page. The app has never been deployed: there is no Vercel project for apps/app and maxbid.com.au still points at a placeholder. LotRow is In review and needs a Storybook sign off before any further page uses it.
 
-**Open items raised by building.** O17, a catalogue page cut short cannot be detected. O18, a premium band that combines a fixed amount with a percentage, or carries a minimum.
+**Open items raised by building.** O17, a catalogue page cut short cannot be detected. O18, a premium band that combines a fixed amount with a percentage, or carries a minimum. O19, a lot with too little evidence stores no range, so it is valued again on every analysis.
+
+**A rule that has to be kept by hand.** Decision record 0025 reuses a stored resale range while `VALUATION_METHOD_VERSION` matches. **Bump that string whenever the valuation method changes what the answer would be.** Nothing detects a forgotten bump, and the consequence is that an accuracy fix does not reach any lot already valued.
 
 ## How to read this
 

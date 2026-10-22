@@ -20,7 +20,10 @@ export default async function AnalysisPage({ params }: { params: Promise<{ id: s
 
   if (!data) notFound();
 
-  const [lots, identifications, ranges] = await Promise.all([
+  // The resale range is shared, because it does not depend on who is buying.
+  // The maximum bid and the score are this organisation's own. Decision
+  // record 0024.
+  const [lots, identifications, ranges, shared] = await Promise.all([
     supabase
       .from('lots')
       .select('id, lot_number, title, current_bid, closes_at')
@@ -35,9 +38,19 @@ export default async function AnalysisPage({ params }: { params: Promise<{ id: s
       .from('analysis_lots')
       .select('lot_id, triage_low, triage_high, triage_max_bid, opportunity_score')
       .eq('analysis_id', id),
+    supabase
+      .from('triage_valuations')
+      .select('lot_id, conservative, optimistic, lots!inner(auction_id)')
+      .eq('lots.auction_id', data.auction_id)
+      .eq('is_current', true),
   ]);
 
-  const rows = toRows(lots.data ?? [], identifications.data ?? [], ranges.data ?? []);
+  const rows = toRows(
+    lots.data ?? [],
+    identifications.data ?? [],
+    ranges.data ?? [],
+    shared.data ?? [],
+  );
   const identified = rows.filter((row) => row.identifiedAs).length;
 
   return (
