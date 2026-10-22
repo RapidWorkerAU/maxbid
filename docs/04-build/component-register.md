@@ -69,7 +69,7 @@ This register is the sign off record for every component in packages/ui. It is t
 | UI46 | MethodSteps | Section | Web | Not started |  |  |
 | UI47 | AppShell | Section | App | In review | 29 September 2026 | Sidebar on desktop, bottom tab bar on mobile, safe area aware. Now used by three pages |
 | UI48 | TriageTable | Section | App | Approved | 29 September 2026 | SC05 with the resale range. Sticky header, C09 density switch. Still no opportunity score or maximum bid, which need S6 and a cost profile |
-| UI49 | LotDetail | Section | App | Not started |  |  |
+| UI49 | LotDetail | Section | App | In review | 22 October 2026 | One lot and everything we know about it, in the order of the argument: what it is, what it is bid to, what it resells for, the evidence for that, then the bid figures that follow. A test asserts it never tells the reader whether to bid |
 | UI50 | BidView | Section | App | Not started |  |  |
 | UI51 | ChangesSummary | Composite | App | Not started |  | Added for F54 |
 | UI52 | SearchedNotFoundPanel | Composite | App | Not started |  | Added for F57 |

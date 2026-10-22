@@ -50,6 +50,8 @@ export type LotRowProps = {
   lot: LotRowLot;
   /** C09. Standard is 36px, comfortable is 44px. */
   density?: 'standard' | 'comfortable';
+  /** Where the lot's own screen is. Omitted where there is nowhere to go. */
+  href?: string;
   /** Shown when the list lets the user shortlist lots. */
   selected?: boolean;
   onSelect?: (id: string, selected: boolean) => void;
@@ -118,7 +120,8 @@ function Condition({ note }: { note?: string | null }) {
 }
 
 function Score({ score }: { score?: number | null }) {
-  if (score === null || score === undefined) return <span className="hidden md:block" aria-hidden />;
+  if (score === null || score === undefined)
+    return <span className="hidden md:block" aria-hidden />;
   return <span className="font-mono text-sm font-bold tabular-nums text-ink">{score}</span>;
 }
 
@@ -165,9 +168,7 @@ function MaxBid({ amount }: { amount?: number | null }) {
   }
   if (amount <= 0) {
     return (
-      <span className="whitespace-nowrap font-sans text-xs text-ink-muted">
-        Below your target
-      </span>
+      <span className="whitespace-nowrap font-sans text-xs text-ink-muted">Below your target</span>
     );
   }
   return (
@@ -179,6 +180,7 @@ function MaxBid({ amount }: { amount?: number | null }) {
 
 export function LotRow({
   lot,
+  href,
   density = 'standard',
   selected,
   onSelect,
@@ -204,11 +206,26 @@ export function LotRow({
       </MonoLabel>
 
       {/* Item. The longest thing on the row, so it gets the largest share and
-          truncates rather than pushing everything else out of line. */}
+          truncates rather than pushing everything else out of line.
+
+          The title is the link to the lot, where the evidence behind every
+          figure on this row is shown. It is the title rather than the whole
+          row so that the shortlist checkbox stays usable, and so a reader
+          dragging to select a figure does not navigate away. */}
       <div className="col-start-2 flex min-w-0 items-center gap-2 md:col-start-auto">
-        <span className="truncate font-sans font-semibold text-ink" title={lot.title}>
-          {lot.title}
-        </span>
+        {href ? (
+          <a
+            href={href}
+            className="truncate font-sans font-semibold text-link underline"
+            title={lot.title}
+          >
+            {lot.title}
+          </a>
+        ) : (
+          <span className="truncate font-sans font-semibold text-ink" title={lot.title}>
+            {lot.title}
+          </span>
+        )}
         <Condition note={lot.conditionNote} />
       </div>
 

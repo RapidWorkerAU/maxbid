@@ -172,3 +172,30 @@ describe('the most you should bid', () => {
     expect(screen.queryByText('100')).toBeNull();
   });
 });
+
+describe('linking to the lot', () => {
+  it('links the title when there is somewhere to go', () => {
+    render(<LotRow lot={lot} href="/analysis/a1/lot/l1" />);
+    const link = screen.getByRole('link');
+    expect(link.getAttribute('href')).toBe('/analysis/a1/lot/l1');
+    expect(link.textContent).toBe('2015 Invented Wagon Alpha Diesel');
+  });
+
+  it('shows the title as plain text when there is nowhere to go', () => {
+    render(<LotRow lot={lot} />);
+    expect(screen.queryByRole('link')).toBeNull();
+  });
+
+  it('links the title rather than the whole row', () => {
+    // A whole row link would swallow the shortlist checkbox and would
+    // navigate away when a reader drags to select a figure.
+    render(<LotRow lot={lot} href="/analysis/a1/lot/l1" onSelect={() => {}} />);
+    expect(screen.getAllByRole('link')).toHaveLength(1);
+    expect(screen.getByRole('checkbox')).toBeTruthy();
+  });
+
+  it('keeps the title on one line even as a link', () => {
+    render(<LotRow lot={lot} href="/analysis/a1/lot/l1" />);
+    expect(screen.getByRole('link').className).toContain('truncate');
+  });
+});

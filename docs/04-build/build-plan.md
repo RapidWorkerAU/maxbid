@@ -54,6 +54,7 @@ Updated at the end of every pull request. The current row is always the one to r
 | 54 | Value only the lots this analysis covers | Merged | 22 Oct 2026 |
 | 55 | Re-read a current bid as often as it needs it | Merged | 22 Oct 2026 |
 | 56 | Remember a lot we could not value | Merged | 22 Oct 2026 |
+| 58 | The lot detail screen, which shows the working | Open | |
 | next | Read the sitemaps nightly and queue the sales nobody has asked about | Next |  |
 
 **Where we are.** The pipeline runs end to end on a real sale: a pasted Grays link becomes 36 identified lots with a premium schedule, resale ranges, bid figures and a ranking, all on screen. The archive holds what all 36 lots actually sold for. Decision record 0024's shared layer is now built on top of that, so the work that does not depend on who is asking is done once and read by everybody.
