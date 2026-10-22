@@ -135,3 +135,25 @@ describe('the order the evidence is shown in', () => {
     expect(rows.map((row) => row.id)).toEqual(['a', 'b']);
   });
 });
+
+describe('reading the match level the database stores', () => {
+  it('translates every snake case level the database allows', () => {
+    // The database spells these in snake case and the components in camel
+    // case. Getting it wrong is silent: an unrecognised level falls back to
+    // insufficient, so the screen would call every comparable a failed match
+    // while the range above it was built from exact ones.
+    const pairs = [
+      ['exact', 'exact'],
+      ['near_exact', 'nearExact'],
+      ['higher_spec', 'higherSpec'],
+      ['lower_spec', 'lowerSpec'],
+      ['similar_alternative', 'similarAlternative'],
+      ['insufficient', 'insufficient'],
+    ] as const;
+
+    for (const [stored, shown] of pairs) {
+      const [row] = toComparables([record({ match_level: stored })], NOW);
+      expect(row!.matchLevel, `${stored} should read as ${shown}`).toBe(shown);
+    }
+  });
+});

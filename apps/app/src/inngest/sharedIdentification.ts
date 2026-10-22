@@ -21,6 +21,8 @@ import type { IdentifiedLot } from './triage';
 
 /** What a lot is, as the valuation stage needs to read it. */
 export type LotIdentification = {
+  /** The row's own id. The evidence for a lot hangs off it. F59. */
+  id: string;
   lot_id: string;
   brand: string | null;
   model: string | null;
@@ -34,7 +36,7 @@ export type LotIdentification = {
 };
 
 const COLUMNS =
-  'lot_id, brand, model, year, specs, confidence, stage, condition_notes, analysis_id';
+  'id, lot_id, brand, model, year, specs, confidence, stage, condition_notes, analysis_id';
 
 /**
  * Which of these lots we already know the identity of.

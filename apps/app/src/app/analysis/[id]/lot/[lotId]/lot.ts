@@ -34,14 +34,23 @@ export type EvidenceRecord = {
   } | null;
 };
 
-const MATCH_LEVELS: MatchLevel[] = [
-  'exact',
-  'nearExact',
-  'higherSpec',
-  'lowerSpec',
-  'similarAlternative',
-  'insufficient',
-];
+/**
+ * The database spells a match level in snake case and the components in camel
+ * case.
+ *
+ * This is a map rather than a string transform because getting it wrong is
+ * silent: an unrecognised level falls back to insufficient, so the screen
+ * would tell the reader every comparable was a failed match while the range
+ * above it was built from exact ones.
+ */
+const MATCH_LEVELS: Record<string, MatchLevel> = {
+  exact: 'exact',
+  near_exact: 'nearExact',
+  higher_spec: 'higherSpec',
+  lower_spec: 'lowerSpec',
+  similar_alternative: 'similarAlternative',
+  insufficient: 'insufficient',
+};
 
 /**
  * Which source types are a price somebody paid rather than asked.
@@ -96,9 +105,7 @@ export function toComparables(rows: EvidenceRecord[], now: Date = new Date()): C
         id: row.id,
         title,
         price,
-        matchLevel: MATCH_LEVELS.includes(row.match_level as MatchLevel)
-          ? (row.match_level as MatchLevel)
-          : 'insufficient',
+        matchLevel: MATCH_LEVELS[row.match_level ?? ''] ?? 'insufficient',
         weight: asNumber(row.weight) ?? 0,
         ageInDays: ageInDays(row.comparable_snapshots?.checked_at ?? null, now),
         // The source in our own words, with the site named where we have it.

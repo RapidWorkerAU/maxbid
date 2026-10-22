@@ -235,3 +235,82 @@ describe('a record that we tried and could not', () => {
     expect(other.error).toBeNull();
   });
 });
+
+describe('the evidence behind a shared identification', () => {
+  // F59. The range is checkable or it is a number to be taken on trust, and a
+  // reader who may see the identification may see what it was built from.
+  let identificationId: string;
+
+  it('is readable by every organisation', async () => {
+    const admin = serviceClient();
+
+    const baseline = await admin
+      .from('lot_identifications')
+      .select('id')
+      .eq('lot_id', a.lotId)
+      .is('analysis_id', null)
+      .eq('is_current', true)
+      .single();
+    if (baseline.error) throw baseline.error;
+    identificationId = baseline.data.id;
+
+    const comparable = await admin
+      .from('comparables')
+      .insert({
+        source_type: 'auction_result',
+        provenance: 'extracted',
+        source_name: 'Grays',
+        url: `https://example.test/${crypto.randomUUID()}`,
+        title: 'A past auction result',
+        condition: 'used',
+      })
+      .select('id')
+      .single();
+    if (comparable.error) throw comparable.error;
+
+    const snapshot = await admin
+      .from('comparable_snapshots')
+      .insert({ comparable_id: comparable.data.id, price: 14500, status: 'sold' })
+      .select('id')
+      .single();
+    if (snapshot.error) throw snapshot.error;
+
+    const match = await admin.from('lot_comparables').insert({
+      identification_id: identificationId,
+      comparable_id: comparable.data.id,
+      snapshot_id: snapshot.data.id,
+      match_level: 'near_exact',
+      reason: 'A past auction result for the same kind of item.',
+      adjusted_price: 14500,
+      weight: 0.95,
+    });
+    if (match.error) throw match.error;
+
+    // Before this was fixed, owns_identification asked whether the caller
+    // owned the analysis behind the identification. A baseline has no
+    // analysis, so the answer was no and every row was invisible.
+    for (const user of [t.ownerA, t.ownerB]) {
+      const seen = await user.client
+        .from('lot_comparables')
+        .select('weight')
+        .eq('identification_id', identificationId);
+      expect(isEmpty(seen), 'a shared identification carries shared evidence').toBe(false);
+    }
+  });
+
+  it('lets nobody rewrite the evidence itself', async () => {
+    // The one thing a user may change is whether a comparable counts, and
+    // only on their own identification. The price, the weight and the reason
+    // are the evidence rather than their opinion of it.
+    const changed = await t.ownerA.client
+      .from('lot_comparables')
+      .update({ weight: 0.1 })
+      .eq('identification_id', identificationId);
+    const after = await serviceClient()
+      .from('lot_comparables')
+      .select('weight')
+      .eq('identification_id', identificationId)
+      .single();
+    expect(changed.error !== null || Number(after.data?.weight) === 0.95).toBe(true);
+  });
+});
