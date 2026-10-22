@@ -21,6 +21,8 @@ import { brave, type SearchResult } from '../search/brave';
 import { queryFor, type QuerySubject } from '../search/query';
 import { MATERIAL_USAGE_GAP, readUsage, usageGap } from '../search/usage';
 import { allComparables } from './evidence';
+import { searchEbay } from '../search/ebay';
+import { asSearchResult, withEbayFirst } from '../search/ebayComparables';
 
 export const STAGE = 'S5';
 
@@ -155,7 +157,19 @@ export async function valueLot(input: ValueLotInput): Promise<LotValuation> {
   const past = await findAuctionResults(input.subject, { exceptLotId: input.where.lotId });
   let pagesFetched = past.pagesFetched;
 
-  const results = await brave.search(query, { count: RESULTS });
+  // Two sources, because one web search was not finding enough. eBay is an
+  // official API with structured prices rather than snippets a model has to
+  // read, and data-sources.md puts it at low legal risk.
+  //
+  // Neither failing stops the other. A lot valued on half the evidence is
+  // worse than one valued on all of it and better than one valued on none,
+  // and the confidence score already says which it got.
+  const [ebay, web] = await Promise.all([
+    searchEbay(query, RESULTS).catch(() => []),
+    brave.search(query, { count: RESULTS }).catch(() => []),
+  ]);
+
+  const results = withEbayFirst(ebay.map(asSearchResult), web);
   if (results.length === 0) {
     const comparables = allComparables(past.results, [], input.lotKilometres);
     return {
