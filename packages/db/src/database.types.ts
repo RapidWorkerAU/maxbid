@@ -597,7 +597,7 @@ export type Database = {
       lot_identifications: {
         Row: {
           ai_run_id: string | null
-          analysis_id: string
+          analysis_id: string | null
           brand: string | null
           condition_notes: string | null
           confidence: number
@@ -614,7 +614,7 @@ export type Database = {
         }
         Insert: {
           ai_run_id?: string | null
-          analysis_id: string
+          analysis_id?: string | null
           brand?: string | null
           condition_notes?: string | null
           confidence: number
@@ -631,7 +631,7 @@ export type Database = {
         }
         Update: {
           ai_run_id?: string | null
-          analysis_id?: string
+          analysis_id?: string | null
           brand?: string | null
           condition_notes?: string | null
           confidence?: number
@@ -1056,6 +1056,62 @@ export type Database = {
           version?: string
         }
         Relationships: []
+      }
+      triage_valuations: {
+        Row: {
+          combined_weight: number
+          comparable_count: number
+          confidence: number
+          conservative: number
+          created_at: string
+          expected: number
+          id: string
+          is_current: boolean
+          lot_id: string
+          method_version: string
+          optimistic: number
+          updated_at: string
+          valued_at: string
+        }
+        Insert: {
+          combined_weight?: number
+          comparable_count?: number
+          confidence: number
+          conservative: number
+          created_at?: string
+          expected: number
+          id?: string
+          is_current?: boolean
+          lot_id: string
+          method_version: string
+          optimistic: number
+          updated_at?: string
+          valued_at?: string
+        }
+        Update: {
+          combined_weight?: number
+          comparable_count?: number
+          confidence?: number
+          conservative?: number
+          created_at?: string
+          expected?: number
+          id?: string
+          is_current?: boolean
+          lot_id?: string
+          method_version?: string
+          optimistic?: number
+          updated_at?: string
+          valued_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "triage_valuations_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "lots"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       usage_events: {
         Row: {
