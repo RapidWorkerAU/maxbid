@@ -909,6 +909,56 @@ export type Database = {
         }
         Relationships: []
       }
+      outcomes: {
+        Row: {
+          actual_costs: number | null
+          analysis_lot_id: string
+          created_at: string
+          hammer_price: number | null
+          id: string
+          resale_channel: string | null
+          resale_price: number | null
+          result: string
+          share_anonymised: boolean
+          sold_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          actual_costs?: number | null
+          analysis_lot_id: string
+          created_at?: string
+          hammer_price?: number | null
+          id?: string
+          resale_channel?: string | null
+          resale_price?: number | null
+          result: string
+          share_anonymised?: boolean
+          sold_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          actual_costs?: number | null
+          analysis_lot_id?: string
+          created_at?: string
+          hammer_price?: number | null
+          id?: string
+          resale_channel?: string | null
+          resale_price?: number | null
+          result?: string
+          share_anonymised?: boolean
+          sold_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "outcomes_analysis_lot_id_fkey"
+            columns: ["analysis_lot_id"]
+            isOneToOne: true
+            referencedRelation: "analysis_lots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           alert_lead_minutes: number
@@ -1250,6 +1300,10 @@ export type Database = {
     }
     Functions: {
       can_edit_analysis: { Args: { target_analysis: string }; Returns: boolean }
+      can_edit_analysis_lot: {
+        Args: { target_analysis_lot: string }
+        Returns: boolean
+      }
       can_edit_identification: {
         Args: { target_identification: string }
         Returns: boolean
@@ -1261,6 +1315,10 @@ export type Database = {
       is_valid_premium_schedule: { Args: { schedule: Json }; Returns: boolean }
       org_role: { Args: { target_org: string }; Returns: string }
       owns_analysis: { Args: { target_analysis: string }; Returns: boolean }
+      owns_analysis_lot: {
+        Args: { target_analysis_lot: string }
+        Returns: boolean
+      }
       owns_identification: {
         Args: { target_identification: string }
         Returns: boolean
