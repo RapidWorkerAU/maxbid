@@ -12,6 +12,8 @@ export type LotRecord = {
   title: string;
   current_bid: number | string | null;
   closes_at: string | null;
+  /** Where the lot is, as the catalogue writes it. F16 filters on it. */
+  location_text?: string | null;
   raw?: unknown;
 };
 
@@ -123,6 +125,7 @@ export function toRows(
       lotNumber: lot.lot_number,
       title: lot.title,
       currentBid: asNumber(lot.current_bid),
+      location: lot.location_text ?? null,
       closesAt: lot.closes_at,
       identifiedAs: found ? describeIdentification(found) : null,
       confidence,
