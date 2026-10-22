@@ -44,6 +44,8 @@ export type LotRowLot = {
   maxBid?: number | null;
   /** 0 to 100, relative to the best lot in this catalogue. */
   score?: number | null;
+  /** Which stage is still to run for this lot, if any. */
+  pending?: LotPending;
 };
 
 export type LotRowProps = {
@@ -150,8 +152,47 @@ function CurrentBid({ amount }: { amount?: number | null }) {
   );
 }
 
-function Resale({ low, high }: { low?: number | null; high?: number | null }) {
+/**
+ * What is still being worked out for this lot.
+ *
+ * A blank cell cannot tell a reader whether we looked and found nothing or
+ * have not looked yet, and this row was saying "Not enough evidence" for
+ * both. Those are different statements and the second one is not true yet.
+ *
+ * Null means the stage has run for this lot, so an empty figure is an answer
+ * rather than a wait.
+ */
+export type LotPending = 'identification' | 'valuation' | null;
+
+/** What an unfilled cell says while the stage that fills it is still running. */
+function Working() {
+  return <span className="whitespace-nowrap font-sans text-xs text-ink-muted">Working it out</span>;
+}
+
+/** What we decided the lot is, or why there is nothing there yet. */
+function Identified({ as, pending }: { as?: string | null; pending?: LotPending }) {
+  if (as) {
+    return (
+      <span className="block truncate font-sans text-sm text-ink-muted" title={as}>
+        {as}
+      </span>
+    );
+  }
+  if (pending === 'identification') return <Working />;
+  return <span className="font-sans text-xs text-ink-muted">Not identified</span>;
+}
+
+function Resale({
+  low,
+  high,
+  pending,
+}: {
+  low?: number | null;
+  high?: number | null;
+  pending?: LotPending;
+}) {
   if (low == null || high == null) {
+    if (pending) return <Working />;
     return (
       <span className="whitespace-nowrap font-sans text-xs text-ink-muted">
         Not enough evidence
@@ -175,8 +216,9 @@ function Resale({ low, high }: { low?: number | null; high?: number | null }) {
  * say the lot is not worth bidding on, which would be a recommendation about
  * their money rather than a statement about their figures.
  */
-function MaxBid({ amount }: { amount?: number | null }) {
+function MaxBid({ amount, pending }: { amount?: number | null; pending?: LotPending }) {
   if (amount === null || amount === undefined) {
+    if (pending) return <Working />;
     return <span className="font-sans text-xs text-ink-muted">Not worked out</span>;
   }
   if (amount <= 0) {
@@ -259,16 +301,7 @@ export function LotRow({
       {/* What we decided it is. Its own column on a desktop, so it can never
           sit on top of the row below. */}
       <div className="col-start-2 min-w-0 md:col-start-auto">
-        {lot.identifiedAs ? (
-          <span
-            className="block truncate font-sans text-sm text-ink-muted"
-            title={lot.identifiedAs}
-          >
-            {lot.identifiedAs}
-          </span>
-        ) : (
-          <span className="font-sans text-xs text-ink-muted md:hidden">Not identified yet</span>
-        )}
+        <Identified as={lot.identifiedAs} pending={lot.pending} />
       </div>
 
       <div className="col-start-2 md:col-start-auto md:text-right">
@@ -279,11 +312,11 @@ export function LotRow({
           rather than showing a blank, which would read as a figure nobody
           bothered to fill in. */}
       <div className="col-start-2 md:col-start-auto md:text-right">
-        <Resale low={lot.resaleLow} high={lot.resaleHigh} />
+        <Resale low={lot.resaleLow} high={lot.resaleHigh} pending={lot.pending} />
       </div>
 
       <div className="col-start-2 md:col-start-auto md:text-right">
-        <MaxBid amount={lot.maxBid} />
+        <MaxBid amount={lot.maxBid} pending={lot.pending} />
       </div>
 
       <div className="col-start-2 md:col-start-auto md:justify-self-end">

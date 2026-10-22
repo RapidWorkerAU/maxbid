@@ -244,3 +244,45 @@ export function bidFreshnessNote(
     hasClosed,
   );
 }
+
+/**
+ * Which stage is still to run for one lot.
+ *
+ * A blank figure cannot say for itself whether we looked and found nothing or
+ * have not looked yet, and the row was reading as the first in both cases.
+ * This is what tells them apart.
+ *
+ * An attempt is the evidence that we looked. Without one, an empty range on a
+ * running analysis means the valuation stage has not reached this lot, and
+ * "Not enough evidence" would be a claim about work we have not done.
+ *
+ * Nothing is pending once the analysis has settled. A lot still blank then is
+ * a lot we could not do, whether or not an attempt was recorded, and saying
+ * it is being worked on would be a wait that never ends.
+ */
+export function pendingFor(
+  lot: { identifiedAs?: string | null; resaleLow?: number | null },
+  options: { analysisSettled: boolean; attempted: boolean },
+): 'identification' | 'valuation' | null {
+  if (options.analysisSettled) return null;
+  if (!lot.identifiedAs) return 'identification';
+  if (lot.resaleLow == null && !options.attempted) return 'valuation';
+  return null;
+}
+
+/** Everything the table needs, including what is still being worked out. */
+export function rowsFor(
+  lots: LotRecord[],
+  identifications: IdentificationRecord[],
+  ranges: AnalysisLotRecord[],
+  shared: SharedRangeRecord[],
+  progress: { settled: boolean; attempted: Set<string> },
+): LotRowLot[] {
+  return toRows(lots, identifications, ranges, shared).map((row) => ({
+    ...row,
+    pending: pendingFor(row, {
+      analysisSettled: progress.settled,
+      attempted: progress.attempted.has(row.id),
+    }),
+  }));
+}
