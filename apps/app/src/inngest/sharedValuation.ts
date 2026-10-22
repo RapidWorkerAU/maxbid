@@ -24,7 +24,7 @@ import { createServiceSupabase } from '@maxbid/db/server';
  * only reused while this matches, so forgetting to bump it is how a stale
  * figure survives a fix.
  */
-export const VALUATION_METHOD_VERSION = 'triage-valuation-2';
+export const VALUATION_METHOD_VERSION = 'triage-valuation-3';
 
 /** A resale range we already hold, or have just worked out. */
 export type SharedRange = {
@@ -35,7 +35,23 @@ export type SharedRange = {
   confidence: number;
   comparableCount: number;
   combinedWeight: number;
+  /** What one of these usually fetches at auction. Never the resale figure. */
+  auctionMarket: { low: number; typical: number; high: number; results: number } | null;
 };
+
+/** What these fetch at auction, from a stored row. All three ends or none. */
+function auctionMarketIn(row: {
+  auction_low: number | string | null;
+  auction_typical: number | string | null;
+  auction_high: number | string | null;
+  auction_results: number | null;
+}) {
+  const low = asNumber(row.auction_low);
+  const typical = asNumber(row.auction_typical);
+  const high = asNumber(row.auction_high);
+  if (low === null || typical === null || high === null) return null;
+  return { low, typical, high, results: row.auction_results ?? 0 };
+}
 
 /** Postgres numerics arrive as strings. A range needs numbers. */
 function asNumber(value: number | string | null): number | null {
@@ -60,7 +76,7 @@ export async function storedRangesFor(lotIds: string[]): Promise<Map<string, Sha
   const { data, error } = await createServiceSupabase()
     .from('triage_valuations')
     .select(
-      'lot_id, conservative, expected, optimistic, confidence, comparable_count, combined_weight',
+      'lot_id, conservative, expected, optimistic, confidence, comparable_count, combined_weight, auction_low, auction_typical, auction_high, auction_results',
     )
     .in('lot_id', lotIds)
     .eq('method_version', VALUATION_METHOD_VERSION)
@@ -83,6 +99,7 @@ export async function storedRangesFor(lotIds: string[]): Promise<Map<string, Sha
       confidence: asNumber(row.confidence) ?? 0,
       comparableCount: row.comparable_count,
       combinedWeight: asNumber(row.combined_weight) ?? 0,
+      auctionMarket: auctionMarketIn(row),
     });
   }
   return held;
@@ -114,6 +131,7 @@ export function rangeFrom(
     }).score,
     comparableCount: valuation.counted.length,
     combinedWeight: valuation.combinedWeight,
+    auctionMarket: valuation.auctionMarket,
   };
 }
 
@@ -142,6 +160,10 @@ export async function storeRange(lotId: string, range: SharedRange) {
     confidence: range.confidence,
     comparable_count: range.comparableCount,
     combined_weight: range.combinedWeight,
+    auction_low: range.auctionMarket?.low ?? null,
+    auction_typical: range.auctionMarket?.typical ?? null,
+    auction_high: range.auctionMarket?.high ?? null,
+    auction_results: range.auctionMarket?.results ?? 0,
     method_version: VALUATION_METHOD_VERSION,
   });
   if (error) throw new Error(`Could not store the range: ${error.message}`);

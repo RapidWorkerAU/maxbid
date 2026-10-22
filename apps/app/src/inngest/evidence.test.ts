@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { allComparables, enoughOnTheirOwn, listingAsComparable, resultAsComparable } from './evidence';
+import { RESALE_EVIDENCE } from '@maxbid/calc';
+import { allComparables, listingAsComparable, resultAsComparable } from './evidence';
 import type { AuctionResult } from '../search/auctionResults';
 import type { ValuedComparable } from './valueLot';
 
@@ -26,7 +27,12 @@ const listing = (over: Partial<ValuedComparable> = {}): ValuedComparable =>
     usage: null,
     kilometres: null,
     pageFetched: false,
-    result: { title: 'A listing', url: 'https://example.test/1', snippet: '', host: 'example.test' },
+    result: {
+      title: 'A listing',
+      url: 'https://example.test/1',
+      snippet: '',
+      host: 'example.test',
+    },
     ...over,
   }) as ValuedComparable;
 
@@ -50,12 +56,16 @@ describe('a past sale as evidence', () => {
   it('starts at near exact rather than exact', () => {
     // The same kind of item at the same kind of sale, but a different lot
     // with a different history.
-    expect(resultAsComparable(result({ kilometres: 545000 }), 549752, 0).matchLevel).toBe('nearExact');
+    expect(resultAsComparable(result({ kilometres: 545000 }), 549752, 0).matchLevel).toBe(
+      'nearExact',
+    );
   });
 
   it('marks a result that has done far less as a higher specification', () => {
     // It is worth more than our lot, so it overstates it.
-    expect(resultAsComparable(result({ kilometres: 243356 }), 549752, 0).matchLevel).toBe('higherSpec');
+    expect(resultAsComparable(result({ kilometres: 243356 }), 549752, 0).matchLevel).toBe(
+      'higherSpec',
+    );
   });
 });
 
@@ -65,7 +75,9 @@ describe('a web listing as evidence', () => {
   });
 
   it('counts a sold price as sold', () => {
-    expect(listingAsComparable(listing({ advertised: false })).evidenceType).toBe('marketplaceSold');
+    expect(listingAsComparable(listing({ advertised: false })).evidenceType).toBe(
+      'marketplaceSold',
+    );
   });
 
   it('has no age, because a search gives none', () => {
@@ -73,15 +85,20 @@ describe('a web listing as evidence', () => {
   });
 });
 
-describe('when past sales are enough on their own', () => {
-  it('stops searching the web once there are four', () => {
-    expect(enoughOnTheirOwn([result(), result(), result(), result()])).toBe(true);
+describe('past sales are never enough on their own', () => {
+  it('grades a past result as auction evidence, not resale evidence', () => {
+    // Which is what stops it building a resale range however many there are.
+    // A hammer price is what a reseller paid to buy and a resale price is what
+    // the public paid to own.
+    expect(resultAsComparable(result(), null, 0).evidenceType).toBe('auctionResult');
   });
 
-  it('keeps looking when there are fewer', () => {
-    // A lot with one past sale needs whatever else can be found.
-    expect(enoughOnTheirOwn([result(), result(), result()])).toBe(false);
-    expect(enoughOnTheirOwn([])).toBe(false);
+  it('grades a web listing as resale evidence', () => {
+    expect(RESALE_EVIDENCE).toContain(listingAsComparable(listing()).evidenceType);
+  });
+
+  it('keeps the two kinds apart', () => {
+    expect(RESALE_EVIDENCE).not.toContain('auctionResult');
   });
 });
 

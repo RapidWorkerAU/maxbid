@@ -1112,6 +1112,10 @@ export type Database = {
       }
       triage_valuations: {
         Row: {
+          auction_high: number | null
+          auction_low: number | null
+          auction_results: number
+          auction_typical: number | null
           combined_weight: number
           comparable_count: number
           confidence: number
@@ -1127,6 +1131,10 @@ export type Database = {
           valued_at: string
         }
         Insert: {
+          auction_high?: number | null
+          auction_low?: number | null
+          auction_results?: number
+          auction_typical?: number | null
           combined_weight?: number
           comparable_count?: number
           confidence: number
@@ -1142,6 +1150,10 @@ export type Database = {
           valued_at?: string
         }
         Update: {
+          auction_high?: number | null
+          auction_low?: number | null
+          auction_results?: number
+          auction_typical?: number | null
           combined_weight?: number
           comparable_count?: number
           confidence?: number

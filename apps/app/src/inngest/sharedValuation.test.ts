@@ -18,7 +18,10 @@ function comparable(over: Partial<Comparable> = {}): Comparable {
     id: crypto.randomUUID(),
     price: 20000,
     matchLevel: 'exact',
-    evidenceType: 'auctionResult',
+    // A resale price, because only resale evidence builds a resale range.
+    // An auction result is what a reseller paid to buy, not what the public
+    // paid to own.
+    evidenceType: 'marketplaceSold',
     ageInDays: 30,
     ...over,
   };

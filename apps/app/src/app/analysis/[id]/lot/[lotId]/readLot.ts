@@ -13,7 +13,7 @@ import { targetBidFor } from '../../../../../inngest/targetBid';
 import { bidFreshnessNote } from '../../lots';
 import { preferCorrection } from '../../../../../lib/identifications';
 import type { supabaseServer } from '../../../../../lib/supabase';
-import { asNumber } from './lot';
+import { asNumber, auctionMarketIn } from './lot';
 
 // Taken from the function that makes it rather than imported, so this file
 // does not depend on the client library directly.
@@ -53,7 +53,9 @@ async function readRows(supabase: Client, analysisId: string, lotId: string) {
       .or(`analysis_id.is.null,analysis_id.eq.${analysisId}`),
     supabase
       .from('triage_valuations')
-      .select('conservative, expected, optimistic, confidence')
+      .select(
+        'conservative, expected, optimistic, confidence, auction_low, auction_typical, auction_high, auction_results',
+      )
       .eq('lot_id', lotId)
       .eq('is_current', true)
       .maybeSingle(),
@@ -185,6 +187,9 @@ export async function readLot(supabase: Client, analysisId: string, lotId: strin
       expected: corrected ? null : asNumber(valuation.data?.expected),
       optimistic,
       confidence: corrected ? null : asNumber(valuation.data?.confidence),
+      // What it takes to win one of these. Shown beside the resale rather than
+      // inside it, because a hammer price is what a reseller paid to buy.
+      auctionMarket: auctionMarketIn(valuation.data),
     },
     // All three figures, worked out here rather than read back. Only the
     // target bid is stored, because the ranking needs one number. The limit
