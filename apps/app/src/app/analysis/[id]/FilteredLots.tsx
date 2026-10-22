@@ -1,5 +1,6 @@
 'use client';
 
+import { CreditPreview } from '@maxbid/ui/composites/CreditPreview';
 import { TriageTable } from '@maxbid/ui/sections/TriageTable';
 import {
   LotFilters,
@@ -31,6 +32,8 @@ import { useMemo, useState } from 'react';
 export type FilteredLotsProps = {
   lots: (LotRowLot & { location?: string | null })[];
   initialFilters: LotFilterState;
+  /** Credits this organisation has left, for the shortlist preview. F17. */
+  credits: number;
   hrefFor: (lotId: string) => string;
   caption?: string;
   pendingNote?: string;
@@ -39,11 +42,13 @@ export type FilteredLotsProps = {
 export function FilteredLots({
   lots,
   initialFilters,
+  credits,
   hrefFor,
   caption,
   pendingNote,
 }: FilteredLotsProps) {
   const [filters, setFilters] = useState(initialFilters);
+  const [shortlisted, setShortlisted] = useState<string[]>([]);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -73,7 +78,17 @@ export function FilteredLots({
         hrefFor={hrefFor}
         caption={caption}
         pendingNote={pendingNote}
+        selected={shortlisted}
+        onSelect={(id, on) =>
+          setShortlisted((chosen) =>
+            on ? [...chosen, id] : chosen.filter((each) => each !== id),
+          )
+        }
       />
+      {/* A lot the filters are hiding stays ticked. Narrowing the list is not
+          changing your mind about a lot, and quietly unticking one would be
+          us doing that for them. */}
+      <CreditPreview selected={shortlisted.length} available={credits} />
     </>
   );
 }
