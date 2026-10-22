@@ -1,6 +1,7 @@
 // Every pipeline function Inngest may run. Stages are added here as they are
 // built, in the order docs/02-specs/pipeline.md lists them.
 
+import { deepIdentify } from './deepFunction';
 import { extract } from './extract';
 import { ingest } from './ingest';
 import { harvestResults } from './harvestFunction';
@@ -16,4 +17,5 @@ export const functions = [
   harvestResults,
   refreshBids,
   refreshOneSale,
+  deepIdentify,
 ];
