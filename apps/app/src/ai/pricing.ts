@@ -18,10 +18,25 @@ export type ModelPrice = { inputPerMillion: number; outputPerMillion: number };
  */
 export const MODEL_PRICES: Record<string, ModelPrice> = {
   'claude-haiku-4-5-20251001': { inputPerMillion: 1, outputPerMillion: 5 },
+  // The deep identification model. Checked against Anthropic's published
+  // prices on 22 October 2026 rather than remembered, because this table is
+  // what the spend ceiling is computed from and a price we guessed at would
+  // make the ceiling a guess too.
+  'claude-opus-5-5': { inputPerMillion: 4, outputPerMillion: 20 },
 };
 
 /** The small model, per D33. Triage runs on every lot, so it runs on this. */
 export const TRIAGE_MODEL = 'claude-haiku-4-5-20251001';
+
+/**
+ * The larger model, for the deep identification only.
+ *
+ * Twenty times the output price of the triage model, which is why it reads a
+ * lot's photographs once rather than every lot's. D10 says a model number is
+ * often only legible on a plate in a picture, and getting that wrong makes
+ * every search and every comparable after it wrong as well.
+ */
+export const DEEP_MODEL = 'claude-opus-5-5';
 
 export type TokenUse = { inputTokens: number; outputTokens: number };
 

@@ -44,6 +44,11 @@ export const valueRequested = eventType('analysis/value.requested', {
   }>(),
 });
 
+/** S8. Lots somebody shortlisted, to be read from their photographs. F18. */
+export const deepRequested = eventType('analysis/deep.requested', {
+  schema: staticSchema<{ analysisId: string; orgId: string; lotIds: string[] }>(),
+});
+
 /** A sale somebody is looking at, whose bids are due a re-read. DR 0026. */
 export const bidRefreshRequested = eventType('auction/bids.refresh.requested', {
   schema: staticSchema<{ auctionId: string }>(),

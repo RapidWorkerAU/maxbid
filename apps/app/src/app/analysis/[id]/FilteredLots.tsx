@@ -11,7 +11,7 @@ import {
 } from '@maxbid/ui/composites/LotFilters';
 import type { LotRowLot } from '@maxbid/ui/composites/LotRow';
 import { usePathname, useRouter } from 'next/navigation';
-import { saveShortlist } from '../../../lib/shortlist';
+import { analyseShortlist } from '../../../lib/shortlist';
 import { useMemo, useState } from 'react';
 
 /**
@@ -77,7 +77,7 @@ export function FilteredLots({
   const save = async () => {
     setSaving(true);
     setSaved(null);
-    const result = await saveShortlist(analysisId, shortlisted);
+    const result = await analyseShortlist(analysisId, shortlisted);
     setSaving(false);
 
     if ('error' in result) {
@@ -88,8 +88,8 @@ export function FilteredLots({
     // the reader unsure whether unticking everything had worked.
     setSaved(
       result.saved === 0
-        ? 'Your shortlist is empty. Nothing is saved against this catalogue.'
-        : `Saved. ${result.saved} ${result.saved === 1 ? 'lot is' : 'lots are'} on your shortlist for this catalogue.`,
+        ? 'Your shortlist is empty. Nothing is being analysed.'
+        : `Started. We are reading ${result.saved} ${result.saved === 1 ? 'lot' : 'lots'} from ${result.saved === 1 ? 'its' : 'their'} photographs. You can leave this page.`,
     );
   };
 
@@ -125,11 +125,10 @@ export function FilteredLots({
         available={credits}
         onConfirm={save}
         confirming={saving}
-        confirmLabel="Save to your shortlist"
-        confirmingLabel="Saving"
+        confirmingLabel="Starting"
         note={
           saved ??
-          'This saves which lots you want analysed in full. It does not spend any credits: the full analysis of each lot is still being built, and credits are only taken when it runs.'
+          'Each lot is read from its own photographs, including any plates and labels, which is where a model number usually is. A credit is taken for each lot and given back for any we cannot read.'
         }
       />
     </>

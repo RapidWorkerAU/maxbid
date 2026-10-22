@@ -91,6 +91,14 @@ export type AskOptions = {
   maxTokens?: number;
   /** An image the model should look at as well as the words. */
   imageUrl?: string;
+  /**
+   * Several images, for the deep identification. F18.
+   *
+   * In the order they are given, because a lot's photographs are ordered and
+   * the model is told which one it is looking at. They go before the words,
+   * so the question is the last thing it reads.
+   */
+  imageUrls?: string[];
 };
 
 /**
@@ -101,8 +109,8 @@ export type AskOptions = {
  */
 export async function ask(options: AskOptions, where: CallRecord): Promise<CallResult> {
   const content: Anthropic.ContentBlockParam[] = [];
-  if (options.imageUrl) {
-    content.push({ type: 'image', source: { type: 'url', url: options.imageUrl } });
+  for (const url of options.imageUrls ?? (options.imageUrl ? [options.imageUrl] : [])) {
+    content.push({ type: 'image', source: { type: 'url', url } });
   }
   content.push({ type: 'text', text: options.prompt });
 
@@ -134,17 +142,13 @@ export async function ask(options: AskOptions, where: CallRecord): Promise<CallR
     // produces nothing. If that record cannot be written either, the
     // unrecorded spend is the more serious of the two problems, so it is the
     // one that surfaces, carrying the original failure in its message.
-    await record(
-      where,
-      options.model,
-      { inputTokens: 0, outputTokens: 0 },
-      0,
-      message,
-    ).catch((recordFailure: unknown) => {
-      throw new UnrecordedSpendError(
-        `${recordFailure instanceof Error ? recordFailure.message : String(recordFailure)}. The call itself failed with: ${message}`,
-      );
-    });
+    await record(where, options.model, { inputTokens: 0, outputTokens: 0 }, 0, message).catch(
+      (recordFailure: unknown) => {
+        throw new UnrecordedSpendError(
+          `${recordFailure instanceof Error ? recordFailure.message : String(recordFailure)}. The call itself failed with: ${message}`,
+        );
+      },
+    );
     throw cause;
   }
 }
