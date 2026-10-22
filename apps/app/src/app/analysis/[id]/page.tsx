@@ -37,13 +37,20 @@ export default async function AnalysisPage({
 
   const { data } = await supabase
     .from('analyses')
-    .select('id, status, progress_pct, auction_id, auctions(title, source_url)')
+    .select('id, status, progress_pct, auction_id, org_id, auctions(title, source_url)')
     .eq('id', id)
     .maybeSingle();
 
   if (!data) notFound();
 
   const { rows, note } = await readCatalogue(supabase, id, data.auction_id, data.status);
+
+  // What this organisation has left to spend on deep analysis. F17 shows it
+  // before a shortlist is confirmed, because a charge somebody did not see
+  // coming is a charge they did not agree to.
+  const { data: credits } = await supabase.rpc('credits_available', {
+    target_org: data.org_id,
+  });
 
   // Somebody is looking at this sale, so ask for its bids if they are due a
   // re-read. Decision record 0026.
@@ -67,6 +74,7 @@ export default async function AnalysisPage({
         <FilteredLots
           lots={rows}
           initialFilters={filtersFromParams(onlyStrings(query))}
+          credits={credits ?? 0}
           hrefFor={(lotId) => `/analysis/${id}/lot/${lotId}`}
           caption="Lots in this catalogue"
           pendingNote={note || undefined}

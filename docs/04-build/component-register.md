@@ -76,3 +76,4 @@ This register is the sign off record for every component in packages/ui. It is t
 | UI53 | CannotVerifyPanel | Composite | App | Not started |  | Added for F58 |
 | UI54 | ReportProblem | Composite | App | Not started |  | Added for F64 |
 | UI55 | LotFilters | Composite | App | In review | 22 October 2026 | Narrows a catalogue on what a lot is worth bidding, where it is and when it closes. A lot we could not value stays in the list unless the reader hides it themselves, because we did not say it was unsuitable, we said we could not tell. Added for F16 |
+| UI56 | CreditPreview | Composite | App | In review | 22 October 2026 | What a shortlist costs before it is confirmed. Blocked when it exceeds the balance, per F17, and it states the cost without saying the shortlist is too big or suggesting which lots to drop. Added for F17 |

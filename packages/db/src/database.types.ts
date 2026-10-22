@@ -511,6 +511,47 @@ export type Database = {
           },
         ]
       }
+      credit_ledger: {
+        Row: {
+          created_at: string
+          delta: number
+          expires_at: string | null
+          id: string
+          note: string | null
+          org_id: string
+          reason: string
+          reference_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          delta: number
+          expires_at?: string | null
+          id?: string
+          note?: string | null
+          org_id: string
+          reason: string
+          reference_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          delta?: number
+          expires_at?: string | null
+          id?: string
+          note?: string | null
+          org_id?: string
+          reason?: string
+          reference_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "credit_ledger_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lot_comparables: {
         Row: {
           adjusted_price: number
@@ -1363,6 +1404,7 @@ export type Database = {
       }
       can_edit_org: { Args: { target_org: string }; Returns: boolean }
       create_organisation: { Args: { org_name: string }; Returns: string }
+      credits_available: { Args: { target_org: string }; Returns: number }
       is_org_admin: { Args: { target_org: string }; Returns: boolean }
       is_org_member: { Args: { target_org: string }; Returns: boolean }
       is_valid_premium_schedule: { Args: { schedule: Json }; Returns: boolean }
