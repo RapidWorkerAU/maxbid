@@ -1,6 +1,13 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import { LOT_CELL_COUNT, LOT_COLUMNS, LotRow, closesIn, type LotRowLot } from './LotRow';
+import {
+  LOT_COLUMNS,
+  LOT_COLUMNS_NO_SHORTLIST,
+  LotRow,
+  cellCountFor,
+  closesIn,
+  type LotRowLot,
+} from './LotRow';
 
 const lot: LotRowLot = {
   id: '1',
@@ -205,26 +212,37 @@ describe('the row and its heading line up', () => {
   // implicit row: the Closes heading sat under Rank, and every lot's closing
   // time sat on a line of its own under the row it belonged to. Counting is
   // what catches that, because every cell was styled correctly.
-  it('declares as many columns as a row has cells', () => {
-    const columns = LOT_COLUMNS.match(/\[(.+)\]/)![1]!.split('_').length;
-    expect(columns).toBe(LOT_CELL_COUNT);
+  const columnsIn = (classes: string) => classes.match(/\[(.+)\]/)![1]!.split('_').length;
+
+  it('declares as many columns as a shortlisting row has cells', () => {
+    expect(columnsIn(LOT_COLUMNS)).toBe(cellCountFor(true));
   });
 
-  it('renders exactly that many cells, shortlist or not', () => {
+  it('declares one fewer when the list does not shortlist', () => {
+    expect(columnsIn(LOT_COLUMNS_NO_SHORTLIST)).toBe(cellCountFor(false));
+  });
+
+  it('renders exactly that many cells without a shortlist', () => {
     const { container } = render(<LotRow lot={lot} />);
-    const row = container.firstElementChild!;
-    expect(row.children).toHaveLength(LOT_CELL_COUNT);
+    expect(container.firstElementChild!.children).toHaveLength(cellCountFor(false));
   });
 
-  it('renders the same number when the list shortlists', () => {
+  it('renders one more when the list shortlists', () => {
     const { container } = render(<LotRow lot={lot} onSelect={() => {}} />);
-    expect(container.firstElementChild!.children).toHaveLength(LOT_CELL_COUNT);
+    expect(container.firstElementChild!.children).toHaveLength(cellCountFor(true));
+  });
+
+  it('holds no column open for a shortlist that is not there', () => {
+    // An empty cell would be a strip of dead space down the left of every row
+    // for a feature that is not built.
+    const { container } = render(<LotRow lot={lot} />);
+    expect(container.firstElementChild!.className).toContain(LOT_COLUMNS_NO_SHORTLIST);
   });
 
   it('keeps the count when a lot has no closing time or score', () => {
     const bare = { id: '2', lotNumber: '0002-1', title: 'A lot' };
     const { container } = render(<LotRow lot={bare} />);
-    expect(container.firstElementChild!.children).toHaveLength(LOT_CELL_COUNT);
+    expect(container.firstElementChild!.children).toHaveLength(cellCountFor(false));
   });
 });
 

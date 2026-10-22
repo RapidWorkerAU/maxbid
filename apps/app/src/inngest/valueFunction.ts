@@ -72,7 +72,13 @@ export async function scoreAndStore(analysisId: string) {
   for (const lot of scored) {
     const { error: failed } = await supabase
       .from('analysis_lots')
-      .update({ opportunity_score: lot.score })
+      // A lot we could not value has no rank, rather than a rank of nought.
+      // The score is relative to the best lot in the catalogue, so a lot with
+      // no bid figure scores nought by arithmetic rather than by judgement,
+      // and showing that as a rank says we put it last when we could not
+      // place it at all. Null is the same statement the rest of its row
+      // makes.
+      .update({ opportunity_score: lot.targetBid === null ? null : lot.score })
       .eq('analysis_id', analysisId)
       .eq('lot_id', lot.id);
     if (failed) throw new Error(`Could not store the score: ${failed.message}`);

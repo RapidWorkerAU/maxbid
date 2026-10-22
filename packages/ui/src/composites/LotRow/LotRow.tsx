@@ -67,9 +67,26 @@ export type LotRowProps = {
  * without wrapping, which the first version was not. The two flexible columns
  * share what is left, with the item given the larger share because a
  * catalogue title is the longest thing on the row.
+ *
+ * There are two sets because the shortlist column only exists when the list
+ * shortlists. It used to be an empty cell held open for a feature that is not
+ * built, which is a strip of dead space down the left of every row, and the
+ * first thing Ashleigh asked about on seeing a real catalogue. A column that
+ * holds nothing is not a column.
  */
+// Both written out in full. Tailwind reads these files as text to decide
+// which utilities to generate, so a class name it cannot see written down is
+// a class name that does not exist at runtime.
 export const LOT_COLUMNS =
   'md:grid-cols-[1.75rem_3rem_7.5rem_minmax(0,1.8fr)_minmax(0,1fr)_6rem_9rem_7rem_7rem_8rem]';
+
+export const LOT_COLUMNS_NO_SHORTLIST =
+  'md:grid-cols-[3rem_7.5rem_minmax(0,1.8fr)_minmax(0,1fr)_6rem_9rem_7rem_7rem_8rem]';
+
+/** The grid for a list that shortlists, or one that does not. */
+export function columnsFor(shortlisting: boolean): string {
+  return shortlisting ? LOT_COLUMNS : LOT_COLUMNS_NO_SHORTLIST;
+}
 
 /**
  * How many cells a row and the heading above it must each render.
@@ -81,6 +98,11 @@ export const LOT_COLUMNS =
  * now rather than measuring them.
  */
 export const LOT_CELL_COUNT = 10;
+
+/** How many cells a row renders, with or without the shortlist column. */
+export function cellCountFor(shortlisting: boolean): number {
+  return shortlisting ? LOT_CELL_COUNT : LOT_CELL_COUNT - 1;
+}
 
 const ROW_HEIGHT = {
   standard: 'md:h-row',
@@ -105,7 +127,10 @@ export function closesIn(closesAt: string, now: Date = new Date()): string {
 function Checkbox({ lot, selected, onSelect }: LotRowProps) {
   // The cell is always here, empty when the list does not shortlist, so the
   // columns line up with the heading row either way.
-  if (!onSelect) return <span className="hidden md:block" aria-hidden />;
+  // No cell at all when the list does not shortlist, because the grid drops
+  // the column with it. An empty cell would hold open a strip of dead space
+  // down the left of every row for a feature that is not built.
+  if (!onSelect) return null;
   return (
     <input
       type="checkbox"
@@ -251,7 +276,7 @@ export function LotRow({
       // No hover tint. A background behind the row dropped the write off tag
       // to 4.25 against 4.5, and the amber only passes on the page colour. The
       // underlined title is the hover signal instead.
-      className={`relative grid grid-cols-[auto_1fr] items-center gap-x-3 gap-y-1 border-b border-line/40 px-3 py-2.5 text-base last:border-b-0 md:gap-y-0 md:py-0 md:text-[0.9375rem] ${LOT_COLUMNS} ${ROW_HEIGHT[density]} ${className}`}
+      className={`relative grid grid-cols-[auto_1fr] items-center gap-x-3 gap-y-1 border-b border-line/40 px-3 py-2.5 text-base last:border-b-0 md:gap-y-0 md:py-0 md:text-[0.9375rem] ${columnsFor(Boolean(onSelect))} ${ROW_HEIGHT[density]} ${className}`}
     >
       <Checkbox lot={lot} selected={selected} onSelect={onSelect} />
 
