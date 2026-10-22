@@ -34,7 +34,15 @@ export type FilteredLotsProps = {
   initialFilters: LotFilterState;
   /** Credits this organisation has left, for the shortlist preview. F17. */
   credits: number;
-  hrefFor: (lotId: string) => string;
+  /**
+   * The analysis these lots belong to, for the link to each lot.
+   *
+   * The id rather than a function that builds the link. A function cannot
+   * cross from a server component to a client one: there is nothing to send
+   * over the wire, and Next refuses it at runtime rather than sending
+   * something that would not work.
+   */
+  analysisId: string;
   caption?: string;
   pendingNote?: string;
 };
@@ -43,7 +51,7 @@ export function FilteredLots({
   lots,
   initialFilters,
   credits,
-  hrefFor,
+  analysisId,
   caption,
   pendingNote,
 }: FilteredLotsProps) {
@@ -75,14 +83,12 @@ export function FilteredLots({
       <TriageTable
         className="mt-4"
         lots={shown}
-        hrefFor={hrefFor}
+        hrefFor={(lotId) => `/analysis/${analysisId}/lot/${lotId}`}
         caption={caption}
         pendingNote={pendingNote}
         selected={shortlisted}
         onSelect={(id, on) =>
-          setShortlisted((chosen) =>
-            on ? [...chosen, id] : chosen.filter((each) => each !== id),
-          )
+          setShortlisted((chosen) => (on ? [...chosen, id] : chosen.filter((each) => each !== id)))
         }
       />
       {/* A lot the filters are hiding stays ticked. Narrowing the list is not

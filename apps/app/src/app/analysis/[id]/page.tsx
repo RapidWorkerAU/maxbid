@@ -75,7 +75,7 @@ export default async function AnalysisPage({
           lots={rows}
           initialFilters={filtersFromParams(onlyStrings(query))}
           credits={credits ?? 0}
-          hrefFor={(lotId) => `/analysis/${id}/lot/${lotId}`}
+          analysisId={id}
           caption="Lots in this catalogue"
           pendingNote={note || undefined}
         />
