@@ -13,7 +13,7 @@
 // model to read the results.
 
 /** Changing the prompt changes the answers, so every run records which one. */
-export const READ_LISTINGS_PROMPT_VERSION = 'triage-read-listings-4';
+export const READ_LISTINGS_PROMPT_VERSION = 'triage-read-listings-5';
 
 /** How well a listing matches the lot. These are the levels in @maxbid/calc. */
 export type ListingMatch =
