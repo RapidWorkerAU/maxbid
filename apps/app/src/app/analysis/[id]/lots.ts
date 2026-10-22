@@ -15,13 +15,27 @@ export type LotRecord = {
   raw?: unknown;
 };
 
-/** What triage worked out a lot is worth, for this organisation. */
+/**
+ * What this organisation holds about a lot.
+ *
+ * The maximum bid and the score are theirs, because both come from their own
+ * profit target and GST position. triage_low and triage_high are an override:
+ * null is the ordinary case and means read the shared range. Decision record
+ * 0024.
+ */
 export type AnalysisLotRecord = {
   lot_id: string;
   triage_low: number | string | null;
   triage_high: number | string | null;
   triage_max_bid: number | string | null;
   opportunity_score: number | null;
+};
+
+/** The shared resale range, which is the same whoever is buying. */
+export type SharedRangeRecord = {
+  lot_id: string;
+  conservative: number | string | null;
+  optimistic: number | string | null;
 };
 
 export type IdentificationRecord = {
@@ -52,17 +66,46 @@ function asNumber(value: number | string | null | undefined): number | null {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
+/**
+ * The resale range to show for one lot.
+ *
+ * This organisation's own correction wins where they made one, because they
+ * know something about this lot that we do not. Otherwise the shared range,
+ * which is what the pipeline worked out for everybody.
+ *
+ * Both ends or neither, from one source or the other. Half a range is not a
+ * range, and mixing a corrected low with a shared high would produce a span
+ * nobody worked out and nobody could explain.
+ */
+export function resaleRangeFor(
+  override: AnalysisLotRecord | undefined,
+  shared: SharedRangeRecord | undefined,
+): { low: number | null; high: number | null } {
+  const ownLow = asNumber(override?.triage_low);
+  const ownHigh = asNumber(override?.triage_high);
+  if (ownLow !== null && ownHigh !== null) return { low: ownLow, high: ownHigh };
+
+  const sharedLow = asNumber(shared?.conservative);
+  const sharedHigh = asNumber(shared?.optimistic);
+  if (sharedLow !== null && sharedHigh !== null) return { low: sharedLow, high: sharedHigh };
+
+  return { low: null, high: null };
+}
+
 export function toRows(
   lots: LotRecord[],
   identifications: IdentificationRecord[],
   ranges: AnalysisLotRecord[] = [],
+  shared: SharedRangeRecord[] = [],
 ): LotRowLot[] {
   const byLot = new Map(identifications.map((row) => [row.lot_id, row]));
   const rangeByLot = new Map(ranges.map((row) => [row.lot_id, row]));
+  const sharedByLot = new Map(shared.map((row) => [row.lot_id, row]));
 
   const rows = lots.map((lot) => {
     const found = byLot.get(lot.id);
     const range = rangeByLot.get(lot.id);
+    const resale = resaleRangeFor(range, sharedByLot.get(lot.id));
     const confidence = asNumber(found?.confidence);
 
     return {
@@ -74,10 +117,8 @@ export function toRows(
       identifiedAs: found ? describeIdentification(found) : null,
       confidence,
       conditionNote: found?.condition_notes ?? null,
-      // Both ends or neither. Half a range is not a range, and one figure on
-      // its own would be read as a single estimate.
-      resaleLow: asNumber(range?.triage_low),
-      resaleHigh: asNumber(range?.triage_high),
+      resaleLow: resale.low,
+      resaleHigh: resale.high,
       maxBid: asNumber(range?.triage_max_bid),
       score: range?.opportunity_score ?? null,
     };

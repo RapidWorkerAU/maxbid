@@ -1,120 +1,41 @@
-// S5 Triage value, as an Inngest function. F14, decision records 0018 to 0021.
+// S5 Triage value, as an Inngest function. F14, decision records 0018 to 0021
+// and 0024.
 //
 // One step per lot, so a lot that cannot be valued takes only itself down. The
 // spend ceiling is checked before each batch rather than after, the same way
 // S4 does it, so it limits what is spent rather than reporting what was.
+//
+// Since decision record 0024 the first thing it does is read what we already
+// hold. A resale value does not depend on who is buying, so a lot somebody
+// else has already had valued needs no search, no model call and no page
+// fetch: only the arithmetic that turns a range into this organisation's own
+// maximum bid.
 
 import { bandForScore, scoreCatalogue, type ScorableLot } from '@maxbid/calc';
 import { createServiceSupabase } from '@maxbid/db/server';
 import { SpendCeilingError } from '../ai/pricing';
 import { inngest, valueRequested } from './client';
 import { lotsWorthValuing } from './shortlist';
+import { storedRangesFor, VALUATION_METHOD_VERSION, type SharedRange } from './sharedValuation';
 import { assertBudgetLeft } from './triage';
-import { targetBidFor } from './targetBid';
-import { valueLot } from './valueLot';
+import { applyRange, valueAndStore, type LotToValue, type ValuingContext } from './valueOneLot';
 
 /** How many lots are valued at once. Each one searches and fetches pages. */
 const AT_A_TIME = 3;
 
-/** What we know about a lot before valuing it. */
-type LotToValue = {
-  lot_id: string;
-  /** Only used to decide which lots are worth valuing, never to rank them. */
-  lots_current_bid?: number | string | null;
-  brand: string | null;
-  model: string | null;
-  year: number | null;
-  specs: unknown;
-  lots: { title: string; raw: unknown } | null;
-};
-
-/** The odometer the catalogue stated, which decides the usage grading. */
-export function kilometresOf(raw: unknown): number | null {
-  if (typeof raw !== 'object' || raw === null) return null;
-  const attributes = (raw as Record<string, unknown>).attributes;
-  if (typeof attributes !== 'object' || attributes === null) return null;
-  const reading = (attributes as Record<string, unknown>).odometer;
-  if (typeof reading !== 'string') return null;
-  const value = Number(reading.replace(/[^\d]/g, ''));
-  return Number.isFinite(value) && value > 0 ? value : null;
-}
-
-/** The lot in words, for the model to compare listings against. */
-export function describeLot(lot: LotToValue, kilometres: number | null): string {
-  const specs = (lot.specs ?? {}) as Record<string, unknown>;
-  return [
-    lot.year,
-    lot.brand,
-    lot.model,
-    typeof specs.fuel === 'string' ? specs.fuel : null,
-    kilometres ? `odometer ${kilometres.toLocaleString()} km` : null,
-  ]
-    .filter(Boolean)
-    .join(' ');
-}
-
-/**
- * Values one lot and stores its range, returning whether it got one.
- *
- * Only a range that met the evidence threshold is stored. A lot without one
- * keeps null, which the screen reads as not enough evidence rather than as a
- * value of nothing.
- */
-/** What the organisation and the auction have told us, read once per run. */
-export type ValuingContext = {
-  gstRegistered: boolean;
-  profile: Parameters<typeof targetBidFor>[1]['profile'];
-  premium: Parameters<typeof targetBidFor>[2]['premium'];
-  gstOnHammer: boolean;
-};
-
-async function valueAndStore(
-  lot: LotToValue,
-  where: { orgId: string; analysisId: string },
-  context: ValuingContext,
-): Promise<boolean> {
-  const kilometres = kilometresOf(lot.lots?.raw);
-  const result = await valueLot({
-    subject: {
-      brand: lot.brand,
-      model: lot.model,
-      year: lot.year,
-      specs: (lot.specs ?? {}) as Record<string, unknown>,
-    },
-    lotKilometres: kilometres,
-    describedAs: describeLot(lot, kilometres),
-    where: { ...where, lotId: lot.lot_id },
-  });
-
-  const scenarios = result.valuation?.scenarios;
-  if (scenarios?.expected == null) return false;
-
-  // The conservative resale, not the expected one, because a bid figure is
-  // advice and the cautious end of a range is the honest one to advise from.
-  const limits = targetBidFor(
-    scenarios.conservative!,
-    { gstRegistered: context.gstRegistered, profile: context.profile },
-    { premium: context.premium, gstOnHammer: context.gstOnHammer },
-  );
-
-  const { error } = await createServiceSupabase()
-    .from('analysis_lots')
-    .update({
-      triage_low: scenarios.conservative,
-      triage_high: scenarios.optimistic,
-      triage_max_bid: limits?.targetBid ?? null,
-    })
-    .eq('analysis_id', where.analysisId)
-    .eq('lot_id', lot.lot_id);
-  if (error) throw new Error(`Could not store the range: ${error.message}`);
-  return true;
-}
+export type { LotToValue, ValuingContext };
+export { kilometresOf, describeLot } from './valueOneLot';
 
 /**
  * Scores the catalogue and stores the order. S6, decision record 0023.
  *
  * Runs once every lot has been valued, because the score is relative to the
  * best lot in the catalogue and there is no best until they are all done.
+ *
+ * The confidence that weights the score now comes from the stored valuation
+ * rather than from a fixed guess. Until decision record 0024 there was
+ * nowhere to keep it, so every valued lot counted as medium, which weighted
+ * every lot identically and left the order decided by the bid figure alone.
  */
 export async function scoreAndStore(analysisId: string) {
   const supabase = createServiceSupabase();
@@ -124,16 +45,19 @@ export async function scoreAndStore(analysisId: string) {
     .eq('analysis_id', analysisId);
   if (error) throw new Error(`Could not read the analysis lots: ${error.message}`);
 
-  const lots: ScorableLot[] = (data ?? []).map((row) => {
+  const rows = data ?? [];
+  const held = await storedRangesFor(rows.map((row) => row.lot_id));
+
+  const lots: ScorableLot[] = rows.map((row) => {
     const targetBid = row.triage_max_bid === null ? null : Number(row.triage_max_bid);
+    const confidence = held.get(row.lot_id)?.confidence;
     return {
       id: row.lot_id,
       targetBid: Number.isFinite(targetBid) ? targetBid : null,
-      // The evidence threshold is what decides a range exists at all, so a lot
-      // with a bid figure has already cleared it. Until the confidence score
-      // itself is stored, a valued lot counts as medium and an unvalued one
-      // as insufficient, which is the honest reading of what we know.
-      confidence: targetBid === null ? 'insufficient' : bandForScore(60),
+      // A lot with no bid figure could not be valued, and the spec bands that
+      // as insufficient so it cannot sit above a lot we can speak to.
+      confidence:
+        targetBid === null || confidence === undefined ? 'insufficient' : bandForScore(confidence),
       closesAt: (row.lots as { closes_at: string | null } | null)?.closes_at ?? null,
     };
   });
@@ -156,10 +80,7 @@ export async function scoreAndStore(analysisId: string) {
  * Apart from the function so it stays inside the line limit, and so the shape
  * of what a valuation needs is visible in one place.
  */
-export async function readContext(
-  analysisId: string,
-  orgId: string,
-): Promise<ValuingContext> {
+export async function readContext(analysisId: string, orgId: string): Promise<ValuingContext> {
   const supabase = createServiceSupabase();
   const [analysis, profile] = await Promise.all([
     supabase
@@ -187,31 +108,40 @@ export async function readContext(
 }
 
 /**
- * Every lot's identification, and which of them are worth valuing.
+ * Every lot's identification, split by whether we already know its worth.
  *
- * Apart from the function so it stays inside the line limit, and so the choice
- * of what to spend fetches on is visible in one place rather than buried in a
- * step.
+ * The shortlist exists because valuing a lot costs a search, a model call and
+ * up to four page fetches, and eight fetches a minute makes a 300 lot
+ * catalogue six hours. A lot we already hold a range for costs none of that,
+ * so it does not use up a shortlist place. That is the whole saving: a sale
+ * read last night has every lot in held and nothing in chosen.
  */
 export async function readLotsToValue(analysisId: string) {
   const supabase = createServiceSupabase();
   const { data, error } = await supabase
     .from('lot_identifications')
-    .select('lot_id, brand, model, year, specs, lots(title, raw, current_bid)')
+    .select('lot_id, brand, model, year, specs, confidence, stage, lots(title, raw, current_bid)')
     .eq('analysis_id', analysisId)
     .eq('is_current', true);
   if (error) throw new Error(`Could not read the identifications: ${error.message}`);
 
-  // Valuing a lot costs a search, a model call and up to four page fetches,
-  // and eight fetches a minute makes a 300 lot catalogue six hours. Every lot
-  // is still identified; only the ones worth bidding on are valued.
   const all = (data ?? []) as unknown as (LotToValue & {
     lots: { title: string; raw: unknown; current_bid: number | string | null } | null;
   })[];
 
+  const ranges = await storedRangesFor(all.map((lot) => lot.lot_id));
+  const unknown = all.filter((lot) => !ranges.has(lot.lot_id));
+
+  // A plain list, not the map. Every step result crosses a JSON boundary on
+  // its way back from Inngest, and a Map does not survive that: it arrives as
+  // an empty object, which would quietly look like nothing was held.
+  const held = all
+    .map((lot) => ({ lotId: lot.lot_id, range: ranges.get(lot.lot_id) }))
+    .filter((entry): entry is { lotId: string; range: SharedRange } => entry.range !== undefined);
+
   const worth = new Set(
     lotsWorthValuing(
-      all.map((lot) => ({
+      unknown.map((lot) => ({
         lotId: lot.lot_id,
         currentBid:
           lot.lots?.current_bid === null || lot.lots?.current_bid === undefined
@@ -222,7 +152,11 @@ export async function readLotsToValue(analysisId: string) {
     ).map((lot) => lot.lotId),
   );
 
-  return { chosen: all.filter((lot) => worth.has(lot.lot_id)), considered: all.length };
+  return {
+    chosen: unknown.filter((lot) => worth.has(lot.lot_id)),
+    held,
+    considered: all.length,
+  };
 }
 
 export const valueLots = inngest.createFunction(
@@ -243,13 +177,17 @@ export const valueLots = inngest.createFunction(
   async ({ event, step }) => {
     const { analysisId, orgId } = event.data;
 
-    const lots = await step.run('read-identifications', async () =>
-      readLotsToValue(analysisId),
-    );
+    const lots = await step.run('read-identifications', async () => readLotsToValue(analysisId));
+    const context = await step.run('read-context', async () => readContext(analysisId, orgId));
 
-    const context = await step.run('read-context', async () =>
-      readContext(analysisId, orgId),
-    );
+    // Everything we already hold, before anything is spent. Arithmetic only,
+    // so those rows fill in at once rather than over forty minutes.
+    const reused = await step.run('apply-stored-ranges', async () => {
+      for (const entry of lots.held) {
+        await applyRange(entry.lotId, entry.range, { analysisId }, context);
+      }
+      return lots.held.length;
+    });
 
     const chosen = lots.chosen;
     let valued = 0;
@@ -277,7 +215,7 @@ export const valueLots = inngest.createFunction(
         chosen.slice(start, start + AT_A_TIME).map((lot) =>
           step
             .run(`value-${lot.lot_id}`, async () => ({
-              valued: await valueAndStore(lot, { orgId, analysisId }, context),
+              valued: (await valueAndStore(lot, { orgId, analysisId }, context)) !== null,
             }))
             .catch(() => ({ valued: false })),
         ),
@@ -309,8 +247,10 @@ export const valueLots = inngest.createFunction(
       analysisId,
       considered: lots.considered,
       valued,
+      reused,
       withoutEvidence,
       stoppedForSpend,
+      methodVersion: VALUATION_METHOD_VERSION,
     };
   },
 );

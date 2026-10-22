@@ -132,3 +132,53 @@ describe('the order of the list', () => {
     expect(rows[0]?.maxBid).toBe(8499.5);
   });
 });
+
+describe('which resale range the screen shows', () => {
+  const sharedRange = { lot_id: 'lot-1', conservative: '8500.00', optimistic: '22500.00' };
+  const override = {
+    lot_id: 'lot-1',
+    triage_low: '9000.00',
+    triage_high: '14000.00',
+    triage_max_bid: '4200.00',
+    opportunity_score: 80,
+  };
+  const noOverride = { ...override, triage_low: null, triage_high: null };
+
+  it('shows the shared range when the organisation has not corrected it', () => {
+    // The ordinary case. A resale value does not depend on who is buying, so
+    // everybody reads the same one. Decision record 0024.
+    const [row] = toRows([lot], [], [noOverride], [sharedRange]);
+    expect(row).toMatchObject({ resaleLow: 8500, resaleHigh: 22500 });
+  });
+
+  it('prefers the organisation own correction where they made one', () => {
+    const [row] = toRows([lot], [], [override], [sharedRange]);
+    expect(row).toMatchObject({ resaleLow: 9000, resaleHigh: 14000 });
+  });
+
+  it('shows no range when neither source has one', () => {
+    const [row] = toRows([lot], [], [noOverride], []);
+    expect(row).toMatchObject({ resaleLow: null, resaleHigh: null });
+  });
+
+  it('falls back to the shared range rather than showing half a correction', () => {
+    // Mixing a corrected low with a shared high would produce a span nobody
+    // worked out and nobody could explain.
+    const halfCorrected = { ...override, triage_high: null };
+    const [row] = toRows([lot], [], [halfCorrected], [sharedRange]);
+    expect(row).toMatchObject({ resaleLow: 8500, resaleHigh: 22500 });
+  });
+
+  it('shows no range when the shared one is half missing too', () => {
+    const halfShared = { lot_id: 'lot-1', conservative: '8500.00', optimistic: null };
+    const [row] = toRows([lot], [], [noOverride], [halfShared]);
+    expect(row).toMatchObject({ resaleLow: null, resaleHigh: null });
+  });
+
+  it('keeps the maximum bid out of the shared range, because it is theirs', () => {
+    // The range is shared. The bid figure comes from their own profit target
+    // and GST position, so it stays on their analysis.
+    const [row] = toRows([lot], [], [noOverride], [sharedRange]);
+    expect(row.maxBid).toBe(4200);
+  });
+});
