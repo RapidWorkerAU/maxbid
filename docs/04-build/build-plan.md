@@ -49,6 +49,7 @@ Updated at the end of every pull request. The current row is always the one to r
 | 49 | Put what a lot is and what it is worth where everybody can read them | Open | |
 | 50 | Record what actually happened, because nothing else can tell us | Open | |
 | 51 | Read what we already know before working it out again | Open | |
+| 52 | Identify a lot once, for everybody | Open | |
 | next | Read the sitemaps nightly and queue the sales nobody has asked about | Next |  |
 
 **Where we are.** The pipeline runs end to end on a real sale: a pasted Grays link becomes 36 identified lots with a premium schedule, resale ranges, bid figures and a ranking, all on screen. The archive holds what all 36 lots actually sold for, harvested after the sale closed, which is evidence nobody else has.
@@ -57,7 +58,7 @@ Updated at the end of every pull request. The current row is always the one to r
 
 **Why, and what fixes it.** Almost every comparable is an advertised price weighted 0.6, where a sold price is weighted 0.95. The archive has one sale in it. Accuracy is a function of how many sales have been harvested, so it improves over weeks rather than in a sitting. Decision records 0020 and 0021 set that up deliberately, and decision record 0024 fills the archive faster by reading every live sale rather than only the ones somebody asked about.
 
-**What we are building now.** Decision record 0024. Analysing a catalogue takes forty minutes, almost all of it page fetches for the valuation, so a sale closing tonight cannot be analysed tonight. Most of that work does not depend on who is asking, so MaxBid crawls the sites it reads on a schedule and holds every live lot parsed, identified and valued before anybody asks. A pasted link becomes a lookup, a refresh of the current bids, and a sum. This is a mechanism, not a feature, and nothing in the interface mentions it. Pull request 49 is the shared layer it rests on.
+**What we are building now.** Decision record 0024. Analysing a catalogue takes forty minutes, almost all of it page fetches for the valuation, so a sale closing tonight cannot be analysed tonight. Most of that work does not depend on who is asking, so MaxBid crawls the sites it reads on a schedule and holds every live lot parsed, identified and valued before anybody asks. A pasted link becomes a lookup, a refresh of the current bids, and a sum. This is a mechanism, not a feature, and nothing in the interface mentions it. Pull requests 49, 51 and 52 build the shared layer it rests on: the tables, then S5 reading a stored resale range, then S4 identifying a lot once for everybody. The crawler is next, and it is now mostly scheduling, because both stages already do the right thing when the work is already done.
 
 **Blocked and waiting on Ashleigh.** O04, the eBay Marketplace Insights application, is still worth making because approval takes time and sold listings would strengthen the evidence. O11 blocks promoting the waitlist page. The app has never been deployed: there is no Vercel project for apps/app and maxbid.com.au still points at a placeholder. LotRow is In review and needs a Storybook sign off before any further page uses it.
 

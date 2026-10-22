@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { AnalysisProgress } from './AnalysisProgress';
 import { pendingNoteFor, toRows } from './lots';
 import { APP_LINKS } from '../../../lib/navigation';
+import { preferCorrection } from '../../../lib/identifications';
 import { supabaseServer } from '../../../lib/supabase';
 
 // SC04 and SC05. Progress while the pipeline runs, then the lots themselves.
@@ -20,9 +21,9 @@ export default async function AnalysisPage({ params }: { params: Promise<{ id: s
 
   if (!data) notFound();
 
-  // The resale range is shared, because it does not depend on who is buying.
-  // The maximum bid and the score are this organisation's own. Decision
-  // record 0024.
+  // What a lot is and what it resells for are shared, because neither depends
+  // on who is buying. The maximum bid and the score are this organisation's
+  // own. Decision record 0024.
   const [lots, identifications, ranges, shared] = await Promise.all([
     supabase
       .from('lots')
@@ -31,9 +32,12 @@ export default async function AnalysisPage({ params }: { params: Promise<{ id: s
       .order('lot_number'),
     supabase
       .from('lot_identifications')
-      .select('lot_id, brand, model, year, confidence, condition_notes')
-      .eq('analysis_id', id)
-      .eq('is_current', true),
+      .select(
+        'lot_id, brand, model, year, confidence, condition_notes, analysis_id, lots!inner(auction_id)',
+      )
+      .eq('lots.auction_id', data.auction_id)
+      .eq('is_current', true)
+      .or(`analysis_id.is.null,analysis_id.eq.${id}`),
     supabase
       .from('analysis_lots')
       .select('lot_id, triage_low, triage_high, triage_max_bid, opportunity_score')
@@ -47,7 +51,7 @@ export default async function AnalysisPage({ params }: { params: Promise<{ id: s
 
   const rows = toRows(
     lots.data ?? [],
-    identifications.data ?? [],
+    preferCorrection(identifications.data ?? []),
     ranges.data ?? [],
     shared.data ?? [],
   );

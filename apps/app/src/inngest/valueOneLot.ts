@@ -83,12 +83,24 @@ export async function applyRange(
     { premium: context.premium, gstOnHammer: context.gstOnHammer },
   );
 
-  const { error } = await createServiceSupabase()
+  const { data, error } = await createServiceSupabase()
     .from('analysis_lots')
     .update({ triage_max_bid: limits?.targetBid ?? null })
     .eq('analysis_id', where.analysisId)
-    .eq('lot_id', lotId);
+    .eq('lot_id', lotId)
+    .select('id');
   if (error) throw new Error(`Could not store the maximum bid: ${error.message}`);
+
+  // An update that matched nothing is not a success. S2 opens a row for every
+  // lot in the catalogue, so a missing one means this analysis never ran that
+  // stage, which is exactly what happens once a crawled sale is looked up
+  // rather than extracted. Saying so beats a blank column the user would read
+  // as not enough evidence.
+  if ((data ?? []).length === 0) {
+    throw new Error(
+      `No analysis lot row for lot ${lotId} in analysis ${where.analysisId}, so the maximum bid had nowhere to go.`,
+    );
+  }
 }
 
 /**

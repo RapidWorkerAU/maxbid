@@ -4,8 +4,6 @@
 // ceiling is checked before each lot rather than after, so it limits what is
 // spent rather than reporting what was.
 
-import { createServiceSupabase } from '@maxbid/db/server';
-import type { Json } from '@maxbid/db';
 import { ask, spentOnAnalysis } from '../ai/claude';
 import {
   IDENTIFY_PROMPT_VERSION,
@@ -104,33 +102,9 @@ export async function identifyLot(
   return { lotId: lot.id, identification, aiRunId, costUsd, usedPhoto };
 }
 
-/** Stores an identification, superseding any earlier current one for that lot. */
-export async function storeIdentification(analysisId: string, result: IdentifiedLot) {
-  const supabase = createServiceSupabase();
-
-  // Only one identification may be current per lot, so the old one steps down
-  // before the new one arrives. The unique index makes that a rule.
-  await supabase
-    .from('lot_identifications')
-    .update({ is_current: false })
-    .eq('analysis_id', analysisId)
-    .eq('lot_id', result.lotId)
-    .eq('is_current', true);
-
-  const { error } = await supabase.from('lot_identifications').insert({
-    analysis_id: analysisId,
-    lot_id: result.lotId,
-    stage: 'triage',
-    brand: result.identification.brand,
-    model: result.identification.model,
-    year: result.identification.year,
-    specs: result.identification.specs as Json,
-    condition_notes: result.identification.conditionNotes,
-    confidence: result.identification.confidence,
-    ai_run_id: result.aiRunId,
-  });
-  if (error) throw new Error(`Could not store the identification: ${error.message}`);
-}
+// Storing an identification now lives in sharedIdentification.ts, because an
+// identification belongs to the lot rather than to whichever analysis
+// happened to ask first. Decision record 0024.
 
 /** Refuses to start another lot once the analysis has spent its limit. */
 export async function assertBudgetLeft(analysisId: string, ceiling = DEFAULT_ANALYSIS_CEILING_USD) {
