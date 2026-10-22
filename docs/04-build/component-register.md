@@ -41,12 +41,12 @@ This register is the sign off record for every component in packages/ui. It is t
 | UI18 | Wordmark | Primitive | Both | Approved | 23 September 2026 | Three sizes, light and on navy |
 | UI19 | BidRail | Composite | Both | Not started |  |  |
 | UI20 | BidSlider | Composite | App | Not started |  |  |
-| UI21 | BidLimits | Composite | Both | Not started |  |  |
-| UI22 | EvidenceRow | Composite | App | Not started |  |  |
-| UI23 | PriceLine | Composite | Both | Not started |  |  |
+| UI21 | BidLimits | Composite | Both | In review | 22 October 2026 | The three figures rise in order, so break even is the biggest number on screen and the one to act on is the smallest. Only the target bid carries marker yellow, and the break even line says a bid above it loses money |
+| UI22 | EvidenceRow | Composite | App | In review | 22 October 2026 | One comparable sale with its price, match level, age and the weight it carried, so a resale range can be checked rather than taken on trust. F59 |
+| UI23 | PriceLine | Composite | Both | In review | 22 October 2026 | A named money figure on a leader line. Obeys the rounding rules, carries the sentence saying what the figure is, and states that a missing figure is not worked out rather than leaving a blank |
 | UI24 | SpecTable | Composite | Both | Not started |  |  |
 | UI25 | OptionChecklist | Composite | App | Not started |  |  |
-| UI26 | DetailCard | Composite | Both | Not started |  |  |
+| UI26 | DetailCard | Composite | Both | In review | 22 October 2026 | A framed card with a label on its edge, the way a view on a drawing is labelled DETAIL A. Heading level is a prop, because a wrong one is an accessibility failure the axe gate does not catch |
 | UI27 | TimeRemainingBar | Composite | Both | Not started |  |  |
 | UI28 | SplitBar | Composite | Web | Not started |  |  |
 | UI29 | PriceChart | Composite | Web | Not started |  |  |
