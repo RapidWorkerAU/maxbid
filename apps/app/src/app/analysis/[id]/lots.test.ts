@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { describeIdentification, pendingNoteFor, toRows } from './lots';
+import { bidsCheckedNoteFor, describeIdentification, pendingNoteFor, toRows } from './lots';
 
 const lot = {
   id: 'lot-1',
@@ -104,19 +104,51 @@ describe('the order of the list', () => {
 
   it('puts the best lot first', () => {
     // Decision record 0023. The score is why the list is in this order.
-    const rows = toRows(two, [], [
-      { lot_id: 'a', triage_low: null, triage_high: null, triage_max_bid: null, opportunity_score: 40 },
-      { lot_id: 'b', triage_low: null, triage_high: null, triage_max_bid: null, opportunity_score: 100 },
-    ]);
+    const rows = toRows(
+      two,
+      [],
+      [
+        {
+          lot_id: 'a',
+          triage_low: null,
+          triage_high: null,
+          triage_max_bid: null,
+          opportunity_score: 40,
+        },
+        {
+          lot_id: 'b',
+          triage_low: null,
+          triage_high: null,
+          triage_max_bid: null,
+          opportunity_score: 100,
+        },
+      ],
+    );
     expect(rows.map((r) => r.id)).toEqual(['b', 'a']);
   });
 
   it('puts an unscored lot below every scored one', () => {
     // Not that it scored badly, but that we could not say.
-    const rows = toRows(two, [], [
-      { lot_id: 'a', triage_low: null, triage_high: null, triage_max_bid: null, opportunity_score: null },
-      { lot_id: 'b', triage_low: null, triage_high: null, triage_max_bid: null, opportunity_score: 0 },
-    ]);
+    const rows = toRows(
+      two,
+      [],
+      [
+        {
+          lot_id: 'a',
+          triage_low: null,
+          triage_high: null,
+          triage_max_bid: null,
+          opportunity_score: null,
+        },
+        {
+          lot_id: 'b',
+          triage_low: null,
+          triage_high: null,
+          triage_max_bid: null,
+          opportunity_score: 0,
+        },
+      ],
+    );
     expect(rows.map((r) => r.id)).toEqual(['b', 'a']);
   });
 
@@ -126,9 +158,19 @@ describe('the order of the list', () => {
   });
 
   it('carries the maximum bid through', () => {
-    const rows = toRows([two[0]!], [], [
-      { lot_id: 'a', triage_low: null, triage_high: null, triage_max_bid: '8499.50', opportunity_score: 100 },
-    ]);
+    const rows = toRows(
+      [two[0]!],
+      [],
+      [
+        {
+          lot_id: 'a',
+          triage_low: null,
+          triage_high: null,
+          triage_max_bid: '8499.50',
+          opportunity_score: 100,
+        },
+      ],
+    );
     expect(rows[0]?.maxBid).toBe(8499.5);
   });
 });
@@ -180,5 +222,61 @@ describe('which resale range the screen shows', () => {
     // and GST position, so it stays on their analysis.
     const [row] = toRows([lot], [], [noOverride], [sharedRange]);
     expect(row.maxBid).toBe(4200);
+  });
+});
+
+describe('saying when we last checked the bids', () => {
+  const now = new Date('2026-10-22T12:00:00.000Z');
+  const ago = (minutes: number) => new Date(now.getTime() - minutes * 60_000).toISOString();
+
+  it('says nothing when we have never checked', () => {
+    // A sentence about a check that never happened is worse than no sentence.
+    expect(bidsCheckedNoteFor([], now)).toBeUndefined();
+    expect(bidsCheckedNoteFor([null, null], now)).toBeUndefined();
+  });
+
+  it('says just now for a check inside the minute', () => {
+    expect(bidsCheckedNoteFor([ago(0)], now)).toBe('We checked the current bids just now.');
+  });
+
+  it('counts in minutes under the hour', () => {
+    expect(bidsCheckedNoteFor([ago(14)], now)).toContain('14 minutes ago');
+  });
+
+  it('uses the singular for one', () => {
+    expect(bidsCheckedNoteFor([ago(1)], now)).toContain('1 minute ago');
+    expect(bidsCheckedNoteFor([ago(60)], now)).toContain('1 hour ago');
+  });
+
+  it('counts in hours under the day', () => {
+    expect(bidsCheckedNoteFor([ago(60 * 7)], now)).toContain('7 hours ago');
+  });
+
+  it('counts in days beyond that, and says the figures may be well out of date', () => {
+    const note = bidsCheckedNoteFor([ago(60 * 24 * 3)], now)!;
+    expect(note).toContain('3 days ago');
+    expect(note).toContain('well out of date');
+  });
+
+  it('quotes the oldest check, not the newest', () => {
+    // A list is only as current as its stalest row. Quoting the newest would
+    // describe the best case as the whole picture.
+    expect(bidsCheckedNoteFor([ago(2), ago(400)], now)).toContain('7 hours ago');
+  });
+
+  it('ignores a lot we have never checked rather than treating it as ancient', () => {
+    expect(bidsCheckedNoteFor([null, ago(14)], now)).toContain('14 minutes ago');
+  });
+
+  it('tells the reader to check the site before bidding', () => {
+    // We are stating a fact about a figure we read, not telling anybody what
+    // to bid. The auction site is the only live answer.
+    expect(bidsCheckedNoteFor([ago(30)], now)).toContain('auction site');
+  });
+
+  it('contains no dashes, as the writing rules require', () => {
+    for (const minutes of [0, 5, 90, 60 * 24 * 2]) {
+      expect(bidsCheckedNoteFor([ago(minutes)], now)).not.toMatch(/[-–—]/);
+    }
   });
 });

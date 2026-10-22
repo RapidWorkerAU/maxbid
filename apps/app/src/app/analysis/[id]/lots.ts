@@ -155,3 +155,54 @@ export function pendingNoteFor(identified: number, total: number): string | unde
 
   return 'This list shows what each lot is and what it is bid to now. A rough resale range and the most you should bid are added once the valuation stage runs.';
 }
+
+/** Under a minute reads as now, which is what a person means by just checked. */
+const JUST_NOW_SECONDS = 60;
+
+/**
+ * A sentence saying when we last read the bids from the site.
+ *
+ * Needed because the figure on screen is labelled the current bid, and once
+ * sales are read on a schedule rather than when somebody asks, it may be hours
+ * old. Saying so is the honest version of showing it. Decision record 0024.
+ *
+ * Returns undefined when we have never read a bid for any of these lots. There
+ * is nothing to date, and a sentence about a check that never happened would be
+ * worse than no sentence.
+ *
+ * A sentence rather than a tenth column, because the table already carries nine
+ * at 360px wide and this is one fact about the whole list rather than about any
+ * one lot.
+ */
+export function bidsCheckedNoteFor(
+  checkedAt: (string | null)[],
+  now: Date = new Date(),
+): string | undefined {
+  const times = checkedAt
+    .filter((value): value is string => Boolean(value))
+    .map((value) => new Date(value).getTime())
+    .filter((value) => Number.isFinite(value));
+  if (times.length === 0) return undefined;
+
+  // The oldest, not the newest. A list is only as current as its stalest row,
+  // and quoting the newest would describe the best case as the whole picture.
+  const oldest = Math.min(...times);
+  const seconds = Math.round((now.getTime() - oldest) / 1000);
+
+  if (seconds < JUST_NOW_SECONDS) {
+    return 'We checked the current bids just now.';
+  }
+
+  const minutes = Math.round(seconds / 60);
+  if (minutes < 60) {
+    return `We checked the current bids ${minutes} ${minutes === 1 ? 'minute' : 'minutes'} ago. A bid can rise at any time, so open the lot on the auction site before you bid.`;
+  }
+
+  const hours = Math.round(minutes / 60);
+  if (hours < 24) {
+    return `We checked the current bids ${hours} ${hours === 1 ? 'hour' : 'hours'} ago. A bid can rise at any time, so open the lot on the auction site before you bid.`;
+  }
+
+  const days = Math.round(hours / 24);
+  return `We checked the current bids ${days} ${days === 1 ? 'day' : 'days'} ago, so the figures below may be well out of date. Open the lot on the auction site to see what it is bid to now.`;
+}
