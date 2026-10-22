@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { LotFilters, NO_FILTERS } from './LotFilters';
+import { LotFilters } from './LotFilters';
+import { NO_FILTERS } from './filters';
 
 const meta: Meta<typeof LotFilters> = {
   title: 'Composites/LotFilters',

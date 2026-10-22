@@ -1,13 +1,15 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
+import { LotFilters } from './LotFilters';
+import controlsSource from './LotFilters.tsx?raw';
+import rulesSource from './filters.ts?raw';
 import {
-  LotFilters,
   NO_FILTERS,
   filtersFromParams,
   locationsIn,
   matchesFilters,
   paramsFromFilters,
-} from './LotFilters';
+} from './filters';
 
 const NOW = new Date('2026-10-22T12:00:00.000Z');
 const closesIn = (hours: number) => new Date(NOW.getTime() + hours * 3_600_000).toISOString();
@@ -228,5 +230,30 @@ describe('filters in the query string', () => {
   it('keeps a floor of nought, which is a real choice', () => {
     const params = paramsFromFilters({ ...NO_FILTERS, minMaxBid: 0 });
     expect(filtersFromParams(Object.fromEntries(params)).minMaxBid).toBe(0);
+  });
+});
+
+describe('which side of the client boundary the rules live on', () => {
+  it('keeps use client off the rules file', () => {
+    // A server page reads the filters out of the query string before it
+    // renders. Everything exported from a module with use client on it is a
+    // client export, so putting these next to the controls made that fail at
+    // runtime with "attempted to call it from the server".
+    //
+    // Nothing else catches it. Unit tests do not enforce the boundary and the
+    // story tests render in a browser where everything is a client, so only
+    // opening the page did.
+    // The directive, not the words. This file explains the boundary in a
+    // comment, and a test that matched the prose would fail on the
+    // explanation of why it must not be there.
+    // The directive, not the words. This file explains the boundary in a
+    // comment, and a test that matched the prose would fail on the
+    // explanation of why the directive must not be there.
+    expect(rulesSource.trimStart().startsWith('"use client"')).toBe(false);
+    expect(rulesSource.trimStart().startsWith("'use client'")).toBe(false);
+  });
+
+  it('keeps use client on the controls, which need it', () => {
+    expect(controlsSource.startsWith("'use client'")).toBe(true);
   });
 });
