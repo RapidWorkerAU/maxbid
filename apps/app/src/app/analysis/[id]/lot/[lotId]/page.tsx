@@ -2,6 +2,7 @@ import { AppShell } from '@maxbid/ui/sections/AppShell';
 import { LotDetail } from '@maxbid/ui/sections/LotDetail';
 import { notFound } from 'next/navigation';
 import { heaviestFirst, toComparables, type EvidenceRecord } from './lot';
+import { CorrectForm } from './CorrectForm';
 import { readLot } from './readLot';
 import { APP_LINKS } from '../../../../../lib/navigation';
 import { supabaseServer } from '../../../../../lib/supabase';
@@ -30,6 +31,14 @@ export default async function LotPage({
         bids={read.bids}
         missingBidReason={read.missingBidReason}
         method={read.method}
+        correction={
+          <CorrectForm
+            analysisId={id}
+            lotId={lotId}
+            current={read.current}
+            alreadyCorrected={read.correctedByYou}
+          />
+        }
       />
     </AppShell>
   );

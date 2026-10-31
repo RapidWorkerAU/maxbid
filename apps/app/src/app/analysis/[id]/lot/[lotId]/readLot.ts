@@ -166,19 +166,7 @@ export async function readLot(supabase: Client, analysisId: string, lotId: strin
             : NO_PREMIUM;
 
   return {
-    lot: {
-      lotNumber: lot.lot_number,
-      title: lot.title,
-      currentBid: asNumber(lot.current_bid),
-      closesAt: lot.closes_at,
-      saleTitle: lot.auctions?.title ?? null,
-      identifiedAs,
-      identificationConfidence: asNumber(found?.confidence),
-      conditionNote: found?.condition_notes ?? null,
-      // The same sentence the list carries, so a reader who clicks through
-      // does not lose the one fact that says how current the bid is.
-      bidNote: bidFreshnessNote([{ closes_at: lot.closes_at, bid_checked_at: lot.bid_checked_at }]),
-    },
+    lot: lotShown(lot, found, identifiedAs),
     valuation: {
       conservative,
       // Shown only where it came from the shared valuation. A corrected range
@@ -200,6 +188,14 @@ export async function readLot(supabase: Client, analysisId: string, lotId: strin
     missingBidReason: whyNoBid,
     method: limits ? methodFor(conservative!) : undefined,
     evidence: evidence.data ?? [],
+    // What the correction form starts on, which is whatever we think now.
+    current: {
+      brand: found?.brand ?? null,
+      model: found?.model ?? null,
+      year: found?.year ?? null,
+      conditionNotes: found?.condition_notes ?? null,
+    },
+    correctedByYou: found?.analysis_id != null,
   };
 }
 
@@ -222,4 +218,34 @@ export function methodFor(resale: number): string {
     'We took off this auction’s buyer’s premium and the GST on it, then your costs, then the profit you said you want.',
     'The figure left is the most you can bid and still reach that profit.',
   ].join(' ');
+}
+
+/** The lot as the screen reads it, apart so readLot stays inside its limit. */
+function lotShown(
+  lot: {
+    lot_number: string;
+    title: string;
+    current_bid: number | string | null;
+    closes_at: string | null;
+    bid_checked_at: string | null;
+    auctions: { title: string | null } | null;
+  },
+  found: IdentificationRow | undefined,
+  identifiedAs: string | null,
+) {
+  return {
+    lotNumber: lot.lot_number,
+    title: lot.title,
+    currentBid: asNumber(lot.current_bid),
+    closesAt: lot.closes_at,
+    saleTitle: lot.auctions?.title ?? null,
+    identifiedAs,
+    identificationConfidence: asNumber(found?.confidence),
+    // A correction has an analysis behind it. The baseline does not.
+    correctedByYou: found?.analysis_id != null,
+    conditionNote: found?.condition_notes ?? null,
+    // The same sentence the list carries, so a reader who clicks through does
+    // not lose the one fact that says how current the bid is.
+    bidNote: bidFreshnessNote([{ closes_at: lot.closes_at, bid_checked_at: lot.bid_checked_at }]),
+  };
 }

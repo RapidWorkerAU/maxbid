@@ -18,6 +18,13 @@ export type LotToValue = {
   lot_id: string;
   /** Only used to decide which lots are worth valuing, never to rank them. */
   lots_current_bid?: number | string | null;
+  /**
+   * Null for the shared baseline, set for one organisation's correction.
+   *
+   * It decides where the range this produces is stored, which is the whole
+   * difference between a fact about the lot and an opinion about it.
+   */
+  analysis_id?: string | null;
   brand: string | null;
   model: string | null;
   year: number | null;
@@ -162,8 +169,41 @@ export async function valueAndStore(
     return null;
   }
 
-  await storeRange(lot.lot_id, range);
+  // Where the identification came from decides where the range goes.
+  //
+  // A range worked out from the shared baseline is a fact about the lot and
+  // everybody reads it. A range worked out from one organisation's own
+  // correction is a consequence of their opinion about what the lot is, and
+  // storing it shared would push that opinion onto every other organisation
+  // looking at the same sale. So a correction's figures stay on their own
+  // analysis, which is what triage_low and triage_high on analysis_lots are
+  // for. Decision record 0024.
+  if (lot.analysis_id) {
+    await storeOverride(lot.lot_id, range, where);
+  } else {
+    await storeRange(lot.lot_id, range);
+  }
+
   await applyRange(lot.lot_id, range, where, context);
 
   return range;
+}
+
+/**
+ * Stores a range that belongs to one organisation rather than to the lot.
+ *
+ * Null means read the shared figure, which is the ordinary case, so writing
+ * here is what makes the screen prefer theirs.
+ */
+export async function storeOverride(
+  lotId: string,
+  range: SharedRange,
+  where: { analysisId: string },
+) {
+  const { error } = await createServiceSupabase()
+    .from('analysis_lots')
+    .update({ triage_low: range.conservative, triage_high: range.optimistic })
+    .eq('analysis_id', where.analysisId)
+    .eq('lot_id', lotId);
+  if (error) throw new Error(`Could not store their own range: ${error.message}`);
 }

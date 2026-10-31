@@ -254,3 +254,23 @@ describe('what it takes to win one, kept apart from what it resells for', () => 
     expect(marked[0]!.textContent).toBe('$7,936');
   });
 });
+
+describe('correcting what we decided a lot is', () => {
+  it('puts the correction under the identification it corrects', () => {
+    render(<LotDetail {...base} correction={<button type="button">This is not right</button>} />);
+    expect(screen.getByRole('button', { name: 'This is not right' })).toBeTruthy();
+  });
+
+  it('says a corrected identification is the reader own, and private', () => {
+    // One organisation's opinion about a lot is not a fact about the lot, so
+    // it would be wrong to let them think everybody now sees it.
+    render(<LotDetail {...base} lot={{ ...base.lot, correctedByYou: true }} />);
+    expect(screen.getByText(/This is what you told us it is/)).toBeTruthy();
+    expect(screen.getByText(/nobody else analysing this sale sees/)).toBeTruthy();
+  });
+
+  it('says nothing of the sort where we worked it out ourselves', () => {
+    render(<LotDetail {...base} />);
+    expect(screen.queryByText(/This is what you told us it is/)).toBeNull();
+  });
+});
