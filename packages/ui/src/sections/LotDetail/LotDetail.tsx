@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { BidLimits } from '../../composites/BidLimits';
 import { DetailCard } from '../../composites/DetailCard';
 import { EvidenceRow, type Comparable } from '../../composites/EvidenceRow';
@@ -34,6 +35,8 @@ export type LotDetailLot = {
   /** What the catalogue called it. */
   title: string;
   currentBid: number | null;
+  /** True where this organisation corrected the identification themselves. F19. */
+  correctedByYou?: boolean;
   /** When the bid was last read from the site. Decision record 0026. */
   bidNote?: string;
   closesAt?: string | null;
@@ -74,11 +77,18 @@ export type LotDetailProps = {
   missingBidReason?: string;
   /** How the figures were worked out, in words. F59. */
   method?: string;
+  /**
+   * Put under the identification, for correcting it. F19.
+   *
+   * Passed in rather than built here, because correcting one needs a server
+   * action and this package has no server in it.
+   */
+  correction?: ReactNode;
   className?: string;
 };
 
 /** What we decided the lot is, or why we could not say. */
-function Identification({ lot }: { lot: LotDetailLot }) {
+function Identification({ lot, correction }: { lot: LotDetailLot; correction?: ReactNode }) {
   return (
     <DetailCard label="What this lot is" heading="Identification">
       {lot.identifiedAs ? (
@@ -97,6 +107,13 @@ function Identification({ lot }: { lot: LotDetailLot }) {
       {lot.conditionNote ? (
         <p className="mt-3 font-sans text-sm text-ink">The catalogue says: {lot.conditionNote}</p>
       ) : null}
+      {lot.correctedByYou ? (
+        <p className="mt-3 font-sans text-sm text-ink-muted">
+          This is what you told us it is. The figures below are worked out from it, and nobody else
+          analysing this sale sees your correction.
+        </p>
+      ) : null}
+      {correction}
     </DetailCard>
   );
 }
@@ -183,6 +200,7 @@ export function LotDetail({
   bids,
   missingBidReason,
   method,
+  correction,
   className = '',
 }: LotDetailProps) {
   return (
@@ -203,7 +221,7 @@ export function LotDetail({
         />
       </SheetFrame>
 
-      <Identification lot={lot} />
+      <Identification lot={lot} correction={correction} />
 
       <DetailCard label="At auction" heading="What it is bid to now">
         <PriceLine

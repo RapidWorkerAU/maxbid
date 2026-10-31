@@ -44,6 +44,11 @@ export const valueRequested = eventType('analysis/value.requested', {
   }>(),
 });
 
+/** One lot whose identification a user corrected, to be valued again. F19. */
+export const revalueRequested = eventType('analysis/revalue.requested', {
+  schema: staticSchema<{ analysisId: string; lotId: string }>(),
+});
+
 /** S8. Lots somebody shortlisted, to be read from their photographs. F18. */
 export const deepRequested = eventType('analysis/deep.requested', {
   schema: staticSchema<{ analysisId: string; orgId: string; lotIds: string[] }>(),
