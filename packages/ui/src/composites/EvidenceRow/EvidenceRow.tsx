@@ -37,6 +37,16 @@ export type Comparable = {
   url?: string | null;
   /** True where the price is what it sold for rather than what was asked. */
   sold?: boolean;
+  /**
+   * Why this counted as the same thing, in plain English. F21.
+   *
+   * Stored since the evidence tables were built and never shown. A match
+   * level on its own is our verdict with the reasoning left out, which is
+   * the opposite of what the evidence panel is for: the reader is deciding
+   * whether to trust the range, and "near exact" tells them nothing they can
+   * check.
+   */
+  reason?: string | null;
 };
 
 export type EvidenceRowProps = {
@@ -95,6 +105,18 @@ export function EvidenceRow({ comparable: c, className = '' }: EvidenceRowProps)
       <div className="mt-2 md:mt-0">
         <MonoLabel>{ageInWords(c.ageInDays)}</MonoLabel>
       </div>
+
+      {/* Why it counted, under the row rather than in a column, because it is
+          a sentence and the four columns above are all one line each. F21.
+
+          Full width on a desktop so it is not squeezed into the title's
+          share. This is the part a reader uses to disagree with us: a match
+          level on its own is a verdict with the reasoning left out. */}
+      {c.reason ? (
+        <p className="mt-2 font-sans text-sm text-ink-muted md:col-span-4 md:mt-1 md:text-xs">
+          {c.reason}
+        </p>
+      ) : null}
     </div>
   );
 }

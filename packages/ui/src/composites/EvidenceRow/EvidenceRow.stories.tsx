@@ -77,3 +77,43 @@ export const VeryLongTitle: Story = {
     },
   },
 };
+
+/**
+ * F21. The reason is the part a reader uses to disagree with us. A match
+ * level on its own is a verdict with the reasoning left out.
+ */
+export const WithTheReasonItCounted: Story = {
+  args: {
+    comparable: {
+      id: '5',
+      title: '2016 Invented Wagon Alpha Diesel, 120,000 km',
+      price: 24990,
+      matchLevel: 'higherSpec',
+      weight: 0.54,
+      ageInDays: 4,
+      source: 'a dealer listing',
+      sold: false,
+      url: 'https://example.test/listing/5',
+      reason:
+        'Same model and body, one year newer with 60,000 km fewer on it, so it should sell for more than this lot.',
+    },
+  },
+};
+
+/** A reason long enough to wrap, which it should rather than truncate. */
+export const ALongReason: Story = {
+  args: {
+    comparable: {
+      id: '6',
+      title: '2014 Invented Wagon Alpha Petrol',
+      price: 12000,
+      matchLevel: 'similarAlternative',
+      weight: 0.21,
+      ageInDays: 800,
+      source: 'our own archive',
+      sold: true,
+      reason:
+        'Same make and a similar body, but a petrol engine rather than a diesel, an earlier model year, and no service history stated. It is the right kind of vehicle rather than the same vehicle, so it counts for less than a quarter of an exact match.',
+    },
+  },
+};

@@ -117,7 +117,7 @@ export async function readLot(supabase: Client, analysisId: string, lotId: strin
     ? await supabase
         .from('lot_comparables')
         .select(
-          'id, match_level, weight, excluded_by_user, comparable_snapshots(price, checked_at), comparables(title, url, source_type, source_name)',
+          'id, match_level, weight, reason, excluded_by_user, comparable_snapshots(price, checked_at), comparables(title, url, source_type, source_name)',
         )
         .eq('identification_id', found.id)
     : { data: [] };
