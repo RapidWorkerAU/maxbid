@@ -6,7 +6,7 @@ import { EvidenceRow } from './EvidenceRow';
 const meta: Meta<typeof EvidenceRow> = {
   title: 'Composites/EvidenceRow',
   component: EvidenceRow,
-  tags: ['approved'],
+  tags: ['in-review'],
   parameters: { layout: 'padded' },
   args: {
     comparable: {
@@ -114,6 +114,24 @@ export const ALongReason: Story = {
       sold: true,
       reason:
         'Same make and a similar body, but a petrol engine rather than a diesel, an earlier model year, and no service history stated. It is the right kind of vehicle rather than the same vehicle, so it counts for less than a quarter of an exact match.',
+    },
+  },
+};
+
+/** One the reader set aside, with their reason on it. F62. */
+export const SetAside: Story = {
+  args: {
+    comparable: {
+      id: '7',
+      title: '2015 Invented Wagon Alpha Petrol',
+      price: 31500,
+      matchLevel: 'exact',
+      weight: 0.95,
+      ageInDays: 12,
+      source: 'a past auction result on Grays',
+      sold: true,
+      reason: 'Same year and same model, sold three weeks ago.',
+      excludedReason: 'This one has the long wheelbase and this lot does not',
     },
   },
 };

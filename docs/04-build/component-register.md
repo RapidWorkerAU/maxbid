@@ -42,7 +42,7 @@ This register is the sign off record for every component in packages/ui. It is t
 | UI19 | BidRail | Composite | Both | Not started |  |  |
 | UI20 | BidSlider | Composite | App | Not started |  |  |
 | UI21 | BidLimits | Composite | Both | Approved | 22 October 2026 | The three figures rise in order, so break even is the biggest number on screen and the one to act on is the smallest. Only the target bid carries marker yellow, and the break even line says a bid above it loses money |
-| UI22 | EvidenceRow | Composite | App | Approved | 22 October 2026 | One comparable sale with its price, match level, age and the weight it carried, so a resale range can be checked rather than taken on trust. F59 |
+| UI22 | EvidenceRow | Composite | App | In review | 31 October 2026 | One comparable sale with its price, match level, age and the weight it carried, so a resale range can be checked rather than taken on trust. F59. Now also shows a sale the reader set aside, marked, carrying their reason, with room for the control that puts it back. F62 |
 | UI23 | PriceLine | Composite | Both | Approved | 22 October 2026 | A named money figure on a leader line. Obeys the rounding rules, carries the sentence saying what the figure is, and states that a missing figure is not worked out rather than leaving a blank |
 | UI24 | SpecTable | Composite | Both | Not started |  |  |
 | UI25 | OptionChecklist | Composite | App | Not started |  |  |
@@ -69,7 +69,7 @@ This register is the sign off record for every component in packages/ui. It is t
 | UI46 | MethodSteps | Section | Web | Not started |  |  |
 | UI47 | AppShell | Section | App | Approved | 22 October 2026 | Sidebar on desktop, bottom tab bar on mobile, safe area aware. Now used by three pages |
 | UI48 | TriageTable | Section | App | Approved | 29 September 2026 | SC05 with the resale range. Sticky header, C09 density switch. Still no opportunity score or maximum bid, which need S6 and a cost profile |
-| UI49 | LotDetail | Section | App | Approved | 22 October 2026 | One lot and everything we know about it, in the order of the argument: what it is, what it is bid to, what it resells for, the evidence for that, then the bid figures that follow. A test asserts it never tells the reader whether to bid |
+| UI49 | LotDetail | Section | App | In review | 31 October 2026 | One lot and everything we know about it, in the order of the argument: what it is, what it is bid to, what it resells for, the evidence for that, then the bid figures that follow. A test asserts it never tells the reader whether to bid. Now carries a control per comparable, says how many the reader set aside, and shows DS17 for what that did to the figures. F62 |
 | UI50 | BidView | Section | App | Not started |  |  |
 | UI51 | ChangesSummary | Composite | App | Not started |  | Added for F54 |
 | UI52 | SearchedNotFoundPanel | Composite | App | Not started |  | Added for F57 |

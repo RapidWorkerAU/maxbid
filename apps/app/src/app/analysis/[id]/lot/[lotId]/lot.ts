@@ -89,10 +89,15 @@ export function ageInDays(checkedAt: string | null, now: Date): number {
  * evidence, and a row they cannot judge adds nothing and makes the rest look
  * less careful than it is.
  *
- * A comparable the user excluded is also left out. They have already said it
- * does not belong, and showing it as evidence would contradict them.
+ * A comparable this analysis set aside stays in the list, carrying the reason
+ * they gave. F62. Hiding it would leave the figures changed and the reason
+ * for the change nowhere on the page, and they could never put it back.
  */
-export function toComparables(rows: EvidenceRecord[], now: Date = new Date()): Comparable[] {
+export function toComparables(
+  rows: EvidenceRecord[],
+  now: Date = new Date(),
+  setAside: Map<string, string> = new Map(),
+): Comparable[] {
   return rows.flatMap((row) => {
     if (row.excluded_by_user) return [];
 
@@ -116,6 +121,7 @@ export function toComparables(rows: EvidenceRecord[], now: Date = new Date()): C
           : source,
         url: row.comparables?.url ?? null,
         reason: row.reason ?? null,
+        excludedReason: setAside.get(row.id) ?? null,
         sold: SOLD.has(type),
       },
     ];
@@ -125,13 +131,36 @@ export function toComparables(rows: EvidenceRecord[], now: Date = new Date()): C
 /**
  * Heaviest evidence first.
  *
+ * A sale they set aside goes last, whatever it weighed, because it counted
+ * for nothing and the list is meant to open on what the range rests on.
+ *
  * The reader should see what the range mostly rests on before what barely
  * counted. A panel that opens on a weight of 0.21 makes the whole range look
  * thinner than it is, and a panel that opens on a 0.95 sold result shows the
  * range being carried by the thing that should carry it.
  */
 export function heaviestFirst(comparables: Comparable[]): Comparable[] {
-  return [...comparables].sort((a, b) => b.weight - a.weight);
+  const aside = (c: Comparable) => (c.excludedReason ? 1 : 0);
+  return [...comparables].sort((a, b) => aside(a) - aside(b) || b.weight - a.weight);
+}
+
+/**
+ * DS17's figures, or nothing where there is nothing to say.
+ *
+ * Null for either end means we cannot state the sentence, and a disclaimer
+ * with a gap in it showing to a user is worse than no disclaimer: it is a
+ * figure we promised and did not give.
+ */
+export function exclusionEffectIn(
+  stored: unknown,
+): { excluded: number; before: number; after: number } | null {
+  if (typeof stored !== 'object' || stored === null) return null;
+  const effect = stored as Record<string, unknown>;
+  const excluded = asNumber(effect.excluded as number | null);
+  const before = asNumber(effect.before as number | null);
+  const after = asNumber(effect.after as number | null);
+  if (!excluded || before === null || after === null) return null;
+  return { excluded, before, after };
 }
 
 /**

@@ -54,8 +54,37 @@ Updated at the end of every pull request. The current row is always the one to r
 | 54 | Value only the lots this analysis covers | Merged | 22 Oct 2026 |
 | 55 | Re-read a current bid as often as it needs it | Merged | 22 Oct 2026 |
 | 56 | Remember a lot we could not value | Merged | 22 Oct 2026 |
-| 58 | The lot detail screen, which shows the working | Open | |
+| 57 | Bring the progress log up to date, including what the work found | Merged | 22 Oct 2026 |
+| 58 | The lot detail screen, which shows the working | Merged | 22 Oct 2026 |
+| 59 | Show all three bid figures on the lot screen | Merged | 22 Oct 2026 |
+| 60 | Say when the job runner is down, rather than crashing | Merged | 22 Oct 2026 |
+| 61 | Look at twenty candidates a lot, not ten | Merged | 22 Oct 2026 |
+| 62 | Say what is still being worked out, and stop throwing away the scroll | Merged | 22 Oct 2026 |
+| 63 | An auction price is not a resale price, decision record 0028 | Merged | 22 Oct 2026 |
+| 64 | Hold no column open for a feature that is not built | Merged | 22 Oct 2026 |
+| 65 | Say what the confidence column is confidence in | Merged | 22 Oct 2026 |
+| 66 | Filters on the triage table | Merged | 22 Oct 2026 |
+| 67 | The credit ledger, and what a shortlist costs before you confirm it | Merged | 22 Oct 2026 |
+| 68 | The dashboard | Merged | 22 Oct 2026 |
+| 69 | Approve every component in review | Merged | 22 Oct 2026 |
+| 70 | Keep the filter rules on the server side of the client boundary | Merged | 22 Oct 2026 |
+| 71 | Pass the analysis id across the boundary, not a function | Merged | 22 Oct 2026 |
+| 72 | Make ticking a lot do something | Merged | 22 Oct 2026 |
+| 73 | Look on eBay as well as the web | Merged | 22 Oct 2026 |
+| 74 | Read a lot from its own photographs | Merged | 22 Oct 2026 |
+| 75 | Say why a job could not be started, rather than guessing | Merged | 22 Oct 2026 |
+| 76 | Show the deep run, rather than announcing it once | Merged | 23 Oct 2026 |
+| 77 | Stop a condition note laying itself across the row | Merged | 23 Oct 2026 |
+| 78 | Show why each comparable counted | Merged | 31 Oct 2026 |
+| 79 | Let a user say what a lot actually is | Merged | 31 Oct 2026 |
+| 80 | Set a comparable aside, and say what that did to the figures | Open |  |
 | next | Read the sitemaps nightly and queue the sales nobody has asked about | Next |  |
+
+**What was built on 31 October.** Three pull requests. 78 shows why each comparable counted, which is the reasoning we had stored since the evidence tables were built and never put on screen. 79 lets a user say what a lot actually is, which is the one place their word changes every figure below it. 80 lets them set a comparable aside with a reason, work the figures out again without it, and see what that did. Decision record 0029 explains why the exclusion is its own row per analysis rather than the flag that was already sitting on `lot_comparables`: that flag is shared, so using it would have set the comparable aside for every organisation looking at the sale, and nobody was allowed to write it in any case.
+
+**What that work found.** F62 could not have been built as designed. `can_edit_identification` returns false for a baseline identification, so the user had no row they were permitted to touch, and the feature was unreachable until they had an identification of their own to exclude from. That is why 79 came first.
+
+**Still to do before this is testable end to end.** `pnpm db:push` has not run for the exclusion migrations, so nothing on this branch is live. The before and after figures come from `analysis_lots.exclusion_effect`, which the recompute stage writes, so a lot valued before this change has no before figure until something sets a comparable aside.
 
 **Where we are.** The pipeline runs end to end on a real sale: a pasted Grays link becomes 36 identified lots with a premium schedule, resale ranges, bid figures and a ranking, all on screen. The archive holds what all 36 lots actually sold for. Decision record 0024's shared layer is now built on top of that, so the work that does not depend on who is asking is done once and read by everybody.
 

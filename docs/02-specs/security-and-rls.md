@@ -6,7 +6,8 @@ Source: MaxBid Project Workbook, tab 14 Security.
 | --- | --- | --- |
 | Organisation scoped tables | analyses, analysis_lots, lot_identifications, valuations, lot_costs, outcomes, cost_profiles, notifications, exports, credit_ledger | Select, insert and update allowed where org_id is in the user's memberships. Helper function is_org_member(org_id). |
 | Shared tables | auctions, lots, lot_images, products, product_aliases, comparables, comparable_snapshots, categories, auction_platforms | Read for any signed in user. Write only by the service role through background jobs. |
-| Match table | lot_comparables | Readable when the linked identification belongs to the user's organisation. Written by service role. Users may update excluded_by_user only. |
+| Match table | lot_comparables | Readable when the linked identification belongs to the user's organisation. Written by service role only. Amended by decision record 0029: a user excludes a comparable by inserting into comparable_exclusions, not by updating this table, because this table is shared and an update here would set the comparable aside for every organisation. |
+| Exclusions | comparable_exclusions | Select where owns_analysis(analysis_id). Insert where can_edit_analysis(analysis_id) and excluded_by is the signed in user. Delete where can_edit_analysis(analysis_id). No update, because the reason is the record of why a figure moved. Decision record 0029. |
 | Roles | owner, admin, buyer, viewer | Viewer read only. Buyer can edit costs, confirm identifications and spend credits. Admin manages members and profiles. Owner manages billing. |
 | Credits | credit_ledger | Insert only through a security definer function that checks balance atomically. No direct client writes. |
 | Service role | Inngest or Trigger.dev functions | Service key held only in server environment variables. Never sent to the browser. |

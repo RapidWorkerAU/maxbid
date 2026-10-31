@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { MatchBadge, type MatchLevel } from '../../primitives/MatchBadge';
 import { Money } from '../../primitives/Money';
 import { MonoLabel } from '../../primitives/MonoLabel';
@@ -12,7 +13,10 @@ import { MonoLabel } from '../../primitives/MonoLabel';
  * record 0020 turns into the range.
  *
  * A comparable the reader can see is also a comparable they can disagree
- * with, which is the point: we show the evidence and they decide.
+ * with, which is the point: we show the evidence and they decide. F62 is that
+ * disagreement made to count, and a comparable they set aside stays on the
+ * row, marked, with their reason on it. Hiding it would leave the figures
+ * changed and the reason for the change nowhere on the page.
  *
  * A card at 360px and a row from the medium breakpoint up, the same shape as
  * LotRow and for the same reason: five facts do not fit across a phone.
@@ -47,10 +51,24 @@ export type Comparable = {
    * check.
    */
   reason?: string | null;
+  /**
+   * Why the reader set this one aside, where they did. F62.
+   *
+   * Their words, not ours. Set means this comparable counted for nothing in
+   * the figures above.
+   */
+  excludedReason?: string | null;
 };
 
 export type EvidenceRowProps = {
   comparable: Comparable;
+  /**
+   * Setting this one aside, or putting it back. F62.
+   *
+   * Passed in rather than built here, because it writes to the database and
+   * this package has no server in it.
+   */
+  action?: ReactNode;
   className?: string;
 };
 
@@ -66,9 +84,12 @@ export function ageInWords(days: number): string {
   return `${years} ${years === 1 ? 'year' : 'years'} ago`;
 }
 
-export function EvidenceRow({ comparable: c, className = '' }: EvidenceRowProps) {
+export function EvidenceRow({ comparable: c, action, className = '' }: EvidenceRowProps) {
+  const setAside = Boolean(c.excludedReason);
+
   return (
     <div
+      data-set-aside={setAside ? 'true' : undefined}
       className={`border-b border-border py-3 last:border-b-0 md:grid md:grid-cols-[minmax(0,1fr)_7rem_9rem_7rem] md:items-center md:gap-3 ${className}`}
     >
       <div className="min-w-0">
@@ -99,7 +120,14 @@ export function EvidenceRow({ comparable: c, className = '' }: EvidenceRowProps)
       </div>
 
       <div className="mt-2 md:mt-0">
-        <MatchBadge level={c.matchLevel} weight={c.weight} />
+        {/* A weight of nothing, said as words as well as a figure, because a
+            set aside comparable did not count towards anything above. Design
+            rule 4: a status always carries a text label. */}
+        {setAside ? (
+          <MonoLabel>Set aside</MonoLabel>
+        ) : (
+          <MatchBadge level={c.matchLevel} weight={c.weight} />
+        )}
       </div>
 
       <div className="mt-2 md:mt-0">
@@ -112,11 +140,20 @@ export function EvidenceRow({ comparable: c, className = '' }: EvidenceRowProps)
           Full width on a desktop so it is not squeezed into the title's
           share. This is the part a reader uses to disagree with us: a match
           level on its own is a verdict with the reasoning left out. */}
-      {c.reason ? (
+      {c.reason && !setAside ? (
         <p className="mt-2 font-sans text-sm text-ink-muted md:col-span-4 md:mt-1 md:text-xs">
           {c.reason}
         </p>
       ) : null}
+
+      {setAside ? (
+        <p className="mt-2 font-sans text-sm text-ink md:col-span-4 md:mt-1 md:text-xs">
+          You set this one aside and said: {c.excludedReason}. It counted for nothing in the figures
+          above.
+        </p>
+      ) : null}
+
+      {action ? <div className="mt-2 md:col-span-4 md:mt-1">{action}</div> : null}
     </div>
   );
 }

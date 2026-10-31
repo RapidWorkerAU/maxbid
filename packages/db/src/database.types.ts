@@ -186,6 +186,7 @@ export type Database = {
         Row: {
           analysis_id: string
           created_at: string
+          exclusion_effect: Json | null
           id: string
           is_watchlisted: boolean
           lot_id: string
@@ -199,6 +200,7 @@ export type Database = {
         Insert: {
           analysis_id: string
           created_at?: string
+          exclusion_effect?: Json | null
           id?: string
           is_watchlisted?: boolean
           lot_id: string
@@ -212,6 +214,7 @@ export type Database = {
         Update: {
           analysis_id?: string
           created_at?: string
+          exclusion_effect?: Json | null
           id?: string
           is_watchlisted?: boolean
           lot_id?: string
@@ -377,6 +380,55 @@ export type Database = {
             columns: ["comparable_id"]
             isOneToOne: false
             referencedRelation: "comparables"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      comparable_exclusions: {
+        Row: {
+          analysis_id: string
+          created_at: string
+          excluded_by: string
+          id: string
+          lot_comparable_id: string
+          reason: string
+        }
+        Insert: {
+          analysis_id: string
+          created_at?: string
+          excluded_by: string
+          id?: string
+          lot_comparable_id: string
+          reason: string
+        }
+        Update: {
+          analysis_id?: string
+          created_at?: string
+          excluded_by?: string
+          id?: string
+          lot_comparable_id?: string
+          reason?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comparable_exclusions_analysis_id_fkey"
+            columns: ["analysis_id"]
+            isOneToOne: false
+            referencedRelation: "analyses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comparable_exclusions_excluded_by_fkey"
+            columns: ["excluded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comparable_exclusions_lot_comparable_id_fkey"
+            columns: ["lot_comparable_id"]
+            isOneToOne: false
+            referencedRelation: "lot_comparables"
             referencedColumns: ["id"]
           },
         ]
