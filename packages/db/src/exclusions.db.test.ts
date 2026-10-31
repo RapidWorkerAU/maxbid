@@ -19,9 +19,17 @@ import {
 
 let t: Tenants;
 let a: AuctionFixture;
+let identificationId: string;
 let matchId: string;
 
-/** One graded comparable against one identification of the fixture lot. */
+/**
+ * One graded comparable against the fixture lot's identification.
+ *
+ * The identification is made once, in the setup, because a lot may have only
+ * one current identification per analysis. Each call here adds another
+ * comparable to that same identification, which is what a lot with several
+ * pieces of evidence actually looks like.
+ */
 async function makeEvidence(): Promise<string> {
   const admin = serviceClient();
 
@@ -47,17 +55,10 @@ async function makeEvidence(): Promise<string> {
     .single();
   if (snapshot.error) throw snapshot.error;
 
-  const identification = await admin
-    .from('lot_identifications')
-    .insert({ analysis_id: a.analysisId, lot_id: a.lotId, stage: 'triage', confidence: 90 })
-    .select('id')
-    .single();
-  if (identification.error) throw identification.error;
-
   const match = await admin
     .from('lot_comparables')
     .insert({
-      identification_id: identification.data.id,
+      identification_id: identificationId,
       comparable_id: comparable.data.id,
       snapshot_id: snapshot.data.id,
       match_level: 'near_exact',
@@ -88,6 +89,15 @@ async function exclude(
 beforeAll(async () => {
   t = await createTenants();
   a = await createAuction(t);
+
+  const identification = await serviceClient()
+    .from('lot_identifications')
+    .insert({ analysis_id: a.analysisId, lot_id: a.lotId, stage: 'triage', confidence: 90 })
+    .select('id')
+    .single();
+  if (identification.error) throw identification.error;
+  identificationId = identification.data.id as string;
+
   matchId = await makeEvidence();
 }, 60_000);
 
