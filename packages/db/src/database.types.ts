@@ -343,47 +343,6 @@ export type Database = {
           },
         ]
       }
-      comparable_snapshots: {
-        Row: {
-          checked_at: string
-          comparable_id: string
-          created_at: string
-          id: string
-          price: number
-          price_includes_gst: boolean | null
-          status: string
-          updated_at: string
-        }
-        Insert: {
-          checked_at?: string
-          comparable_id: string
-          created_at?: string
-          id?: string
-          price: number
-          price_includes_gst?: boolean | null
-          status: string
-          updated_at?: string
-        }
-        Update: {
-          checked_at?: string
-          comparable_id?: string
-          created_at?: string
-          id?: string
-          price?: number
-          price_includes_gst?: boolean | null
-          status?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "comparable_snapshots_comparable_id_fkey"
-            columns: ["comparable_id"]
-            isOneToOne: false
-            referencedRelation: "comparables"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       comparable_exclusions: {
         Row: {
           analysis_id: string
@@ -429,6 +388,47 @@ export type Database = {
             columns: ["lot_comparable_id"]
             isOneToOne: false
             referencedRelation: "lot_comparables"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      comparable_snapshots: {
+        Row: {
+          checked_at: string
+          comparable_id: string
+          created_at: string
+          id: string
+          price: number
+          price_includes_gst: boolean | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          checked_at?: string
+          comparable_id: string
+          created_at?: string
+          id?: string
+          price: number
+          price_includes_gst?: boolean | null
+          status: string
+          updated_at?: string
+        }
+        Update: {
+          checked_at?: string
+          comparable_id?: string
+          created_at?: string
+          id?: string
+          price?: number
+          price_includes_gst?: boolean | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comparable_snapshots_comparable_id_fkey"
+            columns: ["comparable_id"]
+            isOneToOne: false
+            referencedRelation: "comparables"
             referencedColumns: ["id"]
           },
         ]
