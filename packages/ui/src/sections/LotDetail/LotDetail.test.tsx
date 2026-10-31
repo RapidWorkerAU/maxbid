@@ -274,3 +274,75 @@ describe('correcting what we decided a lot is', () => {
     expect(screen.queryByText(/This is what you told us it is/)).toBeNull();
   });
 });
+
+describe('setting a sale aside, and what that did', () => {
+  const aside = {
+    ...base,
+    comparables: [
+      base.comparables[0]!,
+      {
+        id: '2',
+        title: '2015 Invented Wagon Alpha Petrol',
+        price: 31500,
+        matchLevel: 'exact' as const,
+        weight: 0.95,
+        ageInDays: 12,
+        source: 'Grays auction result',
+        sold: true,
+        excludedReason: 'This one has the long wheelbase and this lot does not',
+      },
+    ],
+  };
+
+  it('puts a control on every sale, counted or not', () => {
+    render(
+      <LotDetail
+        {...aside}
+        exclusionFor={(comparable) => <button type="button">Set aside {comparable.id}</button>}
+      />,
+    );
+    expect(screen.getByRole('button', { name: 'Set aside 1' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Set aside 2' })).toBeTruthy();
+  });
+
+  it('says how many they set aside, and that we left them out', () => {
+    render(<LotDetail {...aside} />);
+    expect(screen.getByText(/You have set 1 sale aside/)).toBeTruthy();
+    expect(screen.getByText(/worked the figures above out without it/)).toBeTruthy();
+  });
+
+  it('counts in the plural for more than one', () => {
+    const both = {
+      ...aside,
+      comparables: aside.comparables.map((c) => ({ ...c, excludedReason: 'Not this model' })),
+    };
+    render(<LotDetail {...both} />);
+    expect(screen.getByText(/You have set 2 sales aside/)).toBeTruthy();
+  });
+
+  it('shows the standard wording for what the figures did', () => {
+    // DS17, filled by the page. The component never types disclaimer text.
+    const said = 'You excluded 1 comparable. The expected resale changed from $17,500 to $14,000.';
+    render(<LotDetail {...aside} exclusionNote={said} />);
+    expect(screen.getByText(said)).toBeTruthy();
+  });
+
+  it('says nothing of the sort where they set nothing aside', () => {
+    render(<LotDetail {...base} />);
+    expect(screen.queryByText(/You have set/)).toBeNull();
+  });
+
+  it('counts only the sales that counted when it explains a missing range', () => {
+    // Telling a reader we found two sales and could not use them, when they
+    // set one of the two aside themselves, reads as a broken product.
+    render(
+      <LotDetail {...aside} valuation={{ conservative: null, expected: null, optimistic: null }} />,
+    );
+    expect(screen.getByText(/We found 1 possible comparable sale,/)).toBeTruthy();
+  });
+
+  it('uses no dashes in the copy it adds', () => {
+    const { container } = render(<LotDetail {...aside} />);
+    expect(container.textContent).not.toMatch(/[–—]/);
+  });
+});

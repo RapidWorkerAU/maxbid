@@ -13,7 +13,7 @@ import { targetBidFor } from '../../../../../inngest/targetBid';
 import { bidFreshnessNote } from '../../lots';
 import { preferCorrection } from '../../../../../lib/identifications';
 import type { supabaseServer } from '../../../../../lib/supabase';
-import { asNumber, auctionMarketIn } from './lot';
+import { asNumber, auctionMarketIn, exclusionEffectIn } from './lot';
 
 // Taken from the function that makes it rather than imported, so this file
 // does not depend on the client library directly.
@@ -44,7 +44,7 @@ const NO_PREMIUM =
 
 /** Everything the screen reads, in as few round trips as the joins allow. */
 async function readRows(supabase: Client, analysisId: string, lotId: string) {
-  const [identifications, valuation, own, analysis] = await Promise.all([
+  const [identifications, valuation, own, analysis, setAside] = await Promise.all([
     supabase
       .from('lot_identifications')
       .select('id, lot_id, brand, model, year, confidence, condition_notes, analysis_id')
@@ -61,7 +61,7 @@ async function readRows(supabase: Client, analysisId: string, lotId: string) {
       .maybeSingle(),
     supabase
       .from('analysis_lots')
-      .select('triage_low, triage_high, triage_max_bid')
+      .select('triage_low, triage_high, triage_max_bid, exclusion_effect')
       .eq('analysis_id', analysisId)
       .eq('lot_id', lotId)
       .maybeSingle(),
@@ -72,6 +72,14 @@ async function readRows(supabase: Client, analysisId: string, lotId: string) {
       .select('org_id, organisations(gst_registered)')
       .eq('id', analysisId)
       .maybeSingle(),
+    // Which comparables this analysis has set aside, and why. F62. Scoped to
+    // this analysis rather than embedded on the evidence, because the same
+    // sale may be in another of their analyses with a different judgement on
+    // it and that one is not this screen's business.
+    supabase
+      .from('comparable_exclusions')
+      .select('lot_comparable_id, reason')
+      .eq('analysis_id', analysisId),
   ]);
 
   // After the analysis, because it is what says which organisation to ask.
@@ -86,7 +94,7 @@ async function readRows(supabase: Client, analysisId: string, lotId: string) {
         .maybeSingle()
     : { data: null };
 
-  return { identifications, valuation, own, analysis, profile };
+  return { identifications, valuation, own, analysis, profile, setAside };
 }
 
 export async function readLot(supabase: Client, analysisId: string, lotId: string) {
@@ -99,7 +107,7 @@ export async function readLot(supabase: Client, analysisId: string, lotId: strin
     .maybeSingle();
   if (!lot) return null;
 
-  const { identifications, valuation, own, analysis, profile } = await readRows(
+  const { identifications, valuation, own, analysis, profile, setAside } = await readRows(
     supabase,
     analysisId,
     lotId,
@@ -188,6 +196,9 @@ export async function readLot(supabase: Client, analysisId: string, lotId: strin
     missingBidReason: whyNoBid,
     method: limits ? methodFor(conservative!) : undefined,
     evidence: evidence.data ?? [],
+    // Their own judgement about the evidence, and what it did to the figures.
+    setAside: new Map((setAside.data ?? []).map((row) => [row.lot_comparable_id, row.reason])),
+    exclusionEffect: exclusionEffectIn(own.data?.exclusion_effect),
     // What the correction form starts on, which is whatever we think now.
     current: {
       brand: found?.brand ?? null,

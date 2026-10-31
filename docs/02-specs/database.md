@@ -130,6 +130,7 @@ Source: MaxBid Project Workbook, tab 13 Database.
 | analysis_lots |  | triage_max_bid | numeric(12,2) | Yes |  |  |
 | analysis_lots |  | opportunity_score | integer | Yes |  | 0 to 100 |
 | analysis_lots |  | is_watchlisted | boolean | No |  |  |
+| analysis_lots |  | exclusion_effect | jsonb | Yes |  | {excluded, before, after}. What setting comparables aside did to the expected resale, for DS17. Null where nothing is set aside. Decision record 0029 |
 | comparables | Every comparable listing ever seen. Shared evidence library. | id | uuid | No | PK |  |
 | comparables |  | source_type | text | No |  | auction_result, marketplace_sold, advertised_used, new_retail, outcome, user_supplied |
 | comparables |  | org_id | uuid | Yes | FK organisations | Null for shared evidence. Set for private user supplied comparables |
@@ -160,9 +161,15 @@ Source: MaxBid Project Workbook, tab 13 Database.
 | lot_comparables |  | adjustment_pct | numeric(6,4) | No |  |  |
 | lot_comparables |  | adjusted_price | numeric(12,2) | No |  |  |
 | lot_comparables |  | weight | numeric(6,4) | No |  | Combined weight |
-| lot_comparables |  | excluded_by_user | boolean | No |  | User can exclude a comparable |
+| lot_comparables |  | excluded_by_user | boolean | No |  | Set by the pipeline only. A user excludes a comparable in comparable_exclusions instead, because this table is shared. Decision record 0029 |
 | lot_comparables |  | exclusion_reason | text | Yes |  | Required when excluded |
 | lot_comparables |  | excluded_by | uuid | Yes | FK profiles |  |
+| comparable_exclusions | One organisation's judgement that a comparable does not belong, per analysis. Decision record 0029. | id | uuid | No | PK |  |
+| comparable_exclusions |  | analysis_id | uuid | No | FK analyses |  |
+| comparable_exclusions |  | lot_comparable_id | uuid | No | FK lot_comparables, unique with analysis_id |  |
+| comparable_exclusions |  | reason | text | No |  | Required, and never updatable |
+| comparable_exclusions |  | excluded_by | uuid | No | FK profiles | Must be the signed in user |
+| comparable_exclusions |  | created_at | timestamptz | No |  |  |
 | valuations | Versioned valuation per lot per analysis. | id | uuid | No | PK |  |
 | valuations |  | analysis_lot_id | uuid | No | FK analysis_lots |  |
 | valuations |  | identification_id | uuid | No | FK lot_identifications |  |

@@ -2,6 +2,7 @@
 // built, in the order docs/02-specs/pipeline.md lists them.
 
 import { deepIdentify } from './deepFunction';
+import { recompute } from './recomputeFunction';
 import { revalue } from './revalueFunction';
 import { extract } from './extract';
 import { ingest } from './ingest';
@@ -20,4 +21,5 @@ export const functions = [
   refreshOneSale,
   deepIdentify,
   revalue,
+  recompute,
 ];

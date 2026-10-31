@@ -44,6 +44,20 @@ export const valueRequested = eventType('analysis/value.requested', {
   }>(),
 });
 
+/**
+ * One lot whose evidence a user changed, to be worked out again from what we
+ * already hold. F62.
+ *
+ * Separate from a revaluation because the two are different jobs. A
+ * correction changed what the lot is, so the old evidence no longer applies
+ * and the search runs again. An exclusion left the lot alone and set one
+ * piece of evidence aside, so searching again would spend fetches to find
+ * the same listings we already have.
+ */
+export const recomputeRequested = eventType('analysis/recompute.requested', {
+  schema: staticSchema<{ analysisId: string; lotId: string }>(),
+});
+
 /** One lot whose identification a user corrected, to be valued again. F19. */
 export const revalueRequested = eventType('analysis/revalue.requested', {
   schema: staticSchema<{ analysisId: string; lotId: string }>(),

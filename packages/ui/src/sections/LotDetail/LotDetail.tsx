@@ -1,14 +1,16 @@
 import type { ReactNode } from 'react';
 import { BidLimits } from '../../composites/BidLimits';
 import { DetailCard } from '../../composites/DetailCard';
-import { EvidenceRow, type Comparable } from '../../composites/EvidenceRow';
 import { PriceLine } from '../../composites/PriceLine';
 import { ConfidenceBadge } from '../../primitives/ConfidenceBadge';
 import { InfoNote } from '../../primitives/InfoNote';
-import { MonoLabel } from '../../primitives/MonoLabel';
 import { SheetFrame } from '../../primitives/SheetFrame';
 import { formatMoney } from '../../primitives/Money';
 import { TitleBlock } from '../../primitives/TitleBlock';
+import { counted, Evidence, Resale } from './panels';
+import type { LotDetailLot, LotDetailProps } from './types';
+
+export type { LotDetailLot, LotDetailProps, LotDetailValuation } from './types';
 
 /** A figure inside a sentence, formatted the way every other figure is. */
 const money = (amount: number) => formatMoney({ amount });
@@ -29,64 +31,6 @@ const money = (amount: number) => formatMoney({ amount });
  * Read only for now. Confirming an identification, editing cost lines and the
  * bid slider are UI20, UI25 and the calculator panel, which come next.
  */
-export type LotDetailLot = {
-  /** The auction's own lot number, such as 0004-23502418. */
-  lotNumber: string;
-  /** What the catalogue called it. */
-  title: string;
-  currentBid: number | null;
-  /** True where this organisation corrected the identification themselves. F19. */
-  correctedByYou?: boolean;
-  /** When the bid was last read from the site. Decision record 0026. */
-  bidNote?: string;
-  closesAt?: string | null;
-  /** What we decided the lot is, in words. Null where we could not say. */
-  identifiedAs: string | null;
-  /** 0 to 100 from the identification. */
-  identificationConfidence?: number | null;
-  /** Anything the catalogue said about condition, such as a write off marker. */
-  conditionNote?: string | null;
-  /** The sale this lot belongs to. */
-  saleTitle?: string | null;
-};
-
-export type LotDetailValuation = {
-  /**
-   * What one of these usually fetches at auction, where we know.
-   *
-   * Never the resale figure. A hammer price is what a reseller paid to buy
-   * and a resale price is what the public paid to own, and the gap between
-   * them is the margin. It is shown because what it takes to win is a
-   * question a bidder genuinely has, and we have the evidence for it.
-   */
-  auctionMarket?: { low: number; typical: number; high: number; results: number } | null;
-  /** The cautious end, which the bid figures are worked out from. */
-  conservative: number | null;
-  expected: number | null;
-  optimistic: number | null;
-  /** 0 to 100. Leave out where the evidence threshold was not met. */
-  confidence?: number | null;
-};
-
-export type LotDetailProps = {
-  lot: LotDetailLot;
-  valuation: LotDetailValuation;
-  comparables: Comparable[];
-  bids: { targetBid: number | null; limitBid: number | null; breakEvenBid: number | null };
-  /** Why there are no bid figures, when there are none. */
-  missingBidReason?: string;
-  /** How the figures were worked out, in words. F59. */
-  method?: string;
-  /**
-   * Put under the identification, for correcting it. F19.
-   *
-   * Passed in rather than built here, because correcting one needs a server
-   * action and this package has no server in it.
-   */
-  correction?: ReactNode;
-  className?: string;
-};
-
 /** What we decided the lot is, or why we could not say. */
 function Identification({ lot, correction }: { lot: LotDetailLot; correction?: ReactNode }) {
   return (
@@ -118,81 +62,6 @@ function Identification({ lot, correction }: { lot: LotDetailLot; correction?: R
   );
 }
 
-/**
- * What there is to say when we have no range.
- *
- * "We could not find enough comparable sales" read as "we found nothing" on a
- * lot where we had found four and they were below the weight the evidence
- * rule asks for. Those are different statements, and a reader who owns a 1998
- * Landcruiser knows perfectly well that sales of them exist. Saying how many
- * we found, and that they were not enough rather than not there, is the
- * difference between a limitation and a bug.
- */
-function whyNoRange(found: number): string {
-  if (found === 0) {
-    return 'We could not find any sales of this item to compare it against, so we cannot say what it resells for. A comparable is a sale of the same or a similar item that we use as evidence.';
-  }
-  const sales = found === 1 ? '1 possible comparable sale' : `${found} possible comparable sales`;
-  return `We found ${sales}, which is not enough to put a resale figure on this lot. They are listed below with the weight each one carried. A sold price counts for more than an advertised one, a closer match counts for more than a rough one, and a recent price counts for more than an old one.`;
-}
-
-/** What we think it resells for, and how sure we are. */
-function Resale({ valuation, found }: { valuation: LotDetailValuation; found: number }) {
-  const hasRange = valuation.conservative !== null && valuation.optimistic !== null;
-
-  return (
-    <DetailCard label="Resale" heading="What we think it resells for">
-      {hasRange ? (
-        <>
-          <div className="space-y-3">
-            <PriceLine
-              label="Cautious"
-              amount={valuation.conservative}
-              note="The bid figures below are worked out from this end of the range, because the cautious end is the honest one to plan from."
-            />
-            <PriceLine label="Expected" amount={valuation.expected} />
-            <PriceLine label="Optimistic" amount={valuation.optimistic} />
-          </div>
-          {valuation.confidence != null ? (
-            <div className="mt-4 flex items-center gap-2">
-              <MonoLabel>How sure we are</MonoLabel>
-              <ConfidenceBadge score={valuation.confidence} showScore />
-            </div>
-          ) : null}
-        </>
-      ) : (
-        <p className="font-sans text-sm text-ink-muted">{whyNoRange(found)}</p>
-      )}
-    </DetailCard>
-  );
-}
-
-/** The sales the range was worked out from. F59, and the point of the screen. */
-function Evidence({ comparables }: { comparables: Comparable[] }) {
-  return (
-    <DetailCard label="Evidence" heading="The sales we worked from">
-      {comparables.length > 0 ? (
-        <>
-          <p className="mb-3 font-sans text-sm text-ink-muted">
-            Each sale below counted towards the range above. A sold price counts for more than an
-            advertised price, a closer match counts for more than a rough one, and a recent price
-            counts for more than an old one. The weight shows how much each one counted.
-          </p>
-          <div>
-            {comparables.map((comparable) => (
-              <EvidenceRow key={comparable.id} comparable={comparable} />
-            ))}
-          </div>
-        </>
-      ) : (
-        <p className="font-sans text-sm text-ink-muted">
-          We have not found any sales of this item to compare it against yet.
-        </p>
-      )}
-    </DetailCard>
-  );
-}
-
 export function LotDetail({
   lot,
   valuation,
@@ -201,6 +70,8 @@ export function LotDetail({
   missingBidReason,
   method,
   correction,
+  exclusionFor,
+  exclusionNote,
   className = '',
 }: LotDetailProps) {
   return (
@@ -245,8 +116,15 @@ export function LotDetail({
         ) : null}
       </DetailCard>
 
-      <Resale valuation={valuation} found={comparables.length} />
-      <Evidence comparables={comparables} />
+      {/* Only the ones that counted, because a reader who set two of their
+          four sales aside should not be told we found four and could not use
+          them. They know why. */}
+      <Resale valuation={valuation} found={counted(comparables).length} />
+      <Evidence
+        comparables={comparables}
+        exclusionFor={exclusionFor}
+        exclusionNote={exclusionNote}
+      />
 
       <DetailCard label="Your figures" heading="What this means for you">
         <p className="mb-4 font-sans text-sm text-ink-muted">

@@ -120,3 +120,65 @@ describe('why a comparable counted', () => {
     expect(shown.className).not.toContain('truncate');
   });
 });
+
+describe('a sale the reader set aside', () => {
+  const aside: Comparable = {
+    ...comparable,
+    reason: 'Same model and year, one trim level higher.',
+    excludedReason: 'This is the four cylinder, and this lot is the six',
+  };
+
+  it('stays on the page, carrying their own words', () => {
+    // F62. Hiding it would leave the figures changed and the reason for the
+    // change nowhere on the page.
+    render(<EvidenceRow comparable={aside} />);
+    expect(screen.getByText(/This is the four cylinder, and this lot is the six/)).toBeTruthy();
+  });
+
+  it('says plainly that it counted for nothing', () => {
+    render(<EvidenceRow comparable={aside} />);
+    expect(screen.getByText(/counted for nothing in the figures above/)).toBeTruthy();
+  });
+
+  it('carries a text label, not just a different look', () => {
+    // Design rule 4. A status always says what it is in words.
+    render(<EvidenceRow comparable={aside} />);
+    expect(screen.getByText('Set aside')).toBeTruthy();
+  });
+
+  it('drops the weight it used to carry, because it carries none', () => {
+    const counted = render(<EvidenceRow comparable={comparable} />);
+    expect(counted.container.textContent).toContain('0.95');
+    counted.unmount();
+
+    const { container } = render(<EvidenceRow comparable={aside} />);
+    expect(container.textContent).not.toContain('0.95');
+  });
+
+  it('drops our reason for counting it, which is no longer the point', () => {
+    const { container } = render(<EvidenceRow comparable={aside} />);
+    expect(container.textContent).not.toContain('one trim level higher');
+  });
+
+  it('makes room for putting it back', () => {
+    render(
+      <EvidenceRow comparable={aside} action={<button type="button">Put this back</button>} />,
+    );
+    expect(screen.getByRole('button', { name: 'Put this back' })).toBeTruthy();
+  });
+
+  it('shows no such line where they set nothing aside', () => {
+    const { container } = render(<EvidenceRow comparable={comparable} />);
+    expect(container.textContent).not.toContain('Set aside');
+  });
+
+  it('marks the row for the panel around it', () => {
+    const { container } = render(<EvidenceRow comparable={aside} />);
+    expect(container.firstElementChild!.getAttribute('data-set-aside')).toBe('true');
+  });
+
+  it('uses no marker yellow, because this is evidence rather than an action', () => {
+    const { container } = render(<EvidenceRow comparable={aside} />);
+    expect(container.querySelectorAll('.bg-accent')).toHaveLength(0);
+  });
+});

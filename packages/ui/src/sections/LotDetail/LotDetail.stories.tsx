@@ -41,7 +41,7 @@ const comparables = [
 const meta: Meta<typeof LotDetail> = {
   title: 'Sections/LotDetail',
   component: LotDetail,
-  tags: ['approved'],
+  tags: ['in-review'],
   parameters: { layout: 'padded' },
   args: {
     lot: {
@@ -49,7 +49,8 @@ const meta: Meta<typeof LotDetail> = {
       title: '2015 Invented Wagon Alpha Diesel',
       saleTitle: 'Motor vehicles, Perth',
       currentBid: 1609,
-      bidNote: 'We checked the current bids 14 minutes ago. A bid can rise at any time, so open the lot on the auction site before you bid.',
+      bidNote:
+        'We checked the current bids 14 minutes ago. A bid can rise at any time, so open the lot on the auction site before you bid.',
       identifiedAs: 'Invented Wagon, Alpha, 2015, diesel, odometer 180,000 km',
       identificationConfidence: 95,
       conditionNote: 'WOVR-INSPECTED',
@@ -118,5 +119,30 @@ export const ThinEvidence: Story = {
     missingBidReason:
       'We found one comparable sale, which is not enough to work out a resale range we would stand behind.',
     method: undefined,
+  },
+};
+
+/**
+ * One sale set aside by the reader, with their reason and what it did. F62.
+ *
+ * The evidence panel exists so somebody can judge what a range was built
+ * from, and this is that judgement made to count. The set aside sale stays on
+ * the page: the figures moved, and the reason they moved has to be visible
+ * next to them.
+ */
+export const ASaleSetAside: Story = {
+  args: {
+    comparables: [
+      comparables[0]!,
+      { ...comparables[1]!, excludedReason: 'This is the higher trim, not the one in this lot' },
+      comparables[2]!,
+    ],
+    exclusionNote:
+      'You excluded 1 comparable. The expected resale changed from $17,500 to $16,200.',
+    exclusionFor: (comparable) => (
+      <button type="button" className="font-sans text-sm text-link underline">
+        {comparable.excludedReason ? 'Put this one back' : 'This sale does not belong'}
+      </button>
+    ),
   },
 };
