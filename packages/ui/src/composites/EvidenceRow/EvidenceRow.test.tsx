@@ -87,3 +87,36 @@ describe('the Blueprint rules', () => {
     expect(titled?.className).toContain('truncate');
   });
 });
+
+describe('why a comparable counted', () => {
+  // F21. A match level on its own is our verdict with the reasoning left
+  // out, which is the opposite of what the evidence panel is for: the reader
+  // is deciding whether to trust the range, and "near exact" tells them
+  // nothing they can check.
+  const reason = 'Same model and year, one trim level higher, 60,000 km fewer.';
+
+  it('shows the reason beside the comparable', () => {
+    render(<EvidenceRow comparable={{ ...comparable, reason }} />);
+    expect(screen.getByText(reason)).toBeTruthy();
+  });
+
+  it('shows nothing where no reason was recorded', () => {
+    // A blank line would read as a reason we had and did not give.
+    const withReason = render(<EvidenceRow comparable={{ ...comparable, reason }} />);
+    const lines = withReason.container.querySelectorAll('p').length;
+    withReason.unmount();
+
+    const { container } = render(<EvidenceRow comparable={{ ...comparable, reason: null }} />);
+    expect(container.querySelectorAll('p')).toHaveLength(lines - 1);
+    expect(container.textContent).not.toContain('undefined');
+  });
+
+  it('lets a long reason wrap rather than truncating it', () => {
+    // It is a sentence, not a code. The row above it is one line a cell; this
+    // is the part somebody reads.
+    const long = `${reason} ${reason} ${reason}`;
+    const { container } = render(<EvidenceRow comparable={{ ...comparable, reason: long }} />);
+    const shown = [...container.querySelectorAll('p')].find((p) => p.textContent === long)!;
+    expect(shown.className).not.toContain('truncate');
+  });
+});

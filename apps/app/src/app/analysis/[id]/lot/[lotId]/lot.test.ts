@@ -177,3 +177,19 @@ describe('how the figures were worked out, in words', () => {
     expect(methodFor(14000)).toContain('the most you can bid');
   });
 });
+
+describe('why a comparable counted', () => {
+  it('carries the reason we stored to the screen', () => {
+    // F21. We have recorded this since the evidence tables were built and
+    // never shown it.
+    const [row] = toComparables(
+      [record({ reason: 'Same model and year, one trim level higher.' })],
+      NOW,
+    );
+    expect(row!.reason).toBe('Same model and year, one trim level higher.');
+  });
+
+  it('reads a missing reason as nothing rather than as empty text', () => {
+    expect(toComparables([record({ reason: undefined })], NOW)[0]!.reason).toBeNull();
+  });
+});

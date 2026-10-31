@@ -24,6 +24,8 @@ export type EvidenceRecord = {
   id: string;
   match_level: string | null;
   weight: number | string | null;
+  /** Why it counted as the same thing, in plain English. F21. */
+  reason?: string | null;
   excluded_by_user?: boolean | null;
   comparable_snapshots: { price: number | string | null; checked_at: string | null } | null;
   comparables: {
@@ -113,6 +115,7 @@ export function toComparables(rows: EvidenceRecord[], now: Date = new Date()): C
           ? `${source} on ${row.comparables.source_name}`
           : source,
         url: row.comparables?.url ?? null,
+        reason: row.reason ?? null,
         sold: SOLD.has(type),
       },
     ];
